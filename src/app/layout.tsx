@@ -1,6 +1,9 @@
+import { ReactFlowProvider } from "@xyflow/react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Home from "./ui/Home";
+import { DnDProvider } from "./DragDropCtx";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,10 +27,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body style={{ width: "100vw", height: "100vh" }}>
+        <ReactFlowProvider>
+          <DnDProvider>
+            <Home />
+          </DnDProvider>
+        </ReactFlowProvider>
       </body>
     </html>
   );
