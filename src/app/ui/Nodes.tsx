@@ -1,29 +1,31 @@
 
 import { Handle, Node, NodeProps, Position } from '@xyflow/react';
+import { EditSidebarData } from './NodeEditSidebar';
 
-export function WorldNode({ data, isConnectable, sourcePosition = Position.Bottom }: NodeProps) {
+
+export function WorldNode({ data, isConnectable, sourcePosition = Position.Bottom }: NodeProps<Node<EditSidebarData>>) {
     return (
         <>
-            World
+            {renderUnit('World', data.name)}
             <Handle
                 id="unitOperator_handle"
                 type="source"
                 position={sourcePosition}
                 isConnectable={isConnectable}
-                style={{ left: 20 }}
+                style={{ left: 25 }}
             />
             <Handle
                 id="marketProvider_handle"
                 type="source"
                 position={sourcePosition}
                 isConnectable={isConnectable}
-                style={{ left: 30 }}
+                style={{ left: 55 }}
             />
         </>
     )
 }
 
-export function MarketNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
+export function MarketNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps<Node<EditSidebarData>>) {
 
     return (
         <>
@@ -39,22 +41,22 @@ export function MarketNode({ data, isConnectable, targetPosition = Position.Top,
                 position={Position.Left}
                 isConnectable={isConnectable}
             />
-            Market
+            {renderUnit('Market', data.name)}
         </>
     )
 }
 
-export function MarketProviderNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
+export function MarketProviderNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps<Node<EditSidebarData>>) {
     return (
         <>
             <Handle
-            id="world_handle"
+                id="world_handle"
                 type="target"
                 position={targetPosition}
                 isConnectable={isConnectable}
             />
 
-            Market Provider
+            {renderUnit('Market Provider', data.name)}
             <Handle
                 id="market_handle"
                 type="source"
@@ -66,16 +68,16 @@ export function MarketProviderNode({ data, isConnectable, targetPosition = Posit
 }
 
 
-export function UnitNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
+export function UnitNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps<Node<EditSidebarData>>) {
     return (
         <>
             <Handle
-            id="unitOperator_handle"
+                id="unitOperator_handle"
                 type="target"
                 position={targetPosition}
                 isConnectable={isConnectable}
             />
-            Unit
+            {renderUnit(data.unitType, data.name)}
             <Handle
                 id="market_handle"
                 type="source"
@@ -86,16 +88,16 @@ export function UnitNode({ data, isConnectable, targetPosition = Position.Top, s
     )
 }
 
-export function UnitOperatorNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
+export function UnitOperatorNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps<Node<EditSidebarData>>) {
     return (
         <>
             <Handle
-            id="world_handle"
+                id="world_handle"
                 type="target"
                 position={targetPosition}
                 isConnectable={isConnectable}
             />
-            Unit Operator
+            {renderUnit('Unit Operator', data.name)}
             <Handle
                 id="unit_handle"
                 type="source"
@@ -103,5 +105,18 @@ export function UnitOperatorNode({ data, isConnectable, targetPosition = Positio
                 isConnectable={isConnectable}
             />
         </>
+    )
+}
+
+function renderUnit(name: string, id: string) {
+    return (
+        <div className="px-3 py-1 shadow-md rounded-md bg-white border-2 border-stone-400">
+            <div className='font-bold'>
+                {name}
+            </div>
+            <div className='text-sm text-gray-500'>
+                {id}
+            </div>
+        </div>
     )
 }

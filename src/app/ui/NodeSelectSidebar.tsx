@@ -1,7 +1,8 @@
 import { useContext } from "react";
 import { DnDContext } from "../DragDropCtx";
 
-export default function SelectSidebar() {
+
+export default function SelectSidebar(  ) {
     const [type, setType] = useContext(DnDContext);
     const onDragStart = (event: React.DragEvent, nodeType: string) => {
         setType(nodeType)
