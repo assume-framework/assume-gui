@@ -6,14 +6,18 @@ export function WorldNode({ data, isConnectable, sourcePosition = Position.Botto
         <>
             World
             <Handle
+                id="unitOperator_handle"
                 type="source"
                 position={sourcePosition}
                 isConnectable={isConnectable}
+                style={{ left: 20 }}
             />
             <Handle
+                id="marketProvider_handle"
                 type="source"
                 position={sourcePosition}
                 isConnectable={isConnectable}
+                style={{ left: 30 }}
             />
         </>
     )
@@ -24,19 +28,35 @@ export function MarketNode({ data, isConnectable, targetPosition = Position.Top,
     return (
         <>
             <Handle
-                id="a"
+                id="marketProvider_handle"
                 type="target"
                 position={targetPosition}
                 isConnectable={isConnectable}
             />
             <Handle
-                id="b "
+                id="unit_handle"
                 type="target"
                 position={Position.Left}
                 isConnectable={isConnectable}
             />
             Market
+        </>
+    )
+}
+
+export function MarketProviderNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
+    return (
+        <>
             <Handle
+            id="world_handle"
+                type="target"
+                position={targetPosition}
+                isConnectable={isConnectable}
+            />
+
+            Market Provider
+            <Handle
+                id="market_handle"
                 type="source"
                 position={sourcePosition}
                 isConnectable={isConnectable}
@@ -45,59 +65,43 @@ export function MarketNode({ data, isConnectable, targetPosition = Position.Top,
     )
 }
 
-export function MarketProviderNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
-    return (
-        <div>
-            <Handle
-                type="target"
-                position={targetPosition}
-                isConnectable={isConnectable}
-            />
-
-            Market Provider
-            <Handle
-                type="source"
-                position={sourcePosition}
-                isConnectable={isConnectable}
-            />
-        </div>
-    )
-}
-
 
 export function UnitNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
-
     return (
-        <div>
+        <>
             <Handle
+            id="unitOperator_handle"
                 type="target"
                 position={targetPosition}
                 isConnectable={isConnectable}
             />
             Unit
             <Handle
+                id="market_handle"
                 type="source"
-                position={sourcePosition}
+                position={Position.Right}
                 isConnectable={isConnectable}
             />
-        </div>
+        </>
     )
 }
 
-export function UnitProviderNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
+export function UnitOperatorNode({ data, isConnectable, targetPosition = Position.Top, sourcePosition = Position.Bottom }: NodeProps) {
     return (
-        <div>
+        <>
             <Handle
+            id="world_handle"
                 type="target"
                 position={targetPosition}
                 isConnectable={isConnectable}
             />
-            Unit Provider
+            Unit Operator
             <Handle
+                id="unit_handle"
                 type="source"
                 position={sourcePosition}
                 isConnectable={isConnectable}
             />
-        </div>
+        </>
     )
 }
