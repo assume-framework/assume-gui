@@ -6,11 +6,9 @@ import React, { useCallback, useContext, useRef, useState } from "react";
 import '@xyflow/react/dist/style.css';
 import './index.css';
 
-import DnDContext, { DnDProvider } from '../DragDropCtx';
-import MarketNode, { MarketProviderNode } from './Market';
-import Sidebar from './Sidebar';
-import UnitNode, { UnitProviderNode } from "./Unit";
-import WorldNode from "./World";
+import { DnDContext } from './DragDropCtx';
+import { MarketNode, MarketProviderNode, UnitNode, UnitProviderNode, WorldNode } from './ui/Nodes';
+import Sidebar from './ui/Sidebar';
 
 const nodeTypes = {
   unit: UnitNode,

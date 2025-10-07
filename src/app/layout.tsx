@@ -2,7 +2,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Home from "./ui/Home";
+import Home from "./Home";
 import { DnDProvider } from "./DragDropCtx";
 
 const geistSans = Geist({
