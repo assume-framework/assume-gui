@@ -1,3 +1,5 @@
+import MarketEdit from "./EditComponents/MarketEdit";
+import MarketProductEdit from "./EditComponents/MarketProductEdit";
 import UnitEdit from "./EditComponents/UnitEdit";
 
 export interface EditSidebarData {
@@ -37,6 +39,8 @@ export default ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFu
                 <input type="text" value={data.name} onChange={onChange("name")} />
                 <br />
                 {type === "unit" && <UnitEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
+                {type === "market" && <MarketEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
+                {type === "marketProduct" && <MarketProductEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
                 <br />
                 <button type="submit">Save</button>
             </form>

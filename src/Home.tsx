@@ -9,7 +9,7 @@ import './Home.css';
 import { isValidConnection } from './ConnectionValidator';
 import { DnDContext } from './DragDropCtx';
 import EditSidebar, { type EditSidebarData, type EditSidebarProps } from './ui/NodeEditSidebar';
-import { MarketNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
+import { MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
 import SelectSidebar from './ui/NodeSelectSidebar';
 
 const nodeTypes = {
@@ -18,6 +18,7 @@ const nodeTypes = {
   world: WorldNode,
   market: MarketNode,
   marketProvider: MarketProviderNode,
+  marketProduct: MarketProductNode,
 }
 
 const initialEdges: Edge[] = [];

@@ -1,17 +1,14 @@
-import type { EditComponentArgs } from "../NodeEditSidebar"
+import { handleChange } from "../../utils";
+import type { EditComponentArgs } from "../NodeEditSidebar";
 
 
 
-export default ({id, data, updateNodeValue }: EditComponentArgs) => {
-    const onChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        const d = { ...data }
-        d[key] = e.target.value
-        updateNodeValue(id, d);
-    }
+export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
+    const onChange = handleChange(id, data, updateNodeValue);
     return (
         <>
             <label htmlFor="unitType">Unit Type: </label>
-            <select onChange={e => updateNodeValue(id, { ...data, unitType: e.target.value })}>
+            <select onChange={onChange("unitType")} value={data.unitType}>
                 <option value="storage">Storage</option>
                 <option value="powerplant">Powerplant</option>
                 <option value="building">Building</option>

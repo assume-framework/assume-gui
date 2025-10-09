@@ -24,6 +24,9 @@ export default function SelectSidebar(  ) {
             <div className="dndnode" onDragStart={(event) => onDragStart(event, 'marketProvider')} draggable>
                 Market Provider Node
             </div>
+            <div className="dndnode" onDragStart={(event) => onDragStart(event, 'marketProduct')} draggable>
+                Market Product Node
+            </div>
         </aside>
     )
 }
