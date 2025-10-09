@@ -1,8 +1,8 @@
 'use client';
-import { createContext, ReactNode, SetStateAction, useState } from 'react';
+import { createContext, type ReactNode, type SetStateAction, useState } from 'react';
 
 
-import { Dispatch } from 'react';
+import type { Dispatch } from 'react';
 
 const DnDContext = createContext<[string, Dispatch<SetStateAction<string>>]>(['', (_) => {}]);
 

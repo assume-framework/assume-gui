@@ -1,20 +1,4 @@
- 
-html,
-body {
-  margin: 0;
-  font-family: sans-serif;
-  box-sizing: border-box;
-  /* Prevent zoom on mobile when tapping */
-  touch-action: manipulation;
-  -webkit-touch-callout: none;
-  user-select: none;
-}
- 
-#app {
-  width: 100vw;
-  height: 100vh;
-}
- 
+
 .dndflow {
   flex-direction: column;
   display: flex;
@@ -34,7 +18,7 @@ body {
 }
  
 .dndflow .dndnode {
-  height: 20px;
+  height: 40px;
   padding: 8px;
   border: 1px solid #1a192b;
   border-radius: 6px;
@@ -60,14 +44,6 @@ body {
   cursor: grabbing;
 }
  
-.dndflow .dndnode.input {
-  border-color: #0041d0;
-}
- 
-.dndflow .dndnode.output {
-  border-color: #ff0072;
-}
- 
 .dndflow .reactflow-wrapper {
   flex-grow: 1;
   height: 100%;
@@ -83,3 +59,4 @@ body {
     max-width: 250px;
   }
 }
+

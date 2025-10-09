@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import { DnDContext } from "../DragDropCtx";
-
+import './NodeSelectSidebar.css';
 
 export default function SelectSidebar(  ) {
-    const [type, setType] = useContext(DnDContext);
+    const [ ,setType] = useContext(DnDContext);
     const onDragStart = (event: React.DragEvent, nodeType: string) => {
         setType(nodeType)
         event.dataTransfer.effectAllowed = "move";

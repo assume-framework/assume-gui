@@ -1,6 +1,6 @@
 
-import { Handle, Node, NodeProps, Position } from '@xyflow/react';
-import { EditSidebarData } from './NodeEditSidebar';
+import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
+import type { EditSidebarData } from './NodeEditSidebar';
 
 
 export function WorldNode({ data, isConnectable, sourcePosition = Position.Bottom }: NodeProps<Node<EditSidebarData>>) {
@@ -108,7 +108,7 @@ export function UnitOperatorNode({ data, isConnectable, targetPosition = Positio
     )
 }
 
-function renderUnit(name: string, id: string) {
+function renderUnit(name: string, id: string) { 
     return (
         <div className="px-3 py-1 shadow-md rounded-md bg-white border-2 border-stone-400">
             <div className='font-bold'>

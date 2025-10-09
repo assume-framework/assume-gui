@@ -1,15 +1,15 @@
 'use client'
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, Background, ConnectionState, Controls, Edge, FinalConnectionState, NodeChange, NodeSelectionChange, OnConnect, OnConnectEnd, OnEdgesChange, OnNodesChange, ReactFlow, useReactFlow, type Node } from '@xyflow/react';
+import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, ReactFlow, useReactFlow, type Edge, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange, type Node } from '@xyflow/react';
 import React, { useCallback, useContext, useRef, useState } from "react";
 
 import '@xyflow/react/dist/style.css';
-import './index.css';
+import './Home.css';
 
-import { DnDContext } from './DragDropCtx';
-import { MarketNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
 import { isValidConnection } from './ConnectionValidator';
-import EditSidebar, { EditSidebarData, EditSidebarProps } from './ui/NodeEditSidebar';
+import { DnDContext } from './DragDropCtx';
+import EditSidebar, { type EditSidebarData, type EditSidebarProps } from './ui/NodeEditSidebar';
+import { MarketNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
 import SelectSidebar from './ui/NodeSelectSidebar';
 
 const nodeTypes = {
@@ -36,19 +36,18 @@ export default function Home() {
   const [type] = useContext(DnDContext);
   const { screenToFlowPosition } = useReactFlow();
 
-  const updateNodeValue = (id: string) => {
-    return (data: EditSidebarData) => {
-      setNodes((nds) => nds.map((node) => {
-        if (node.id === id) {
-          return {
-            ...node,
-            data: data,
-          };
-        }
-        return node;
-      }));
+  const updateNodeValue = useCallback((id: string, data: EditSidebarData) => {
+    const node = nodes.find(n => n.id === id);
+    node!.data = data;
+    const updated = nodes.map(n => n.id === id ? node! : n!);
+    setNodes(updated);
+    let nd = nodeData;
+    if (!nd) {
+      nd = { id: node!.id, data: node!.data, type: node!.type };
     }
-  }
+    nd.data = data;
+    setNodeData(nd);
+  }, [nodes, nodeData, setNodes, setNodeData]);
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -58,9 +57,8 @@ export default function Home() {
       }
       const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected === true);
       const node: Node<EditSidebarData> | undefined = nodes.find(n => n.id === selectedChange?.id);
-      if (node && node.type) {
-        const d: EditSidebarProps = { type: node.type, data: node.data, updateNodeValue: updateNodeValue(node.id) }
-        setNodeData(d);
+      if (node) {
+        setNodeData({ id: node.id, type: node.type, data: node.data });
         return
       }
       setNodeData(null);
@@ -86,14 +84,14 @@ export default function Home() {
     event.preventDefault();
     if (!type) return;
     const id = getId(type)
-    const newNode : Node<EditSidebarData> = {
+    const newNode: Node<EditSidebarData> = {
       id: id,
       type,
       position: screenToFlowPosition({
         x: event.clientX,
         y: event.clientY
       }),
-      data: { 
+      data: {
         name: id,
       },
     };
@@ -104,14 +102,16 @@ export default function Home() {
     setNodes((nds) => nds.concat(newNode));
   }, [screenToFlowPosition, type]);
 
+  const onPaneClick = useCallback(() => { setNodeData(null) }, [setNodeData]);
 
   return (
     <div className="dndflow">
       {nodeData ?
         <EditSidebar
+          id={nodeData.id}
           type={nodeData.type}
           data={nodeData.data}
-          updateNodeValue={nodeData.updateNodeValue}
+          updateNodeValue={updateNodeValue}
         /> : <SelectSidebar />}
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
         <ReactFlow
@@ -120,6 +120,7 @@ export default function Home() {
           edges={edges}
           nodeTypes={nodeTypes}
           onNodesChange={onNodesChange}
+          onPaneClick={onPaneClick}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onDragOver={onDragOver}
