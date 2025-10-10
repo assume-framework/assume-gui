@@ -10,7 +10,7 @@ export default function SelectSidebar(  ) {
     }
 
     return (
-        <aside>
+        <aside id="nodeSelect">
             <div className="description">You can drag these nodes to the pane on the right.</div>
             <div className="dndnode" onDragStart={(event) => onDragStart(event, 'unit')} draggable>
                 Unit Node

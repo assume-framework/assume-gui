@@ -1,6 +1,8 @@
+import { Input } from "./EditComponents/Input";
 import MarketEdit from "./EditComponents/MarketEdit";
 import MarketProductEdit from "./EditComponents/MarketProductEdit";
 import UnitEdit from "./EditComponents/UnitEdit";
+import WorldEdit from "./EditComponents/WorldEdit";
 
 export interface EditSidebarData {
     // properties that shall be editable in the sidebar
@@ -32,17 +34,13 @@ export default ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFu
         updateNodeValue(id, d);
     }
     return (
-        <aside>
-            <h1>Edit Sidebar</h1>
-            <form onSubmit={e => { e.preventDefault(); updateNodeValue(id, data); }}>
-                <label htmlFor="name">Name: </label>
-                <input type="text" value={data.name} onChange={onChange("name")} />
-                <br />
+        <aside className="w-full h-full max-w-xs">
+            <form className="px-8 pt-6 pb-8 mb-4" id="NodeEditForm">
+                <Input label="Name" type="text" id="name" value={data.name} onChange={onChange("name")} />
                 {type === "unit" && <UnitEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
                 {type === "market" && <MarketEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
                 {type === "marketProduct" && <MarketProductEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
-                <br />
-                <button type="submit">Save</button>
+                {type === "world" && <WorldEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
             </form>
         </aside>
     )

@@ -6,14 +6,14 @@
   height: 100%;
 }
  
-.dndflow aside {
+.dndflow #nodeSelect {
   border-right: 1px solid #eee;
   padding: 15px 10px;
   font-size: 12px;
   background: #fcfcfc;
 }
  
-.dndflow aside .description {
+.dndflow #nodeSelect .description {
   margin-bottom: 10px;
 }
  
@@ -54,7 +54,7 @@
     flex-direction: row;
   }
  
-  .dndflow aside {
+  .dndflow #nodeSelect {
     width: 20%;
     max-width: 250px;
   }
