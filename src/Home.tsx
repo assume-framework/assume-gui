@@ -1,6 +1,6 @@
 'use client'
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, ReactFlow, useReactFlow, type Edge, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange, type Node } from '@xyflow/react';
+import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, ReactFlow, useReactFlow, type Edge, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange, type Node, type OnDelete, type NodeTypes } from '@xyflow/react';
 import React, { useCallback, useContext, useRef, useState } from "react";
 
 import '@xyflow/react/dist/style.css';
@@ -23,7 +23,7 @@ const nodeTypes = {
 
 const initialEdges: Edge[] = [];
 const initialNodes: Node<EditSidebarData>[] = [
-  { id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" } },
+  { id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" }, deletable: false },
 ];
 
 let id = 1;

@@ -1,5 +1,5 @@
 
-import { Handle, type Node, type NodeProps, Position } from '@xyflow/react';
+import { Handle, type Node, type NodeProps, Position, useNodeConnections } from '@xyflow/react';
 import type { EditSidebarData } from './NodeEditSidebar';
 
 
@@ -122,7 +122,7 @@ export function MarketProductNode({ data, isConnectable }: NodeProps<Node<EditSi
                 id="market_handle"
                 type="target"
                 position={Position.Top}
-                isConnectable={isConnectable}
+                isConnectable={isConnectable && useNodeConnections().length == 0}
             />
             {renderUnit('Market Product', data.name)}
         </>
