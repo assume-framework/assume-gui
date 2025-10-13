@@ -1,13 +1,13 @@
 'use client'
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, ReactFlow, useReactFlow, type Edge, type EdgeChange, type Node, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange } from '@xyflow/react';
-import React, { useCallback, useContext, useRef, useState } from "react";
+import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, Panel, ReactFlow, useReactFlow, type Connection, type Edge, type EdgeChange, type Node, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange } from '@xyflow/react';
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
 
-import { isValidConnection } from './ConnectionValidator';
 import { DnDContext } from './DragDropCtx';
+import sendData from './sendData';
 import { UnitMarketEdge } from './ui/Edges';
 import EditSidebar, { type EditSidebarData, type EditSidebarProps } from './ui/NodeEditSidebar';
 import { MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
@@ -30,6 +30,10 @@ const initialEdges: Edge<EditSidebarData>[] = [];
 const initialNodes: Node<EditSidebarData>[] = [
   { id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" }, deletable: false },
 ];
+
+const isValidConnection = (connection: Connection | Edge) =>
+  connection.targetHandle?.split("_")[0] == connection.source?.split("_")[0] &&
+  connection.sourceHandle?.split("_")[0] === connection.target?.split("_")[0];
 
 let id = 1;
 const getId = (type: string) => `${type}_${id++}`;
@@ -80,7 +84,6 @@ export default function Home() {
         setNodeData({ id: node.id, type: node.type, data: node.data });
         return
       }
-      setNodeData(null);
     },
     [nodes, setNodes, setNodeData],
   );
@@ -97,18 +100,24 @@ export default function Home() {
         setNodeData({ id: edge.id, type: edge.type, data: edge.data!, isEdge: true });
         return
       }
-      setNodeData(null);
     },
     [edges, setEdges, setNodeData],
   );
   const onConnect: OnConnect = useCallback(
     (connection) => setEdges((eds) => {
-      eds = addEdge(connection, eds)
+      let newEdge: Edge<EditSidebarData> = {
+        id: `${connection.source}#${connection.sourceHandle}#${connection.target}#${connection.targetHandle}`,
+        source: connection.source,
+        sourceHandle: connection.sourceHandle,
+        target: connection.target,
+        targetHandle: connection.targetHandle,
+        type: 'default',
+        data: { name: `${connection.source}-${connection.target}` },
+      };
       if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
-        eds[eds.length - 1].type = 'unit-market';
-        eds[eds.length - 1].data = { name: getId('unit-market') };
+        newEdge.type = 'unit-market';
       }
-      return eds
+      return addEdge(newEdge, eds);
     }),
     [setEdges],
   );
@@ -140,7 +149,21 @@ export default function Home() {
     setNodes((nds) => nds.concat(newNode));
   }, [screenToFlowPosition, type]);
 
+  const save = useCallback(() => {
+    localStorage.setItem('flow', JSON.stringify({ "nodes": nodes, "edges": edges }));
+  }, [nodes, edges]);
+
+
   const onPaneClick = useCallback(() => { setNodeData(null) }, [setNodeData]);
+  useEffect(() => {
+    const flow = localStorage.getItem('flow');
+    console.log("Loading", flow);
+    if (flow) {
+      const { nodes, edges } = JSON.parse(flow);
+      setNodes(nodes);
+      setEdges(edges);
+    }
+  }, [setNodes, setEdges]);
 
   return (
     <div className="dndflow">
@@ -166,11 +189,16 @@ export default function Home() {
           onDrop={onDrop}
           edgeTypes={edgeTypes}
           fitView
+          onChange={save}
         >
           <Controls />
           <Background />
+          <Panel position="bottom-right">
+              <button className="focus:outline-none shadow border rounded w-full my-1 py-1 px-1 text-gray-700 leading-tight" onClick={save}>Save</button>
+              <button className='focus:outline-none shadow border rounded w-full my-1 py-1 px-1 text-gray-700 leading-tight' onClick={() => sendData(nodes, edges)}>Submit</button>
+          </Panel>
         </ReactFlow>
       </div>
-    </div>
+    </div >
   );
 }

@@ -10,9 +10,9 @@ export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
 
     return (
         <>
-            <Input disabled label="Duration" id="duration" type="text" value={data.duration} onChange={onChange("duration")} />
+            <Input label="Duration (min)" id="duration" type="number" value={data.duration} onChange={onChange("duration")} />
             <Input label="Count" id="count" type="number" value={data.count} onChange={onChange("count")} />
-            <Input disabled label="First Delivery" id="first_delivery" type="text" value={data.first_delivery} onChange={onChange("first_delivery")} />
+            <Input label="First Delivery (min)" id="first_delivery" type="number" value={data.first_delivery} onChange={onChange("first_delivery")} />
         </>
     )
 }

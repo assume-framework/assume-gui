@@ -37,7 +37,7 @@ export default ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFu
     }
     return (
         <aside className="w-full h-full max-w-xs">
-            <form className="px-8 pt-6 pb-8 mb-4" id="NodeEditForm">
+            <form className="px-8 pt-6 pb-8 mb-4" id="NodeEditForm" onSubmit={e => e.preventDefault()}>
                 <Input label="Name" type="text" id="name" value={data.name} onChange={onChange("name")} />
                 {type === "unit" && <UnitEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
                 {type === "market" && <MarketEdit id={id} data={data} updateNodeValue={updateNodeValue} />}

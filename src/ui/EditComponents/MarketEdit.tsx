@@ -10,10 +10,10 @@ export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
 
     return (
         <>
-            <Input disabled label="Opening Hours" id="opening_hours" type="text" value={data.opening_hours} onChange={onChange("opening_hours")} />
-            <Input disabled label="Opening Duration" id="opening_duration" type="number" value={data.opening_duration} onChange={onChange("opening_duration")} />
-            <Select label="Market Type" id="market_type" value={data.market_type} onChange={onChange("market_type")} >
-                <option value="pay_as_cleared">Pay as cleared</option>
+            <Input disabled label="Opening Hours" id="opening_hours" type="text" value="Every hour" onChange={onChange("opening_hours")} />
+            <Input label="Opening Duration (min)" id="opening_duration" type="number" value={data.opening_duration} onChange={onChange("opening_duration")} />
+            <Select label="Market Mechanism" id="market_mechanism" value={data.market_mechanism} onChange={onChange("market_mechanism")} >
+                <option value="pay_as_clear">Pay as clear</option>
                 <option value="pay_as_bid">Pay as bid</option>
                 <option value="pay_as_bid_contract">Pay as bid (contract)</option>
                 <option value="complex_clearing">Complex clearing</option>

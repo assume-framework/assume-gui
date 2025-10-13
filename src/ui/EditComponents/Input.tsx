@@ -67,6 +67,7 @@ export const Select = ({
                 onChange={onChange}
                 className={classNames}
             >
+                <option disabled selected value="">-- select an option --</option>
                 {children}
             </select>
         </div>
