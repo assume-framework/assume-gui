@@ -10,6 +10,8 @@ interface InputProperties extends BaseProps {
     type: string
 }
 
+  const classNames = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
+
 export const Input = ({
     type,
     id,
@@ -18,17 +20,27 @@ export const Input = ({
     disabled = false,
     onChange
 }: InputProperties) => {
+
     return (
         <div>
             <label htmlFor={id} className="block text-gray-700 text-sm font-bold mt-2">{label}</label>
-            <input
-                type={type}
-                id={id}
-                value={value}
-                disabled={disabled}
-                onChange={onChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
-            />
+            {type === 'textarea' ? (
+                <textarea
+                    id={id}
+                    value={value}
+                    disabled={disabled}
+                    className={classNames}
+                />
+            ) : (
+                <input
+                    type={type}
+                    id={id}
+                    value={value}
+                    disabled={disabled}
+                    onChange={onChange}
+                    className={classNames}
+                />
+            )}
         </div>
     )
 }
@@ -53,7 +65,7 @@ export const Select = ({
                 value={value}
                 disabled={disabled}
                 onChange={onChange}
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
+                className={classNames}
             >
                 {children}
             </select>

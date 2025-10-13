@@ -1,6 +1,6 @@
 'use client'
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, ReactFlow, useReactFlow, type Edge, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange, type Node, type OnDelete, type NodeTypes } from '@xyflow/react';
+import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, ReactFlow, useReactFlow, type Edge, type EdgeChange, type Node, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange } from '@xyflow/react';
 import React, { useCallback, useContext, useRef, useState } from "react";
 
 import '@xyflow/react/dist/style.css';
@@ -8,6 +8,7 @@ import './Home.css';
 
 import { isValidConnection } from './ConnectionValidator';
 import { DnDContext } from './DragDropCtx';
+import { UnitMarketEdge } from './ui/Edges';
 import EditSidebar, { type EditSidebarData, type EditSidebarProps } from './ui/NodeEditSidebar';
 import { MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
 import SelectSidebar from './ui/NodeSelectSidebar';
@@ -21,7 +22,11 @@ const nodeTypes = {
   marketProduct: MarketProductNode,
 }
 
-const initialEdges: Edge[] = [];
+const edgeTypes = {
+  'unit-market': UnitMarketEdge,
+}
+
+const initialEdges: Edge<EditSidebarData>[] = [];
 const initialNodes: Node<EditSidebarData>[] = [
   { id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" }, deletable: false },
 ];
@@ -32,7 +37,7 @@ const getId = (type: string) => `${type}_${id++}`;
 export default function Home() {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(initialNodes);
-  const [edges, setEdges] = useState<Edge[]>(initialEdges);
+  const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(initialEdges);
   const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
   const [type] = useContext(DnDContext);
   const { screenToFlowPosition } = useReactFlow();
@@ -49,6 +54,19 @@ export default function Home() {
     nd.data = data;
     setNodeData(nd);
   }, [nodes, nodeData, setNodes, setNodeData]);
+
+  const updateEdgeValue = useCallback((id: string, data: EditSidebarData) => {
+    const edge = edges.find(e => e.id === id);
+    edge!.data = data;
+    const updated = edges.map(e => e.id === id ? edge! : e!);
+    setEdges(updated);
+    let ed = nodeData;
+    if (!ed) {
+      ed = { id: edge!.id, data: edge!.data, type: edge!.type, isEdge: true };
+    }
+    ed.data = data;
+    setNodeData(ed);
+  }, [edges, nodeData, setEdges, setNodeData]);
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
@@ -67,12 +85,31 @@ export default function Home() {
     [nodes, setNodes, setNodeData],
   );
 
-  const onEdgesChange: OnEdgesChange = useCallback(
-    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
-    [setEdges],
+  const onEdgesChange: OnEdgesChange<Edge<EditSidebarData>> = useCallback(
+    (changes: EdgeChange[]) => {
+      setEdges((eds: Edge<EditSidebarData>[]) => applyEdgeChanges(changes, eds) as Edge<EditSidebarData>[]);
+      if (!changes.map(c => c.type).includes('select')) {
+        return
+      }
+      const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected === true);
+      const edge: Edge<EditSidebarData> | undefined = edges.find(e => e.id === selectedChange?.id);
+      if (edge) {
+        setNodeData({ id: edge.id, type: edge.type, data: edge.data!, isEdge: true });
+        return
+      }
+      setNodeData(null);
+    },
+    [edges, setEdges, setNodeData],
   );
   const onConnect: OnConnect = useCallback(
-    (connection) => setEdges((eds) => addEdge(connection, eds)),
+    (connection) => setEdges((eds) => {
+      eds = addEdge(connection, eds)
+      if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
+        eds[eds.length - 1].type = 'unit-market';
+        eds[eds.length - 1].data = { name: getId('unit-market') };
+      }
+      return eds
+    }),
     [setEdges],
   );
 
@@ -112,7 +149,7 @@ export default function Home() {
           id={nodeData.id}
           type={nodeData.type}
           data={nodeData.data}
-          updateNodeValue={updateNodeValue}
+          updateNodeValue={nodeData.isEdge ? updateEdgeValue : updateNodeValue}
         /> : <SelectSidebar />}
       <div className="reactflow-wrapper" ref={reactFlowWrapper}>
         <ReactFlow
@@ -127,6 +164,7 @@ export default function Home() {
           onDragOver={onDragOver}
           isValidConnection={isValidConnection}
           onDrop={onDrop}
+          edgeTypes={edgeTypes}
           fitView
         >
           <Controls />

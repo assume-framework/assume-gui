@@ -2,6 +2,7 @@ import { Input } from "./EditComponents/Input";
 import MarketEdit from "./EditComponents/MarketEdit";
 import MarketProductEdit from "./EditComponents/MarketProductEdit";
 import UnitEdit from "./EditComponents/UnitEdit";
+import UnitMarketEdit from "./EditComponents/UnitMarketEdit";
 import WorldEdit from "./EditComponents/WorldEdit";
 
 export interface EditSidebarData {
@@ -21,6 +22,7 @@ export type EditSidebarProps = {
     id: string;
     data: EditSidebarData;
     type?: string;
+    isEdge?: boolean;
 };
 
 type updateFunction = { updateNodeValue: (id: string, data: EditSidebarData) => void; }
@@ -41,6 +43,7 @@ export default ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFu
                 {type === "market" && <MarketEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
                 {type === "marketProduct" && <MarketProductEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
                 {type === "world" && <WorldEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
+                {type === "unit-market" && <UnitMarketEdit id={id} data={data} updateNodeValue={updateNodeValue} />}
             </form>
         </aside>
     )
