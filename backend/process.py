@@ -1,11 +1,12 @@
 from datetime import datetime, timedelta
-import json
+import os
 
 import pandas as pd
 from assume import MarketConfig, MarketProduct, World
 from assume.common.forecasts import NaiveForecast
 from dateutil import rrule as rr
 
+DBURI = os.getenv("DATABASE_URL", "postgresql://assume@localhost:5432/assume?password=assume")
 
 def source_target(connection: str):
     return connection.split("#")[0], connection.split("#")[2]
@@ -21,7 +22,7 @@ def process_data(input: dict):
         source, target = source_target(i["id"])
         i["target"] = target
         edges.setdefault(source, {}).setdefault(getType(target), []).append(i)
-    world = World(database_uri="postgresql://assume@localhost:5432/assume?password=assume")
+    world = World(database_uri=DBURI)
     worldData = nodes["world"]["data"]
     start = datetime.fromisoformat(worldData["start"])
     end = datetime.fromisoformat(worldData["end"])
