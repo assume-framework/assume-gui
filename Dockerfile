@@ -12,14 +12,16 @@ RUN npm run build
 
 
 FROM python:3.12-slim AS build-backend
-WORKDIR /backend
-COPY requirements.txt /requirements.txt
-RUN pip install --no-cache-dir --upgrade -r /requirements.txt
-COPY backend /backend
+WORKDIR /server
+RUN pip install pip-tools
+COPY pyproject.toml ./pyproject.toml
+RUN pip-compile --resolver=backtracking -o requirements.txt ./pyproject.toml
+COPY backend /server/backend
+RUN pip install --no-cache-dir -e .
 
-COPY --from=build-frontend /frontend/dist /backend/dist
+COPY --from=build-frontend /frontend/dist /server/dist
 
 ENV DATABASE_URL=postgresql://assume@assume_db:5432/assume?password=assume
 EXPOSE 8080
-CMD ["fastapi", "run", "main.py", "--port", "8080"]
+CMD ["assume-gui"]
 

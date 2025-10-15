@@ -1,2 +1,0 @@
-fastapi[standard]>=0.119.0
-assume-framework[all]>=0.5.5

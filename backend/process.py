@@ -1,12 +1,15 @@
-from datetime import datetime, timedelta
 import os
+from datetime import datetime, timedelta
 
 import pandas as pd
 from assume import MarketConfig, MarketProduct, World
 from assume.common.forecasts import NaiveForecast
 from dateutil import rrule as rr
 
-DBURI = os.getenv("DATABASE_URL", "postgresql://assume@localhost:5432/assume?password=assume")
+DBURI = os.getenv(
+    "DATABASE_URL", "postgresql://assume@localhost:5432/assume?password=assume"
+)
+
 
 def source_target(connection: str):
     return connection.split("#")[0], connection.split("#")[2]
@@ -14,6 +17,7 @@ def source_target(connection: str):
 
 def getType(id: str):
     return id.split("_")[0]
+
 
 def process_data(input: dict):
     nodes = {i["id"]: i for i in input["nodes"]}
@@ -80,7 +84,9 @@ def process_data(input: dict):
             target_unit = unit["target"]
             bidding_strategies = {}
             for connection in edges[target_unit]["market"]:
-                bidding_strategies[connection["target"]] = connection["data"]["strategy"]
+                bidding_strategies[connection["target"]] = connection["data"][
+                    "strategy"
+                ]
             unitData = nodes[target_unit]["data"]
             if unitData["unitType"] == "demand":
                 forecast = NaiveForecast(index, demand=unitData.get("demand", 100))
@@ -111,4 +117,3 @@ def process_data(input: dict):
                 forecaster=forecast,
             )
     return world
-

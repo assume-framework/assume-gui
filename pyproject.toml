@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: ASSUME Developers
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "assume-gui"
+version = "0.5.5"
+description = "ASSUME - GUI"
+authors = [{ name = "ASSUME Developers", email = "contact@assume-project.de"}]
+license = {text = "AGPL-3.0-or-later"}
+readme = "README.md"
+keywords = ["agent based simulation", "energy market", "fastapi", "user interface", "simulation"]
+
+classifiers=[
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Framework :: AsyncIO",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi >=0.119.0",
+    "assume-framework >=0.5.5",
+    "uvicorn >= 0.37.0",
+]
+
+[project.optional-dependencies]
+all = [
+    "assume-framework[all] >=0.5.5",
+]
+
+test = [
+    "ruff >=0.4.9",
+    "mypy >=1.1.1",
+    "matplotlib >=3.7.2",
+    "pytest >=7.2.2",
+    "pytest-cov >=4.1.0",
+    "pytest-asyncio >=0.21.1",
+]
+
+[project.urls]
+Homepage = "https://assume-project.de/"
+Repository = "https://github.com/assume-framework/assume-gui"
+Issues = "https://github.com/assume-framework/assume-gui/issues"
+
+[project.scripts]
+assume-gui = "backend.main:cli"
+
+[tool.setuptools]
+packages = {find = {}}
+
+[tool.ruff]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "G", "PIE"]
+ignore = ["E501", "G004", "E731"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    "I001", # allow unsorted imports in __init__.py
+    "F401", # allow unused imports in __init__.py
+]
+"tests/*" = [
+    "S101", # allow assert statements for pytest
+    "ARG",  # allow unused arguments for pytest fixtures
+    "F841", # allow unused local variables
+]
+"examples/notebooks/*" = [
+    "E402", # allow imports the middle of notebooks
+    "E999", # allow no expressions
+    "F841", # allow unused local variables
+    "F811", # allow import redeclaration
+]

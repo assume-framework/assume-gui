@@ -3,7 +3,7 @@
 ## Start using docker
 1. Make sure that assume dependecies (grafana and postgres) are up & running
 2. Run `docker build -t assume_gui`
-3. Run `docker run --name assume_gui-gui -p 8080:8080 --network assume_default -d assume_gui-gui:latest`
+3. Run `docker run --name assume_gui-gui -p 8080:8080 --network assume_default -d assume_gui:latest`
 Thats it!
 
 ## Build manually
