@@ -10,13 +10,8 @@ app = FastAPI()
 
 @app.post("/api/submit")
 def send_data(data: dict):
-    # print("Received data:", data)
+    json.dump(data, open("backend/data.json", "w"))
     world = process_data(data)
     world.run()
-
-    # with open("data.txt", "a") as f:
-    #     f.write(json.dumps(data))
-    #     f.flush()
-
 
 app.mount("/", StaticFiles(directory="./dist", html=True), name="frontend")

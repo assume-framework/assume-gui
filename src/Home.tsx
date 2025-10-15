@@ -142,9 +142,6 @@ export default function Home() {
         name: id,
       },
     };
-    if (type === "unit") {
-      newNode.data = { ...newNode.data, unitType: "storage" }
-    }
 
     setNodes((nds) => nds.concat(newNode));
   }, [screenToFlowPosition, type]);
@@ -157,7 +154,6 @@ export default function Home() {
   const onPaneClick = useCallback(() => { setNodeData(null) }, [setNodeData]);
   useEffect(() => {
     const flow = localStorage.getItem('flow');
-    console.log("Loading", flow);
     if (flow) {
       const { nodes, edges } = JSON.parse(flow);
       setNodes(nodes);
@@ -194,8 +190,8 @@ export default function Home() {
           <Controls />
           <Background />
           <Panel position="bottom-right">
-              <button className="focus:outline-none shadow border rounded w-full my-1 py-1 px-1 text-gray-700 leading-tight" onClick={save}>Save</button>
-              <button className='focus:outline-none shadow border rounded w-full my-1 py-1 px-1 text-gray-700 leading-tight' onClick={() => sendData(nodes, edges)}>Submit</button>
+              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={save}>Save</button>
+              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={() => sendData(nodes, edges)}>Submit</button>
           </Panel>
         </ReactFlow>
       </div>

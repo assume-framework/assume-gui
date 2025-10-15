@@ -5,15 +5,13 @@ export default async (nodes: Node[], edges: Edge[]) => {
     const e = edges.map(e => ({ id: e.id, type: e.type, data: e.data }));
 
     try {
-
-        const response = await fetch('/api/submit', {
+        await fetch('/api/submit', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ nodes: n, edges: e }),
         })
-        console.log(response);
     } catch (error) {
         console.error("Error sending data:", error);
     }

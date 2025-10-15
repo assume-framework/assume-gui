@@ -1,4 +1,3 @@
-
 from datetime import datetime, timedelta
 import json
 
@@ -22,14 +21,10 @@ def process_data(input: dict):
         source, target = source_target(i["id"])
         i["target"] = target
         edges.setdefault(source, {}).setdefault(getType(target), []).append(i)
-    world = World(
-        database_uri="postgresql://assume@localhost:5432/assume?password=assume"
-    )
+    world = World(database_uri="postgresql://assume@localhost:5432/assume?password=assume")
     worldData = nodes["world"]["data"]
-    start, end = (
-        datetime.fromisoformat(worldData["start"]),
-        datetime.fromisoformat(worldData["end"]),
-    )
+    start = datetime.fromisoformat(worldData["start"])
+    end = datetime.fromisoformat(worldData["end"])
     index = pd.date_range(
         start=start,
         end=end + timedelta(hours=24),
@@ -38,21 +33,10 @@ def process_data(input: dict):
     world.setup(
         start=start,
         end=end,
-        save_frequency_hours=worldData["save_frequency_hours"],
+        save_frequency_hours=int(worldData["save_frequency_hours"]),
         simulation_id=worldData["simulation_id"],
         index=index,
     )
-
-    # market_operators, unit_operators = [], []
-    # for target in edges["world"]:
-    #     if target.startswith("marketProvider"):
-    #         market_operators.append(target)
-    #         world.add_market_operator(target)
-    #     elif target.startswith("unitOperator"):
-    #         unit_operators.append(target)
-    #         world.add_unit_operator(target)
-    #     else:
-    #         raise ValueError(f"Unknown target: {target}")
 
     # add markets
     for market_operator in edges["world"]["marketProvider"]:
@@ -74,7 +58,6 @@ def process_data(input: dict):
                     )
                 )
             data = nodes[target_market]["data"]
-            print(data)
             world.add_market(
                 market_operator_id=target_market_operator,
                 market_config=MarketConfig(
@@ -87,6 +70,8 @@ def process_data(input: dict):
                     market_products=market_products,
                 ),
             )
+
+    # add unit operators and units
     for unit_operator in edges["world"]["unitOperator"]:
         target_unit_operator = unit_operator["target"]
         world.add_unit_operator(target_unit_operator)
@@ -94,20 +79,25 @@ def process_data(input: dict):
             target_unit = unit["target"]
             bidding_strategies = {}
             for connection in edges[target_unit]["market"]:
-                strategy_data = connection["data"]
-                bidding_strategies[strategy_data["name"]] = strategy_data["strategy"]
+                bidding_strategies[connection["target"]] = connection["data"]["strategy"]
             unitData = nodes[target_unit]["data"]
-            forecast = NaiveForecast(index, demand=100)
+            if unitData["unitType"] == "demand":
+                forecast = NaiveForecast(index, demand=unitData.get("demand", 100))
+            elif unitData["unitType"] == "power_plant":
+                forecast = NaiveForecast(
+                    index, availability=1, fuel_price=3, co2_price=0.1
+                )
             world.add_unit(
                 id=target_unit,
                 unit_operator_id=target_unit_operator,
                 unit_type=unitData["unitType"],
                 unit_params={
                     "bidding_strategies": bidding_strategies,
-                    "technology": unitData.get("technology"),
+                    "technology": unitData["technology"],
                     "min_power": int(unitData.get("min_power", 0)),
                     "max_power": int(unitData.get("max_power", 0)),
-                    "efficiency": float(unitData.get("efficiency", 0)),
+                    "price": float(unitData.get("price", 0)),
+                    "efficiency": float(unitData.get("efficiency", 1.0)),
                     "ramp_up": int(unitData.get("ramp_up", 0)),
                     "ramp_down": int(unitData.get("ramp_down", 0)),
                     "emission_factor": float(unitData.get("emission_factor", 0)),
@@ -121,9 +111,3 @@ def process_data(input: dict):
             )
     return world
 
-def test():
-    with open("backend/data.json", "r") as f:
-        input = json.load(f)
-        world = process_data(input)
-        world.run()
-# test()

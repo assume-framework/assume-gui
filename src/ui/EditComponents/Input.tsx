@@ -3,14 +3,14 @@ interface BaseProps {
     label: string
     value: any
     disabled?: boolean
-    onChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement>
+    required?: boolean
+    onChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
 }
 
 interface InputProperties extends BaseProps {
     type: string
 }
-
-  const classNames = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
+const classNames = "shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
 
 export const Input = ({
     type,
@@ -18,6 +18,7 @@ export const Input = ({
     value,
     label,
     disabled = false,
+    required = false,
     onChange
 }: InputProperties) => {
 
@@ -29,6 +30,8 @@ export const Input = ({
                     id={id}
                     value={value}
                     disabled={disabled}
+                    required={required}
+                    onChange={onChange}
                     className={classNames}
                 />
             ) : (
@@ -55,6 +58,7 @@ export const Select = ({
     label,
     onChange,
     disabled = false,
+    required = false,
     children
 }: SelectProperties) => {
     return (
@@ -65,6 +69,7 @@ export const Select = ({
                 value={value}
                 disabled={disabled}
                 onChange={onChange}
+                required={required}
                 className={classNames}
             >
                 <option disabled selected value="">-- select an option --</option>
