@@ -27,9 +27,7 @@ const edgeTypes = {
 }
 
 const initialEdges: Edge<EditSidebarData>[] = [];
-const initialNodes: Node<EditSidebarData>[] = [
-  { id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" }, deletable: false },
-];
+const initialNodes: Node<EditSidebarData>[] = [{ id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" }, deletable: false }];
 
 const isValidConnection = (connection: Connection | Edge) =>
   connection.targetHandle?.split("_")[0] == connection.source?.split("_")[0] &&
@@ -150,6 +148,16 @@ export default function Home() {
     localStorage.setItem('flow', JSON.stringify({ "nodes": nodes, "edges": edges }));
   }, [nodes, edges]);
 
+  const reset = useCallback(() => {
+    if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
+      return;
+    }
+    setNodes(initialNodes);
+    setEdges(initialEdges);
+    localStorage.removeItem('flow');
+    setNodeData(null);
+  }, [setNodes, setEdges, setNodeData]);
+
 
   const onPaneClick = useCallback(() => { setNodeData(null) }, [setNodeData]);
   useEffect(() => {
@@ -185,13 +193,13 @@ export default function Home() {
           onDrop={onDrop}
           edgeTypes={edgeTypes}
           fitView
-          onChange={save}
         >
           <Controls />
           <Background />
-          <Panel position="bottom-right">
-              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={save}>Save</button>
-              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={() => sendData(nodes, edges)}>Submit</button>
+          <Panel position="bottom-right" className='w-48'>
+            <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={() => sendData(nodes, edges)}>Submit</button>
+            <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={save}>Save</button>
+            <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={reset}>Reset</button>
           </Panel>
         </ReactFlow>
       </div>

@@ -43,6 +43,12 @@ def process_data(input: dict):
         index=index,
     )
 
+    add_markets(world, edges, nodes)
+    add_units(world, edges, nodes, index)
+    return world
+
+
+def add_markets(world: World, edges: dict, nodes: dict):
     # add markets
     for market_operator in edges["world"]["marketProvider"]:
         target_market_operator = market_operator["target"]
@@ -69,14 +75,14 @@ def process_data(input: dict):
                     market_id=target_market,
                     market_mechanism=data["market_mechanism"],
                     opening_hours=rr.rrule(
-                        rr.HOURLY, interval=24, dtstart=start, until=end
+                        rr.HOURLY, interval=24, dtstart=world.start, until=world.end
                     ),
                     opening_duration=timedelta(minutes=int(data["opening_duration"])),
                     market_products=market_products,
                 ),
             )
 
-    # add unit operators and units
+def add_units(world: World, edges: dict, nodes: dict, index):
     for unit_operator in edges["world"]["unitOperator"]:
         target_unit_operator = unit_operator["target"]
         world.add_unit_operator(target_unit_operator)
@@ -88,12 +94,14 @@ def process_data(input: dict):
                     "strategy"
                 ]
             unitData = nodes[target_unit]["data"]
-            if unitData["unitType"] == "demand":
-                forecast = NaiveForecast(index, demand=unitData.get("demand", 100))
-            elif unitData["unitType"] == "power_plant":
-                forecast = NaiveForecast(
-                    index, availability=1, fuel_price=3, co2_price=0.1
-                )
+            forecast = NaiveForecast(
+                index=index,
+                availability=float(unitData.get("forecast_availability", 1)),
+                fuel_price=float(unitData.get("forecast_fuel_price", 10)),
+                co2_price=float(unitData.get("forecast_co2_price", 10)),
+                demand=float(unitData.get("forecast_demand", 100)),
+                price_forecast=float(unitData.get("forecast_price", 50)),
+            )
             world.add_unit(
                 id=target_unit,
                 unit_operator_id=target_unit_operator,
