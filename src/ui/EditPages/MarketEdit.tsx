@@ -1,6 +1,7 @@
 import { handleChange } from "../../utils";
+import Input from "../InputComponents/Input";
+import Select from "../InputComponents/Select";
 import type { EditComponentArgs } from "../NodeEditSidebar";
-import { Input, Select } from "./Input";
 
 
 

@@ -1,7 +1,9 @@
 import type { ChangeEvent } from "react";
 import { handleChange } from "../../utils";
 import type { EditComponentArgs } from "../NodeEditSidebar";
-import { Input, Select } from "./Input";
+import Select from "../InputComponents/Select";
+import Input from "../InputComponents/Input";
+import Modal from "../InputComponents/Modal";
 
 
 
@@ -22,12 +24,13 @@ export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
             {data.unitType && (
                 <>
                     <Input label="Technology" id="technology" type="text" value={data.technology} onChange={onChange("technology")} />
-                    <h1 >Forecast</h1>
-                    <Input label="Forecast availability" id="forecast_availability" type="number" value={data.forecast_availability ?? 1} onChange={onChange("forecast_availability")} />
-                    <Input label="Forecast fuel price" id="forecast_fuel_price" type="number" value={data.forecast_fuel_price ?? 10} onChange={onChange("forecast_fuel_price")} />
-                    <Input label="Forecast CO2 price" id="forecast_co2_price" type="number" value={data.forecast_co2_price ?? 10} onChange={onChange("forecast_co2_price")} />
-                    <Input label="Forecast Demand" id="forecast_demand" type="number" value={data.forecast_demand ?? 100} onChange={onChange("forecast_demand")} />
-                    <Input label="Forecast Price" id="forecast_price" type="number" value={data.forecast_price ?? 50} onChange={onChange("forecast_price")} />
+                    <Modal name="Forecast settings">
+                        <Input label="Forecast availability" id="forecast_availability" type="number" value={data.forecast_availability ?? 1} onChange={onChange("forecast_availability")} />
+                        <Input label="Forecast fuel price" id="forecast_fuel_price" type="number" value={data.forecast_fuel_price ?? 10} onChange={onChange("forecast_fuel_price")} />
+                        <Input label="Forecast CO2 price" id="forecast_co2_price" type="number" value={data.forecast_co2_price ?? 10} onChange={onChange("forecast_co2_price")} />
+                        <Input label="Forecast Demand" id="forecast_demand" type="number" value={data.forecast_demand ?? 100} onChange={onChange("forecast_demand")} />
+                        <Input label="Forecast Price" id="forecast_price" type="number" value={data.forecast_price ?? 50} onChange={onChange("forecast_price")} />
+                    </Modal>
                 </>
             )}
             {data.unitType === "demand" && (

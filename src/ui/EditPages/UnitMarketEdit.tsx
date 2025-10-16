@@ -1,6 +1,6 @@
 import { handleChange } from "../../utils";
+import Input from "../InputComponents/Input";
 import type { EditComponentArgs } from "../NodeEditSidebar";
-import { Input } from "./Input";
 
 export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
     const onChange = handleChange(id, data, updateNodeValue);

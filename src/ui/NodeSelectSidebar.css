@@ -4,17 +4,7 @@
   display: flex;
   flex-grow: 1;
   height: 100%;
-}
- 
-.dndflow #nodeSelect {
-  border-right: 1px solid #eee;
-  padding: 15px 10px;
-  font-size: 12px;
-  background: #fcfcfc;
-}
- 
-.dndflow #nodeSelect .description {
-  margin-bottom: 10px;
+  flex-direction: row;
 }
  
 .dndflow .dndnode {
@@ -34,12 +24,6 @@
   text-wrap: nowrap;
 }
  
-.dndflow .ghostnode {
-  position: fixed;
-  pointer-events: none;
-  width: 100px;
-}
- 
 .dndflow .dndnode:active {
   cursor: grabbing;
 }
@@ -48,15 +32,3 @@
   flex-grow: 1;
   height: 100%;
 }
- 
-@media screen and (min-width: 768px) {
-  .dndflow {
-    flex-direction: row;
-  }
- 
-  .dndflow #nodeSelect {
-    width: 20%;
-    max-width: 250px;
-  }
-}
-
