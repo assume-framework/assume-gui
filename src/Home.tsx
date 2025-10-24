@@ -12,6 +12,8 @@ import { UnitMarketEdge } from './ui/Edges';
 import EditSidebar, { type EditSidebarData, type EditSidebarProps } from './ui/NodeEditSidebar';
 import { MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
 import SelectSidebar from './ui/NodeSelectSidebar';
+import Header from './Header';
+import Footer from './Footer';
 
 const nodeTypes = {
   unit: UnitNode,
@@ -178,30 +180,36 @@ export default function Home() {
           data={nodeData.data}
           updateNodeValue={nodeData.isEdge ? updateEdgeValue : updateNodeValue}
         /> : <SelectSidebar />}
-      <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-        <ReactFlow
-          deleteKeyCode={["Delete", "Backspace"]}
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          onNodesChange={onNodesChange}
-          onPaneClick={onPaneClick}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onDragOver={onDragOver}
-          isValidConnection={isValidConnection}
-          onDrop={onDrop}
-          edgeTypes={edgeTypes}
-          fitView
-        >
-          <Controls />
-          <Background />
-          <Panel position="bottom-right" className='w-48'>
-            <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={() => sendData(nodes, edges)}>Submit</button>
-            <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={save}>Save</button>
-            <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={reset}>Reset</button>
-          </Panel>
-        </ReactFlow>
+
+      <div className="flex grow flex-col">
+        <Header />
+        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
+          
+          <ReactFlow
+            deleteKeyCode={["Delete", "Backspace"]}
+            nodes={nodes}
+            edges={edges}
+            nodeTypes={nodeTypes}
+            onNodesChange={onNodesChange}
+            onPaneClick={onPaneClick}
+            onEdgesChange={onEdgesChange}
+            onConnect={onConnect}
+            onDragOver={onDragOver}
+            isValidConnection={isValidConnection}
+            onDrop={onDrop}
+            edgeTypes={edgeTypes}
+            fitView
+          >
+            <Controls />
+            <Background />
+            <Panel position="bottom-right" className='w-48'>
+              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={() => sendData(nodes, edges)}>Submit</button>
+              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={save}>Save</button>
+              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={reset}>Reset</button>
+            </Panel>
+          </ReactFlow>
+        </div>
+        <Footer/>
       </div>
     </div >
   );
