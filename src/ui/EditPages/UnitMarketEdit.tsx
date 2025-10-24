@@ -2,7 +2,7 @@ import { handleChange } from "../../utils";
 import Select from "../InputComponents/Select";
 import type { EditComponentArgs } from "../NodeEditSidebar";
 
-export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
+function UnitMarketEdit ({ id, data, updateNodeValue }: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue);
     return (
         <>
@@ -36,3 +36,5 @@ export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
         </>
     );
 }
+
+export default UnitMarketEdit;

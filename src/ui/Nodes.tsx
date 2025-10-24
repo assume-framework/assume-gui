@@ -26,14 +26,14 @@ export function WorldNode({ data, isConnectable }: NodeProps<Node<EditSidebarDat
 }
 
 export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
-
+    const connections = useNodeConnections({handleType: "target", handleId: "marketProvider_handle"});
     return (
         <>
             <Handle
                 id="marketProvider_handle"
                 type="target"
                 position={Position.Top}
-                isConnectable={isConnectable && useNodeConnections({handleType: "target", handleId: "marketProvider_handle"}).length == 0}
+                isConnectable={isConnectable && connections.length == 0}
             />
             <Handle
                 id="unit_handle"
@@ -53,13 +53,14 @@ export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarDa
 }
 
 export function MarketProviderNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+    const connections = useNodeConnections({handleType: "target", handleId: "world_handle"});
     return (
         <>
             <Handle
                 id="world_handle"
                 type="target"
                 position={Position.Top}
-                isConnectable={isConnectable && useNodeConnections({handleType: "target", handleId: "world_handle"}).length == 0}
+                isConnectable={isConnectable && connections.length == 0}
             />
 
             {renderUnit('Market Provider', data.name)}
@@ -75,13 +76,14 @@ export function MarketProviderNode({ data, isConnectable }: NodeProps<Node<EditS
 
 
 export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+    const connections = useNodeConnections({handleType: "target", handleId: "unitOperator_handle"});
     return (
         <>
             <Handle
                 id="unitOperator_handle"
                 type="target"
                 position={Position.Top}
-                isConnectable={isConnectable && useNodeConnections({handleType: "target", handleId: "unitOperator_handle"}).length == 0}
+                isConnectable={isConnectable && connections.length == 0}
             />
             {renderUnit(data.unitType ?? 'Unit', data.name)}
             <Handle
@@ -95,13 +97,14 @@ export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData
 }
 
 export function UnitOperatorNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+    const connections = useNodeConnections({handleType: "target", handleId: "world_handle"});
     return (
         <>
             <Handle
                 id="world_handle"
                 type="target"
                 position={Position.Top}
-                isConnectable={isConnectable && useNodeConnections({handleType: "target", handleId: "world_handle"}).length == 0}
+                isConnectable={isConnectable && connections.length == 0}
             />
             {renderUnit('Unit Operator', data.name)}
             <Handle
@@ -116,13 +119,14 @@ export function UnitOperatorNode({ data, isConnectable }: NodeProps<Node<EditSid
 
 
 export function MarketProductNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+    const connections = useNodeConnections({handleType: "target", handleId: "market_handle"});
     return (
         <>
             <Handle
                 id="market_handle"
                 type="target"
                 position={Position.Top}
-                isConnectable={isConnectable && useNodeConnections({handleType: "target", handleId: "market_handle"}).length == 0}
+                isConnectable={isConnectable && connections.length == 0}
             />
             {renderUnit('Market Product', data.name)}
         </>

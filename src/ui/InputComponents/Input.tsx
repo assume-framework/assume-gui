@@ -4,7 +4,7 @@ interface InputProperties extends BaseProps {
     type: string
 }
 
-export default ({
+function Input ({
     type,
     id,
     value,
@@ -12,7 +12,7 @@ export default ({
     disabled = false,
     required = false,
     onChange
-}: InputProperties) => {
+}: InputProperties) {
 
     return (
         <div>
@@ -39,3 +39,5 @@ export default ({
         </div>
     )
 }
+
+export default Input;

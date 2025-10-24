@@ -7,7 +7,7 @@ import Modal from "../InputComponents/Modal";
 
 
 
-export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
+function editUnit ({ id, data, updateNodeValue }: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue);
     const reset = (event: ChangeEvent<any>) => updateNodeValue(id, { name: data.name, unitType: event.target.value })
 
@@ -71,3 +71,5 @@ export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
         </>
     )
 }
+
+export default editUnit;

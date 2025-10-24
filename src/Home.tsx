@@ -103,7 +103,7 @@ export default function Home() {
   );
   const onConnect: OnConnect = useCallback(
     (connection) => setEdges((eds) => {
-      let newEdge: Edge<EditSidebarData> = {
+      const newEdge: Edge<EditSidebarData> = {
         id: `${connection.source}#${connection.sourceHandle}#${connection.target}#${connection.targetHandle}`,
         source: connection.source,
         sourceHandle: connection.sourceHandle,

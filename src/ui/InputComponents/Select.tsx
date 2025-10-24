@@ -4,7 +4,7 @@ interface SelectProperties extends BaseProps {
     children: React.ReactNode
 }
 
-export default ({
+function Select ({
     id,
     value,
     label,
@@ -12,7 +12,7 @@ export default ({
     disabled = false,
     required = false,
     children
-}: SelectProperties) => {
+}: SelectProperties) {
     return (
         <div>
             <label htmlFor={id} className="block text-gray-700 text-sm font-bold mt-2">{label}</label>
@@ -31,3 +31,4 @@ export default ({
     )
 }
 
+export default Select
