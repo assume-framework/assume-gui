@@ -18,7 +18,7 @@ app.mount("/", StaticFiles(directory="./dist", html=True), name="frontend")
 
 
 def cli():
-    uvicorn.run(app, host="0.0.0.0", port=8080)
+    uvicorn.run(app, host="0.0.0.0", port=9090)
 
 
 if __name__ == "__main__":

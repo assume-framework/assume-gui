@@ -22,6 +22,6 @@ RUN pip install --no-cache-dir -e .
 COPY --from=build-frontend /frontend/dist /server/dist
 
 ENV DATABASE_URL=postgresql://assume@assume_db:5432/assume?password=assume
-EXPOSE 8080
+EXPOSE 9090
 CMD ["assume-gui"]
 
