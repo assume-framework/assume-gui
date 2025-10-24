@@ -82,6 +82,7 @@ def add_markets(world: World, edges: dict, nodes: dict):
                 ),
             )
 
+
 def add_units(world: World, edges: dict, nodes: dict, index):
     for unit_operator in edges["world"]["unitOperator"]:
         target_unit_operator = unit_operator["target"]

@@ -11,7 +11,7 @@ name = "assume-gui"
 version = "0.5.5"
 description = "ASSUME - GUI"
 authors = [{ name = "ASSUME Developers", email = "contact@assume-project.de"}]
-license = {text = "AGPL-3.0-or-later"}
+license = "AGPL-3.0-or-later"
 readme = "README.md"
 keywords = ["agent based simulation", "energy market", "fastapi", "user interface", "simulation"]
 
@@ -57,8 +57,11 @@ Issues = "https://github.com/assume-framework/assume-gui/issues"
 [project.scripts]
 assume-gui = "backend.main:cli"
 
-[tool.setuptools]
-packages = {find = {}}
+[tool.setuptools.packages.find]
+include = ["backend"]
+
+[tool.setuptools.package-data]
+"*" = ["static/**"]
 
 [tool.ruff]
 

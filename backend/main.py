@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -14,7 +16,11 @@ def send_data(data: dict):
     return {"status": "success"}
 
 
-app.mount("/", StaticFiles(directory="./dist", html=True), name="frontend")
+app.mount(
+    "/",
+    StaticFiles(directory=Path(__file__).parent / "static", html=True),
+    name="frontend",
+)
 
 
 def cli():
