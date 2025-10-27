@@ -1,6 +1,6 @@
 import type { Node, Edge } from "@xyflow/react";
 
-export default async (nodes: Node[], edges: Edge[]) => {
+async function sendData(nodes: Node[], edges: Edge[]){
     const n = nodes.map(n => ({ id: n.id, type: n.type, data: n.data }));
     const e = edges.map(e => ({ id: e.id, type: e.type, data: e.data }));
 
@@ -15,5 +15,6 @@ export default async (nodes: Node[], edges: Edge[]) => {
     } catch (error) {
         console.error("Error sending data:", error);
     }
-
 }
+
+export default sendData;

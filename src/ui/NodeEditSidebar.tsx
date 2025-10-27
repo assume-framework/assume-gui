@@ -28,7 +28,7 @@ export type EditSidebarProps = {
 type updateFunction = { updateNodeValue: (id: string, data: EditSidebarData) => void; }
 
 
-export default ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFunction) => {
+function editSidebar ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFunction) {
     // const [internalData, setInternalData] = useState<EditSidebarData>(data);
     const onChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const d = { ...data }
@@ -48,3 +48,5 @@ export default ({ id, type, data, updateNodeValue }: EditSidebarProps & updateFu
         </aside>
     )
 }
+
+export default editSidebar;

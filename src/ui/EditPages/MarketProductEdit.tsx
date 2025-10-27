@@ -2,10 +2,7 @@ import { handleChange } from "../../utils";
 import type { EditComponentArgs } from "../NodeEditSidebar";
 import Input from "../InputComponents/Input";
 
-
-
-
-export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
+function editMarketProduct ({ id, data, updateNodeValue }: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue);
 
     return (
@@ -16,3 +13,5 @@ export default ({ id, data, updateNodeValue }: EditComponentArgs) => {
         </>
     )
 }
+
+export default editMarketProduct;

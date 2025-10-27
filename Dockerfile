@@ -19,7 +19,7 @@ RUN pip-compile --resolver=backtracking -o requirements.txt ./pyproject.toml
 COPY backend /server/backend
 RUN pip install --no-cache-dir -e .
 
-COPY --from=build-frontend /frontend/dist /server/dist
+COPY --from=build-frontend /frontend/backend/static /server/backend/static
 
 ENV DATABASE_URL=postgresql://assume@assume_db:5432/assume?password=assume
 EXPOSE 8080

@@ -4,7 +4,7 @@ import { createContext, type ReactNode, type SetStateAction, useState } from 're
 
 import type { Dispatch } from 'react';
 
-const DnDContext = createContext<[string, Dispatch<SetStateAction<string>>]>(['', (_) => {}]);
+const DnDContext = createContext<[string, Dispatch<SetStateAction<string>>]>(['', () => {}]);
 
 export { DnDContext };
 
