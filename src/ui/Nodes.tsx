@@ -8,14 +8,14 @@ export function WorldNode({ data, isConnectable }: NodeProps<Node<EditSidebarDat
         <>
             {renderUnit('World', data.name)}
             <Handle
-                id="unitOperator_handle"
+                id="marketProvider_handle"
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 style={{ left: '25%' }}
             />
             <Handle
-                id="marketProvider_handle"
+                id="unitOperator_handle"
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
@@ -37,8 +37,8 @@ export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarDa
             />
             <Handle
                 id="unit_handle"
-                type="target"
-                position={Position.Left}
+                type="source"
+                position={Position.Right}
                 isConnectable={isConnectable}
             />
             {renderUnit('Market', data.name)}
@@ -88,8 +88,8 @@ export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData
             {renderUnit(data.unitType ?? 'Unit', data.name)}
             <Handle
                 id="market_handle"
-                type="source"
-                position={Position.Right}
+                type="target"
+                position={Position.Left}
                 isConnectable={isConnectable}
             />
         </>
