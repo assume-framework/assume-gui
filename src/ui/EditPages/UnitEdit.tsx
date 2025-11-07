@@ -41,8 +41,8 @@ function editUnit ({ id, data, updateNodeValue }: EditComponentArgs) {
                     <Input label="Efficiency" id="efficiency" type="number" value={data.efficiency ?? 1} onChange={onChange("efficiency")} />
                     <Input label="Ramp Down (MW/min)" id="ramp_down" type="number" value={data.ramp_down ?? 0} onChange={onChange("ramp_down")} />
                     <Input label="Ramp Up (MW/min)" id="ramp_up" type="number" value={data.ramp_up ?? 0} onChange={onChange("ramp_up")} />
-                    <Input label="Min Operating Time (min)" id="min_operating_time" type="number" value={data.min_operating_time ?? 0} onChange={onChange("min_operating_time")} />
-                    <Input label="Min Downtime (min)" id="min_downtime" type="number" value={data.min_downtime ?? 0} onChange={onChange("min_downtime")} />
+                    <Input label="Min Operating Time (min)" id="min_operating_time" type="number" value={data.min_operating_time ?? 1} onChange={onChange("min_operating_time")} />
+                    <Input label="Min Downtime (min)" id="min_downtime" type="number" value={data.min_downtime ?? 1} onChange={onChange("min_downtime")} />
                 </>
             )}
             {data.unitType === "storage" && (

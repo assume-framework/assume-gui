@@ -1,8 +1,10 @@
 import os
 from datetime import datetime, timedelta
+from typing import Tuple
 
 import pandas as pd
 from assume import MarketConfig, MarketProduct, World
+from assume.common.market_objects import OnlyHours
 from assume.common.forecasts import NaiveForecast
 from dateutil import rrule as rr
 
@@ -59,6 +61,7 @@ def add_markets(world: World, edges: dict, nodes: dict):
             for market_product in edges[target_market]["marketProduct"]:
                 target_market_product = market_product["target"]
                 productData = nodes[target_market_product]["data"]
+                print(productData)
                 market_products.append(
                     MarketProduct(
                         duration=timedelta(minutes=int(productData["duration"])),
@@ -66,6 +69,8 @@ def add_markets(world: World, edges: dict, nodes: dict):
                         first_delivery=timedelta(
                             minutes=int(productData["first_delivery"])
                         ),
+                        only_hours=_only_hours(productData["only_hours"]),
+                        eligible_lambda_function=_optional_string(productData.get("eligible_lambda_function"))
                     )
                 )
             data = nodes[target_market]["data"]
@@ -126,3 +131,13 @@ def add_units(world: World, edges: dict, nodes: dict, index):
                 forecaster=forecast,
             )
     return world
+
+def _only_hours(s: str) -> OnlyHours:
+    if s is None or s == "" or len(s.split(",")) != 2:
+        return None
+    return OnlyHours(int(s.split(",")[0]), int(s.split(",")[1]))
+
+def _optional_string(s: str) -> str | None:
+    if s is None or s == "" or s.lower() == "none":
+        return None
+    return s

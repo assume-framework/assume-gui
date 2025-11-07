@@ -114,7 +114,7 @@ export default function Home() {
         type: 'default',
         data: { name: `${connection.source}-${connection.target}` },
       };
-      if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
+      if (connection.source.startsWith('market') && connection.target.startsWith('unit')) {
         newEdge.type = 'unit-market';
       }
       return addEdge(newEdge, eds);
