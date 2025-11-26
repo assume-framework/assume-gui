@@ -68,7 +68,7 @@ def add_markets(world: World, edges: dict, nodes: dict):
                         first_delivery=timedelta(
                             minutes=int(productData["first_delivery"])
                         ),
-                        only_hours=_only_hours(productData["only_hours"]),
+                        only_hours=_only_hours(productData.get("only_hours", "")),
                         eligible_lambda_function=_optional_string(
                             productData.get("eligible_lambda_function")
                         ),
@@ -134,7 +134,7 @@ def add_units(world: World, edges: dict, nodes: dict, index):
     return world
 
 
-def _only_hours(s: str) -> OnlyHours:
+def _only_hours(s: str) -> OnlyHours | None:
     if s is None or s == "" or len(s.split(",")) != 2:
         return None
     return OnlyHours(int(s.split(",")[0]), int(s.split(",")[1]))

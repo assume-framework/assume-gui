@@ -37,7 +37,7 @@ export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarDa
             />
             <Handle
                 id="unit_handle"
-                type="source"
+                type="target"
                 position={Position.Right}
                 isConnectable={isConnectable}
             />
@@ -88,7 +88,7 @@ export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData
             {renderUnit(data.unitType ?? 'Unit', data.name)}
             <Handle
                 id="market_handle"
-                type="target"
+                type="source"
                 position={Position.Left}
                 isConnectable={isConnectable}
             />
