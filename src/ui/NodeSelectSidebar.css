@@ -1,16 +1,15 @@
-
 .dndflow {
-  flex-direction: column;
   display: flex;
   flex-grow: 1;
   height: 100%;
   flex-direction: row;
 }
  
-.dndflow .dndnode {
+.dndnode {
   height: 40px;
   padding: 8px;
-  border: 1px solid #1a192b;
+  border: 2px solid var(--color-stone-400);
+  font-weight: bold;
   border-radius: 6px;
   margin-bottom: 10px;
   display: flex;
@@ -21,14 +20,8 @@
   touch-action: none;
   background: white;
   font-size: 12px;
-  text-wrap: nowrap;
 }
  
-.dndflow .dndnode:active {
+.dndnode:active {
   cursor: grabbing;
-}
- 
-.dndflow .reactflow-wrapper {
-  flex-grow: 1;
-  height: 100%;
 }
