@@ -1,19 +1,37 @@
 'use client'
 
-import { addEdge, applyEdgeChanges, applyNodeChanges, Background, Controls, Panel, ReactFlow, useReactFlow, type Connection, type Edge, type EdgeChange, type Node, type NodeChange, type NodeSelectionChange, type OnConnect, type OnEdgesChange, type OnNodesChange } from '@xyflow/react';
-import React, { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  addEdge,
+  applyEdgeChanges,
+  applyNodeChanges,
+  Background,
+  Panel,
+  Controls,
+  ReactFlow,
+  useReactFlow,
+  type Connection,
+  type Edge,
+  type EdgeChange,
+  type Node,
+  type NodeChange,
+  type NodeSelectionChange,
+  type OnConnect,
+  type OnEdgesChange,
+  type OnNodesChange
+} from '@xyflow/react';
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
 
-import { DnDContext } from './DragDropCtx';
-import sendData from './sendData';
-import { UnitMarketEdge } from './ui/Edges';
-import EditSidebar, { type EditSidebarData, type EditSidebarProps } from './ui/NodeEditSidebar';
-import { MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode } from './ui/Nodes';
+import {DnDContext} from './DragDropCtx';
+import {UnitMarketEdge} from './ui/Edges';
+import EditSidebar, {type EditSidebarData, type EditSidebarProps} from './ui/NodeEditSidebar';
+import {MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode} from './ui/Nodes';
 import SelectSidebar from './ui/NodeSelectSidebar';
 import Header from './Header';
 import Footer from './Footer';
+import Cockpit from "./ui/Cockpit.tsx";
 
 const nodeTypes = {
   unit: UnitNode,
@@ -29,7 +47,13 @@ const edgeTypes = {
 }
 
 const initialEdges: Edge<EditSidebarData>[] = [];
-const initialNodes: Node<EditSidebarData>[] = [{ id: 'world', type: "world", position: { x: 300, y: 0 }, data: { name: "World Node" }, deletable: false }];
+const initialNodes: Node<EditSidebarData>[] = [{
+  id: 'world',
+  type: "world",
+  position: {x: 300, y: 0},
+  data: {name: "World Node"},
+  deletable: false
+}];
 
 const isValidConnection = (connection: Connection | Edge) =>
   connection.targetHandle?.split("_")[0] == connection.source?.split("_")[0] &&
@@ -44,7 +68,7 @@ export default function Home() {
   const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(initialEdges);
   const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
   const [type] = useContext(DnDContext);
-  const { screenToFlowPosition } = useReactFlow();
+  const {screenToFlowPosition} = useReactFlow();
 
   const updateNodeValue = useCallback((id: string, data: EditSidebarData) => {
     const node = nodes.find(n => n.id === id);
@@ -53,7 +77,7 @@ export default function Home() {
     setNodes(updated);
     let nd = nodeData;
     if (!nd) {
-      nd = { id: node!.id, data: node!.data, type: node!.type };
+      nd = {id: node!.id, data: node!.data, type: node!.type};
     }
     nd.data = data;
     setNodeData(nd);
@@ -66,7 +90,7 @@ export default function Home() {
     setEdges(updated);
     let ed = nodeData;
     if (!ed) {
-      ed = { id: edge!.id, data: edge!.data, type: edge!.type, isEdge: true };
+      ed = {id: edge!.id, data: edge!.data, type: edge!.type, isEdge: true};
     }
     ed.data = data;
     setNodeData(ed);
@@ -81,7 +105,7 @@ export default function Home() {
       const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected === true);
       const node: Node<EditSidebarData> | undefined = nodes.find(n => n.id === selectedChange?.id);
       if (node) {
-        setNodeData({ id: node.id, type: node.type, data: node.data });
+        setNodeData({id: node.id, type: node.type, data: node.data});
         return
       }
     },
@@ -97,7 +121,7 @@ export default function Home() {
       const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected === true);
       const edge: Edge<EditSidebarData> | undefined = edges.find(e => e.id === selectedChange?.id);
       if (edge) {
-        setNodeData({ id: edge.id, type: edge.type, data: edge.data!, isEdge: true });
+        setNodeData({id: edge.id, type: edge.type, data: edge.data!, isEdge: true});
         return
       }
     },
@@ -112,7 +136,7 @@ export default function Home() {
         target: connection.target,
         targetHandle: connection.targetHandle,
         type: 'default',
-        data: { name: `${connection.source}-${connection.target}` },
+        data: {name: `${connection.source}-${connection.target}`},
       };
       if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
         newEdge.type = 'unit-market';
@@ -146,10 +170,6 @@ export default function Home() {
     setNodes((nds) => nds.concat(newNode));
   }, [screenToFlowPosition, type]);
 
-  const save = useCallback(() => {
-    localStorage.setItem('flow', JSON.stringify({ "nodes": nodes, "edges": edges }));
-  }, [nodes, edges]);
-
   const reset = useCallback(() => {
     if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
       return;
@@ -161,15 +181,22 @@ export default function Home() {
   }, [setNodes, setEdges, setNodeData]);
 
 
-  const onPaneClick = useCallback(() => { setNodeData(null) }, [setNodeData]);
+  const onPaneClick = useCallback(() => {
+    setNodeData(null)
+  }, [setNodeData]);
+
+  const setFlowByJson = useCallback((data: string) => {
+    const {nodes, edges} = JSON.parse(data);
+    setNodes(nodes);
+    setEdges(edges);
+  }, [setNodes, setEdges]);
+
   useEffect(() => {
     const flow = localStorage.getItem('flow');
     if (flow) {
-      const { nodes, edges } = JSON.parse(flow);
-      setNodes(nodes);
-      setEdges(edges);
+      setFlowByJson(flow)
     }
-  }, [setNodes, setEdges]);
+  }, [setNodes, setEdges, setFlowByJson]);
 
   return (
     <div className="dndflow">
@@ -179,12 +206,11 @@ export default function Home() {
           type={nodeData.type}
           data={nodeData.data}
           updateNodeValue={nodeData.isEdge ? updateEdgeValue : updateNodeValue}
-        /> : <SelectSidebar />}
+        /> : <SelectSidebar/>}
 
       <div className="flex grow flex-col">
         <Header />
-        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-          
+        <div className="grow" ref={reactFlowWrapper}>
           <ReactFlow
             deleteKeyCode={["Delete", "Backspace"]}
             nodes={nodes}
@@ -203,14 +229,12 @@ export default function Home() {
             <Controls />
             <Background />
             <Panel position="bottom-right" className='w-48'>
-              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={() => sendData(nodes, edges)}>Submit</button>
-              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={save}>Save</button>
-              <button className='bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-1 py-1 px-1' onClick={reset}>Reset</button>
+              <Cockpit nodes={nodes} edges={edges} reset={reset} setFlowByJson={setFlowByJson}/>
             </Panel>
           </ReactFlow>
         </div>
         <Footer/>
       </div>
-    </div >
+    </div>
   );
 }
