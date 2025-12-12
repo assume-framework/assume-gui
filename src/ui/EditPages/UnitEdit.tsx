@@ -20,6 +20,7 @@ function editUnit ({ id, data, updateNodeValue }: EditComponentArgs) {
                 <option value="building">Building</option>
                 <option value="hydrogen_plant">Hydrogen Plant</option>
                 <option value="steel_plant">Steel Plant</option>
+                <option value="exchange">Exchange</option>
             </Select>
             {data.unitType && (
                 <>
@@ -56,6 +57,12 @@ function editUnit ({ id, data, updateNodeValue }: EditComponentArgs) {
                     <Input label="Initial SOC" id="initial_soc" type="number" value={data.initial_soc ?? 0} onChange={onChange("initial_soc")} />
                     <Input label="SOC Tick" id="soc_tick" type="number" value={data.soc_tick ?? 0.01} onChange={onChange("soc_tick")} />
                 </>
+            )}
+            {(data.unitType === "exchange") && (
+              <>
+                <Input type="number" id="volume_import" label="Volume import" value={data.volume_import} onChange={onChange("volume_import")} />
+                <Input type="number" id="volume_export" label="Volume export" value={data.volume_export} onChange={onChange("volume_export")} />
+              </>
             )}
             {data.unitType && (
                 <>
