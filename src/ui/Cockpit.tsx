@@ -6,7 +6,7 @@ import {
   FileDownloadOutlined
 } from '@mui/icons-material';
 import {useCallback} from "react";
-import sendData from "../sendData.tsx";
+import sendData from "../sendData.ts";
 import type {Node, Edge} from "@xyflow/react";
 import type {EditSidebarData} from "./NodeEditSidebar.tsx";
 
