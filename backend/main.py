@@ -3,7 +3,8 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from process import process_data
+
+from .process import process_data
 
 app = FastAPI()
 
