@@ -1,16 +1,19 @@
+import os
+import uuid
 from pathlib import Path
 
+import pandas as pd
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 
-from .process import process_data
+from backend.process import process_data
 
 app = FastAPI()
 
 
 @app.post("/api/submit")
-def send_data(data: dict):
+async def send_data(data: dict):
     try:
         world = process_data(data)
         world.run()
@@ -20,6 +23,14 @@ def send_data(data: dict):
         return HTTPException(status_code=500, detail=str(e))
     return {"status": "success"}
 
+@app.post("/api/upload")
+async def upload_file(file: UploadFile):
+    uid = str(uuid.uuid4())
+    tmpfile = Path(__file__).parent /'tmp'/ f'{uid}.csv'
+    tmpfile.parent.mkdir(exist_ok=True, parents=True)
+    content = (await file.read()).decode('utf-8')
+    tmpfile.open('w+').write(content)
+    return {"id": uid}
 
 app.mount(
     "/",

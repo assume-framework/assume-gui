@@ -8,7 +8,7 @@ import WorldEdit from "./EditPages/WorldEdit";
 export interface EditSidebarData {
     // properties that shall be editable in the sidebar
     name: string;
-    [key: string]: string;
+    [key: string]: any;
 }
 
 export type EditComponentArgs = {
@@ -16,7 +16,6 @@ export type EditComponentArgs = {
     data: EditSidebarData,
     updateNodeValue: (id: string, data: EditSidebarData) => void
 }
-
 
 export type EditSidebarProps = {
     id: string;

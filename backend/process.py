@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from assume import MarketConfig, MarketProduct, World
-from assume.common.forecasts import NaiveForecast
+from assume.common.forecaster import UnitForecaster, DemandForecaster, PowerplantForecaster, ExchangeForecaster, \
+    ForecastIndex
 from assume.common.market_objects import OnlyHours
 from dateutil import rrule as rr
 
@@ -41,7 +42,6 @@ def process_data(input: dict):
         end=end,
         save_frequency_hours=int(worldData["save_frequency_hours"]),
         simulation_id=worldData["simulation_id"],
-        index=index,
     )
 
     add_markets(world, edges, nodes)
@@ -88,8 +88,52 @@ def add_markets(world: World, edges: dict, nodes: dict):
                 ),
             )
 
+def forecaster_for_type(index: ForecastIndex, data: dict) -> UnitForecaster:
+    forecasts = data["forecasts"]
+    match data["unitType"]:
+        case "demand":
+            return DemandForecaster(
+                index=index,
+                availability=forecasts.get("availability", 1),
+                demand=forecasts.get("demand", -100),
+            )
+        case "power_plant":
+            return PowerplantForecaster(
+                index=index,
+                availability=forecasts.get("availability", 1),
+            )
+        case "exchange":
+            return ExchangeForecaster(
+                index=index,
+                availability=forecasts.get("availability", 1),
+
+            )
+        case "storage":
+            return UnitForecaster(
+                index=index,
+                availability=forecasts.get("availability", 1),
+            )
+        # TODO: DSM Units
+        # case "building":
+        #     return BuildingForecaster(
+        #         index=index,
+        #         availability=forecasts.get("availability", 1),
+        #     )
+        # case "hydrogen_plant":
+        #     return HydrogenForecaster(
+        #         index=index,
+        #         availability=forecasts.get("availability", 1),
+        #     )
+        # case "steel_plant":
+        #     return SteelplantForecaster(
+        #         index=index,
+        #         availability=forecasts.get("availability", 1),
+        #     )
+    raise NotImplementedError(f"Forecaster for unit type {data['unitType']} is not implemented.")
+
 
 def add_units(world: World, edges: dict, nodes: dict, index):
+
     for unit_operator in edges["world"]["unitOperator"]:
         target_unit_operator = unit_operator["target"]
         world.add_unit_operator(target_unit_operator)
@@ -101,14 +145,6 @@ def add_units(world: World, edges: dict, nodes: dict, index):
                     "strategy"
                 ]
             unitData = nodes[target_unit]["data"]
-            forecast = NaiveForecast(
-                index=index,
-                availability=float(unitData.get("forecast_availability", 1)),
-                fuel_price=float(unitData.get("forecast_fuel_price", 10)),
-                co2_price=float(unitData.get("forecast_co2_price", 10)),
-                demand=float(unitData.get("forecast_demand", 100)),
-                price_forecast=float(unitData.get("forecast_price", 50)),
-            )
             world.add_unit(
                 id=target_unit,
                 unit_operator_id=target_unit_operator,
@@ -129,7 +165,7 @@ def add_units(world: World, edges: dict, nodes: dict, index):
                     "max_power_discharge": int(unitData.get("max_power_discharge", 0)),
                     "max_soc": int(unitData.get("max_soc", 0)),
                 },
-                forecaster=forecast,
+                forecaster=forecaster_for_type(index, unitData),
             )
     return world
 
