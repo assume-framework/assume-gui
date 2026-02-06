@@ -1,9 +1,9 @@
-import { handleChange } from "../../utils";
-import Select from "../InputComponents/Select";
+import { handleChange } from "../../../utils";
+import Select from "../../InputComponents/Select";
 import type { EditComponentArgs } from "../NodeEditSidebar";
 
 function UnitMarketEdit ({ id, data, updateNodeValue }: EditComponentArgs) {
-    const onChange = handleChange(id, data, updateNodeValue);
+    const onChange = handleChange(id, data, updateNodeValue, true);
     return (
         <>
             <Select label="Strategy" id="strategy" value={data.strategy} onChange={onChange("strategy")}>

@@ -1,14 +1,14 @@
 import type {ChangeEvent} from "react";
-import {handleChange} from "../../utils";
+import {handleChange} from "../../../utils";
 import type {EditComponentArgs} from "../NodeEditSidebar";
-import Select from "../InputComponents/Select";
-import Input from "../InputComponents/Input";
-import Modal from "../InputComponents/Modal";
+import Select from "../../InputComponents/Select";
+import Input from "../../InputComponents/Input";
+import Modal from "../../InputComponents/Modal";
 
 
 export default function editUnit({id, data, updateNodeValue}: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue);
-    const reset = (event: ChangeEvent<any>) => updateNodeValue(id, {name: data.name, unitType: event.target.value})
+    const reset = (event: ChangeEvent<HTMLSelectElement>) => updateNodeValue(id, {name: data.name, unitType: event.target.value}, false)
 
     return (
         <>

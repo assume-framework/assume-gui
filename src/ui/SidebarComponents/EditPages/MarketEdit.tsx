@@ -1,6 +1,6 @@
-import { handleChange } from "../../utils";
-import Input from "../InputComponents/Input";
-import Select from "../InputComponents/Select";
+import { handleChange } from "../../../utils";
+import Input from "../../InputComponents/Input";
+import Select from "../../InputComponents/Select";
 import type { EditComponentArgs } from "../NodeEditSidebar";
 
 function editMarket({ id, data, updateNodeValue }: EditComponentArgs) {

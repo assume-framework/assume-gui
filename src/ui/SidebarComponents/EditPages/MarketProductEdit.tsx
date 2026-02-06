@@ -1,7 +1,7 @@
-import { handleChange } from "../../utils";
+import { handleChange } from "../../../utils";
 import type { EditComponentArgs } from "../NodeEditSidebar";
-import Input from "../InputComponents/Input";
-import Select from "../InputComponents/Select.tsx";
+import Input from "../../InputComponents/Input";
+import Select from "../../InputComponents/Select.tsx";
 
 function editMarketProduct ({ id, data, updateNodeValue }: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue);

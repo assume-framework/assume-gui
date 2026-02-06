@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 import pandas as pd
 from assume import MarketConfig, MarketProduct, World
@@ -19,6 +20,14 @@ def source_target(connection: str):
 
 def getType(id: str):
     return id.split("_")[0]
+
+
+def load_forecasts(forecasts: list[dict]):
+    loaded = {}
+    for f in forecasts:
+        path = Path(__file__).parent / "tmp" / f"{f['id']}.csv"
+        loaded[f['type']] = pd.read_csv(path)
+    return loaded
 
 
 def process_data(input: dict):
@@ -45,7 +54,8 @@ def process_data(input: dict):
     )
 
     add_markets(world, edges, nodes)
-    add_units(world, edges, nodes, index)
+    forecasts = load_forecasts(input["forecasts"])
+    add_units(world, edges, nodes, forecasts, index)
     return world
 
 
@@ -88,30 +98,41 @@ def add_markets(world: World, edges: dict, nodes: dict):
                 ),
             )
 
-def forecaster_for_type(index: ForecastIndex, data: dict) -> UnitForecaster:
+
+def forecaster_for_type(index: ForecastIndex, data: dict, global_forecasts: dict) -> UnitForecaster:
     forecasts = data["forecasts"]
+    price_forecast = global_forecasts.get("price", None)
+    residual_forecast = global_forecasts.get("residual_load", None)
     match data["unitType"]:
         case "demand":
             return DemandForecaster(
                 index=index,
                 availability=forecasts.get("availability", 1),
                 demand=forecasts.get("demand", -100),
+                market_prices=price_forecast,
+                residual_load=residual_forecast,
             )
         case "power_plant":
             return PowerplantForecaster(
                 index=index,
                 availability=forecasts.get("availability", 1),
+                market_prices=price_forecast,
+                residual_load=residual_forecast,
             )
         case "exchange":
             return ExchangeForecaster(
                 index=index,
                 availability=forecasts.get("availability", 1),
+                market_prices=price_forecast,
+                residual_load=residual_forecast,
 
             )
         case "storage":
             return UnitForecaster(
                 index=index,
                 availability=forecasts.get("availability", 1),
+                market_prices=price_forecast,
+                residual_load=residual_forecast,
             )
         # TODO: DSM Units
         # case "building":
@@ -132,8 +153,7 @@ def forecaster_for_type(index: ForecastIndex, data: dict) -> UnitForecaster:
     raise NotImplementedError(f"Forecaster for unit type {data['unitType']} is not implemented.")
 
 
-def add_units(world: World, edges: dict, nodes: dict, index):
-
+def add_units(world: World, edges: dict, nodes: dict, forecasts: dict, index):
     for unit_operator in edges["world"]["unitOperator"]:
         target_unit_operator = unit_operator["target"]
         world.add_unit_operator(target_unit_operator)
@@ -165,7 +185,7 @@ def add_units(world: World, edges: dict, nodes: dict, index):
                     "max_power_discharge": int(unitData.get("max_power_discharge", 0)),
                     "max_soc": int(unitData.get("max_soc", 0)),
                 },
-                forecaster=forecaster_for_type(index, unitData),
+                forecaster=forecaster_for_type(index, unitData, forecasts),
             )
     return world
 

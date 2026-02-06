@@ -1,5 +1,5 @@
-import { handleChange } from "../../utils";
-import Input from "../InputComponents/Input";
+import { handleChange } from "../../../utils";
+import Input from "../../InputComponents/Input";
 import type { EditComponentArgs } from "../NodeEditSidebar";
 
 function editWorld({ id, data, updateNodeValue }: EditComponentArgs) {

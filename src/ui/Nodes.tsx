@@ -1,6 +1,5 @@
-
 import { Handle, type Node, type NodeProps, Position, useNodeConnections } from '@xyflow/react';
-import type { EditSidebarData } from './NodeEditSidebar';
+import type { EditSidebarData } from './SidebarComponents/NodeEditSidebar';
 
 
 export function WorldNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {

@@ -26,12 +26,13 @@ import './Home.css';
 
 import {DnDContext} from './DragDropCtx';
 import {UnitMarketEdge} from './ui/Edges';
-import EditSidebar, {type EditSidebarData, type EditSidebarProps} from './ui/NodeEditSidebar';
 import {MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode} from './ui/Nodes';
-import SelectSidebar, {type ForecastFile} from './ui/NodeSelectSidebar';
+import {type ForecastFile} from './ui/SidebarComponents/UploadSidebar.tsx';
 import Header from './Header';
 import Footer from './Footer';
 import Cockpit from "./ui/Cockpit.tsx";
+import Sidebar from "./ui/Sidebar.tsx";
+import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 
 const nodeTypes = {
     unit: UnitNode,
@@ -71,31 +72,20 @@ export default function Home() {
     const [type] = useContext(DnDContext);
     const {screenToFlowPosition} = useReactFlow();
 
-    const updateNodeValue = useCallback((id: string, data: EditSidebarData) => {
-        const node = nodes.find(n => n.id === id);
+    const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
+        const getter = isEdge ? edges : nodes;
+        const setter = isEdge ? setEdges : setNodes;
+        const node = getter.find(n => n.id === id);
         node!.data = data;
-        const updated = nodes.map(n => n.id === id ? node! : n!);
-        setNodes(updated);
+        const updated: any = getter.map(n => n.id === id ? node! : n!);
+        setter(updated);
         let nd = nodeData;
         if (!nd) {
-            nd = {id: node!.id, data: node!.data, type: node!.type};
+            nd = {id: node!.id, data: node!.data, type: node!.type, isEdge: isEdge};
         }
         nd.data = data;
         setNodeData(nd);
-    }, [nodes, nodeData, setNodes, setNodeData]);
-
-    const updateEdgeValue = useCallback((id: string, data: EditSidebarData) => {
-        const edge = edges.find(e => e.id === id);
-        edge!.data = data;
-        const updated = edges.map(e => e.id === id ? edge! : e!);
-        setEdges(updated);
-        let ed = nodeData;
-        if (!ed) {
-            ed = {id: edge!.id, data: edge!.data, type: edge!.type, isEdge: true};
-        }
-        ed.data = data;
-        setNodeData(ed);
-    }, [edges, nodeData, setEdges, setNodeData]);
+    }, [nodes, edges, nodeData, setNodes, setEdges, setNodeData])
 
     const onNodesChange: OnNodesChange = useCallback(
         (changes: NodeChange[]) => {
@@ -119,7 +109,7 @@ export default function Home() {
             if (!changes.map(c => c.type).includes('select')) {
                 return
             }
-            const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected === true);
+            const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected);
             const edge: Edge<EditSidebarData> | undefined = edges.find(e => e.id === selectedChange?.id);
             if (edge) {
                 setNodeData({id: edge.id, type: edge.type, data: edge.data!, isEdge: true});
@@ -150,7 +140,7 @@ export default function Home() {
     const onForecastUpload = useCallback((id: string, type: string) => {
         console.log("set forecast")
         const existing = forecast.filter(f => f.type != type)
-        setForecast([...existing, {type: type, identifier: id}])
+        setForecast([...existing, {type: type, id: id}])
         console.log(forecast)
     }, [forecast, setForecast])
 
@@ -209,16 +199,11 @@ export default function Home() {
 
     return (
         <div className="dndflow">
-            {nodeData ?
-                <EditSidebar
-                    id={nodeData.id}
-                    type={nodeData.type}
-                    data={nodeData.data}
-                    updateNodeValue={nodeData.isEdge ? updateEdgeValue : updateNodeValue}
-                /> : <SelectSidebar
-                    updateForecast={onForecastUpload}
-                />}
-
+            <Sidebar
+                nodeData={nodeData}
+                updateValue={updateValue}
+                onForecastUpload={onForecastUpload}
+            />
             <div className="flex grow flex-col">
                 <Header/>
                 <div className="grow" ref={reactFlowWrapper}>

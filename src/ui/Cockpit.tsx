@@ -8,8 +8,8 @@ import {
 import {useCallback} from "react";
 import {sendData} from "../sendData.ts";
 import type {Node, Edge} from "@xyflow/react";
-import type {EditSidebarData} from "./NodeEditSidebar.tsx";
-import type {ForecastFile} from "./NodeSelectSidebar.tsx";
+import type {EditSidebarData} from "./SidebarComponents/NodeEditSidebar.tsx";
+import type {ForecastFile} from "./SidebarComponents/UploadSidebar.tsx";
 
 const buttonStyle = 'bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-1 flex justify-center'
 
