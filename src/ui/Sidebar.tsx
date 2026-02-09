@@ -1,15 +1,15 @@
 import EditSidebar, {type EditSidebarData, type EditSidebarProps} from "./SidebarComponents/NodeEditSidebar.tsx";
 import SelectSidebar from "./SidebarComponents/NodeSelectSidebar.tsx";
-import UploadSidebar from "./SidebarComponents/UploadSidebar.tsx";
+import UploadSidebar, {type Forecast} from "./SidebarComponents/UploadSidebar.tsx";
 
 interface SidebarProps {
     nodeData: EditSidebarProps | null,
-    onForecastUpload: (id: string, type: string) => void,
+    updateForecast: (type: keyof Forecast, value: string | null) => void,
     updateValue: (id: string, data: EditSidebarData, isEdge: boolean) => void,
-    updateForecast?: (id: string, type: string) => void
+    forecast: Forecast
 }
 
-export default function Sidebar({nodeData, onForecastUpload, updateValue}: SidebarProps) {
+export default function Sidebar({nodeData, updateForecast, updateValue, forecast}: SidebarProps) {
     return (
         <aside className="w-full h-full max-w-xs border-r border-gray-300 overflow-y-scroll">
             {nodeData ?
@@ -22,7 +22,7 @@ export default function Sidebar({nodeData, onForecastUpload, updateValue}: Sideb
                 :
                 <>
                     <SelectSidebar/>
-                    <UploadSidebar updateForecast={onForecastUpload}/>
+                    <UploadSidebar updateForecast={updateForecast} forecast={forecast}/>
                 </>
             }
         </aside>

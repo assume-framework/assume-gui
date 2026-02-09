@@ -1,7 +1,7 @@
 import type {Node, Edge} from "@xyflow/react";
-import type {ForecastFile} from "./ui/NodeSelectSidebar.tsx";
+import type {Forecast} from "./ui/SidebarComponents/UploadSidebar.tsx";
 
-export async function sendData(nodes: Node[], edges: Edge[], forecasts: ForecastFile[]) {
+export async function sendData(nodes: Node[], edges: Edge[], forecasts: Forecast) {
     const n = nodes.map(n => ({id: n.id, type: n.type, data: n.data}));
     const e = edges.map(e => ({id: e.id, type: e.type, data: e.data}));
 

@@ -9,14 +9,14 @@ import {useCallback} from "react";
 import {sendData} from "../sendData.ts";
 import type {Node, Edge} from "@xyflow/react";
 import type {EditSidebarData} from "./SidebarComponents/NodeEditSidebar.tsx";
-import type {ForecastFile} from "./SidebarComponents/UploadSidebar.tsx";
+import type {Forecast} from "./SidebarComponents/UploadSidebar.tsx";
 
 const buttonStyle = 'bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-1 flex justify-center'
 
 type Args = {
     nodes: Node<EditSidebarData>[]
     edges: Edge<EditSidebarData>[]
-    forecasts: ForecastFile[]
+    forecasts: Forecast
     reset: () => void
     setFlowByJson: (data: string) => void
 }

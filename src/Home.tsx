@@ -27,7 +27,7 @@ import './Home.css';
 import {DnDContext} from './DragDropCtx';
 import {UnitMarketEdge} from './ui/Edges';
 import {MarketNode, MarketProductNode, MarketProviderNode, UnitNode, UnitOperatorNode, WorldNode} from './ui/Nodes';
-import {type ForecastFile} from './ui/SidebarComponents/UploadSidebar.tsx';
+import {type Forecast} from './ui/SidebarComponents/UploadSidebar.tsx';
 import Header from './Header';
 import Footer from './Footer';
 import Cockpit from "./ui/Cockpit.tsx";
@@ -67,7 +67,7 @@ export default function Home() {
     const reactFlowWrapper = useRef(null);
     const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(initialNodes);
     const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(initialEdges);
-    const [forecast, setForecast] = useState<ForecastFile[]>([]);
+    const [forecast, setForecast] = useState<Forecast>({price: null, residual_load: null});
     const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
     const [type] = useContext(DnDContext);
     const {screenToFlowPosition} = useReactFlow();
@@ -75,13 +75,19 @@ export default function Home() {
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         const getter = isEdge ? edges : nodes;
         const setter = isEdge ? setEdges : setNodes;
-        const node = getter.find(n => n.id === id);
-        node!.data = data;
-        const updated: any = getter.map(n => n.id === id ? node! : n!);
-        setter(updated);
-        let nd = nodeData;
+
+        const entryList: Array<any> = structuredClone(getter);
+        let foundItem: EditSidebarData | null = null
+        entryList.forEach(item => {
+            if (item.id === id) {
+                item.data = data;
+                foundItem = item
+            }
+        })
+        setter(entryList);
+        let nd = structuredClone(nodeData);
         if (!nd) {
-            nd = {id: node!.id, data: node!.data, type: node!.type, isEdge: isEdge};
+            nd = {id: foundItem!.id, data: data, type: foundItem!.type, isEdge: isEdge};
         }
         nd.data = data;
         setNodeData(nd);
@@ -137,11 +143,10 @@ export default function Home() {
         [setEdges],
     );
 
-    const onForecastUpload = useCallback((id: string, type: string) => {
-        console.log("set forecast")
-        const existing = forecast.filter(f => f.type != type)
-        setForecast([...existing, {type: type, id: id}])
-        console.log(forecast)
+    const updateForecast = useCallback((type: keyof Forecast, value: string | null) => {
+        const tmp = structuredClone(forecast)
+        tmp[type] = value
+        setForecast(tmp)
     }, [forecast, setForecast])
 
     const onDragOver = useCallback((event: React.DragEvent) => {
@@ -174,7 +179,7 @@ export default function Home() {
         }
         setNodes(initialNodes);
         setEdges(initialEdges);
-        setForecast([]);
+        setForecast({price: null, residual_load: null});
         localStorage.removeItem('flow');
         setNodeData(null);
     }, [setNodes, setEdges, setNodeData]);
@@ -202,7 +207,8 @@ export default function Home() {
             <Sidebar
                 nodeData={nodeData}
                 updateValue={updateValue}
-                onForecastUpload={onForecastUpload}
+                forecast={forecast}
+                updateForecast={updateForecast}
             />
             <div className="flex grow flex-col">
                 <Header/>
