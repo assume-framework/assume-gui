@@ -11,7 +11,7 @@ import type {Node, Edge} from "@xyflow/react";
 import type {EditSidebarData} from "./SidebarComponents/NodeEditSidebar.tsx";
 import type {Forecast} from "./SidebarComponents/UploadSidebar.tsx";
 
-const buttonStyle = 'bg-white hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-1 flex justify-center'
+const buttonStyle = 'bg-white cursor-pointer hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-3 flex justify-center'
 
 type Args = {
     nodes: Node<EditSidebarData>[]
@@ -53,29 +53,37 @@ export default function Cockpit({nodes, edges, forecasts, reset, setFlowByJson}:
     }, [nodes, edges])
 
     return <>
-        <div className={buttonStyle}>
-            <label htmlFor="file_upload">
-                <FileUploadOutlined/>
-                <span>Upload</span>
-            </label>
-            <input id="file_upload" type="file" accept=".json" className="hidden" onInput={handleFileUpload}/>
+        <label htmlFor="file_upload" className={"cursor-pointer"}>
+            <div className={buttonStyle}>
+                <div className="w-13"><FileUploadOutlined/></div>
+                <div className="flex-1 pl-3">Upload</div>
+                <div className="flex-1"/>
+            </div>
+        </label>
+        <input id="file_upload" type="file" accept=".json" className="hidden" onInput={handleFileUpload}/>
+
+        <div className={buttonStyle} onClick={download}>
+            <div className="w-13"><FileDownloadOutlined/></div>
+            <div className="flex-1 pl-3">Download</div>
+            <div className="flex-1"/>
         </div>
-        <button className={buttonStyle} onClick={download}>
-            <FileDownloadOutlined/>
-            <span>Download</span>
-        </button>
-        <button className={buttonStyle} onClick={() => sendData(nodes, edges, forecasts)}>
-            <SendOutlined/>
-            <span>Submit</span>
-        </button>
-        <button className={buttonStyle} onClick={save}>
-            <SaveOutlined/>
-            <span>Save</span>
-        </button>
-        <button className={buttonStyle} onClick={reset}>
-            <ReplayOutlined/>
-            <span>Reset</span>
-        </button>
+        <div className={buttonStyle} onClick={() => sendData(nodes, edges, forecasts)}>
+            <div className="w-13"><SendOutlined/></div>
+            <div className="flex-1 pl-3">Submit</div>
+            <div className="flex-1"/>
+
+        </div>
+        <div className={buttonStyle} onClick={save}>
+            <div className="w-13"><SaveOutlined/></div>
+            <div className="flex-1 pl-3">Save</div>
+            <div className="flex-1"/>
+
+        </div>
+        <div className={buttonStyle} onClick={reset}>
+            <div className="w-13"><ReplayOutlined/></div>
+            <div className="flex-1 pl-3">Reset</div>
+            <div className="flex-1"/>
+        </div>
     </>
 
 }
