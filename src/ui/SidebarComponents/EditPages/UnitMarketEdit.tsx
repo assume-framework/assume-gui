@@ -6,7 +6,7 @@ function UnitMarketEdit ({ id, data, updateNodeValue }: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue, true);
     return (
         <>
-            <Select label="Strategy" id="strategy" value={data.strategy} onChange={onChange("strategy")}>
+            <Select label="Strategy" value={data.strategy} onChange={onChange("strategy")}>
                 <option value="naive_eom">Naive EOM</option>
                 <option value="naive_dam">Naive DAM</option>
                 <option value="naive_pos_reserve">Naive Pos Reserve</option>

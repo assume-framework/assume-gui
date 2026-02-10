@@ -12,19 +12,21 @@ export type UploadSidebarProps = {
 }
 
 export default function UploadSidebar({updateForecast, forecast}: UploadSidebarProps) {
+    const setDocumentID = (type: keyof Forecast) => (value: string | null) => {
+        updateForecast(type, value)
+    }
+
     return (
         <div className="px-8 pt-6 pb-8 mb-4">
             <p>Forecasts</p>
             <UploadButton
-                forecastType={"price"}
                 name={"Price"}
-                uploaded={forecast.price != undefined}
-                updateForecast={updateForecast}/>
+                uploaded={!!forecast.price}
+                setDocumentID={setDocumentID("price")}/>
             <UploadButton
-                forecastType={"residual_load"}
                 name={"Resiudal load"}
-                uploaded={!!forecast["residual_load"]}
-                updateForecast={updateForecast}/>
+                uploaded={!!forecast.residual_load}
+                setDocumentID={setDocumentID("residual_load")}/>
         </div>
     )
 }

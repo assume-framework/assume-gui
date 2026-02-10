@@ -1,11 +1,11 @@
 import { classNames, type BaseProps } from "./types"
+import {useId} from "react";
 
 interface SelectProperties extends BaseProps {
     children: React.ReactNode
 }
 
 function Select ({
-    id,
     value,
     label,
     onChange,
@@ -13,6 +13,7 @@ function Select ({
     required = false,
     children
 }: SelectProperties) {
+    const id = useId()
     return (
         <div>
             <label htmlFor={id} className="block text-gray-700 text-sm font-bold mt-2">{label}</label>

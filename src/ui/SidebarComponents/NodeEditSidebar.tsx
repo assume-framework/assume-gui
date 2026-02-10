@@ -38,7 +38,7 @@ export default function EditSidebar({id, type, data, updateNodeValue}: EditSideb
 
     return (
         <form className="px-8 pt-6 pb-8 mb-4" id="NodeEditForm" onSubmit={e => e.preventDefault()}>
-            <Input label="Name" type="text" id="name" value={data.name} onChange={onChange("name")}/>
+            <Input label="Name" type="text" value={data.name} onChange={onChange("name")} tooltip="Hier könnten Ihre Tooltips stehen!"/>
             {type === "unit" && <UnitEdit id={id} data={data} updateNodeValue={updateNodeValue}/>}
             {type === "market" && <MarketEdit id={id} data={data} updateNodeValue={updateNodeValue}/>}
             {type === "marketProduct" && <MarketProductEdit id={id} data={data} updateNodeValue={updateNodeValue}/>}
