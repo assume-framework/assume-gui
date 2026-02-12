@@ -1,5 +1,5 @@
 import { BaseEdge, EdgeLabelRenderer, getSimpleBezierPath, type Edge, type EdgeProps } from "@xyflow/react";
-import type { EditSidebarData } from "./NodeEditSidebar";
+import type { EditSidebarData } from "./SidebarComponents/NodeEditSidebar";
 
 export function UnitMarketEdge({ id, sourceX, sourceY, targetX, targetY, data }: EdgeProps<Edge<EditSidebarData>>) {
     const [edgePath, labelX, labelY] = getSimpleBezierPath({ sourceX, sourceY, targetX, targetY });

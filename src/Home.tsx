@@ -171,7 +171,7 @@ export default function Home() {
         };
 
         setNodes((nds) => nds.concat(newNode));
-    }, [screenToFlowPosition, type]);
+    }, [screenToFlowPosition, setNodes, type]);
 
     const reset = useCallback(() => {
         if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
