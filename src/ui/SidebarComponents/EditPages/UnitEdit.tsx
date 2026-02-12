@@ -70,7 +70,7 @@ export default function editUnit({id, data, updateNodeValue}: EditComponentArgs)
                         <Input label="Forecast fuel price" type="number"
                                value={data.forecast_fuel_price ?? 10} onChange={onChange("forecast_fuel_price")}/>
                         <Input label="Forecast CO2 price" type="number"
-                               value={data.forecas_co2_price ?? 10} onChange={onChange("forecast_co2_price")}/>
+                               value={data.forecast_co2_price ?? 10} onChange={onChange("forecast_co2_price")}/>
                     </Modal>
                 </>
             )}

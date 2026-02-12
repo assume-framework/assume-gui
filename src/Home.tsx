@@ -5,11 +5,8 @@ import {
     applyEdgeChanges,
     applyNodeChanges,
     Background,
-    Panel,
-    Controls,
-    ReactFlow,
-    useReactFlow,
     type Connection,
+    Controls,
     type Edge,
     type EdgeChange,
     type Node,
@@ -17,7 +14,10 @@ import {
     type NodeSelectionChange,
     type OnConnect,
     type OnEdgesChange,
-    type OnNodesChange
+    type OnNodesChange,
+    Panel,
+    ReactFlow,
+    useReactFlow
 } from '@xyflow/react';
 import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 
@@ -73,12 +73,12 @@ export default function Home() {
     const {screenToFlowPosition} = useReactFlow();
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
-        const getter = isEdge ? edges : nodes;
-        const setter = isEdge ? setEdges : setNodes;
+        type T = Node<EditSidebarData> | Edge<EditSidebarData>;
+        const setter: CallableFunction = isEdge ? setEdges : setNodes;
 
-        const entryList: Array<any> = structuredClone(getter);
-        let foundItem: EditSidebarData | null = null
-        entryList.forEach(item => {
+        const entryList: T[] = structuredClone(isEdge ? edges : nodes);
+        let foundItem: T | null = null
+        entryList.forEach((item: T) => {
             if (item.id === id) {
                 item.data = data;
                 foundItem = item

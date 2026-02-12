@@ -1,6 +1,6 @@
 export interface BaseProps {
     label: string
-    value: any
+    value: number | string
     disabled?: boolean
     required?: boolean
     onChange: React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>

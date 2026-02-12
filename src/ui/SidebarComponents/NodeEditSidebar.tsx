@@ -9,7 +9,7 @@ export interface EditSidebarData {
     // properties that shall be editable in the sidebar
     name: string;
 
-    [key: string]: any;
+    [key: string]: string | number;
 }
 
 export type EditComponentArgs = {
