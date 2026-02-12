@@ -5,7 +5,6 @@ export async function sendData(nodes: Node[], edges: Edge[], forecasts: Forecast
     const n = nodes.map(n => ({id: n.id, type: n.type, data: n.data}));
     const e = edges.map(e => ({id: e.id, type: e.type, data: e.data}));
 
-    console.log(forecasts)
     try {
         const resp = await fetch('/api/submit', {
             method: 'POST',
@@ -27,10 +26,15 @@ export async function sendData(nodes: Node[], edges: Edge[], forecasts: Forecast
 export async function uploadFile(file: File): Promise<string> {
     const formData = new FormData()
     formData.append('file', file)
-    const result = await fetch('/api/upload',{
+    const result = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
     })
-    const body = await result.json()
-    return body['id']
+    try {
+        const body = await result.json()
+        return body['id']
+    } catch (e) {
+        console.error(e)
+        return ''
+    }
 }
