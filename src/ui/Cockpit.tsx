@@ -72,10 +72,9 @@ function CockpitElement({onClick, name, Icon}: ElementArgs) {
     return (
         <div
             className="bg-white cursor-pointer hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-3 flex"
-            onClick={onClick}>
-            <div>
-                <Icon/>
-            </div>
+            onClick={onClick}
+        >
+            <Icon/>
             <div className="px-3">{name}</div>
         </div>
     )
