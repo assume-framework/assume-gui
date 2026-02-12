@@ -230,7 +230,7 @@ export default function Home() {
                     >
                         <Controls/>
                         <Background/>
-                        <Panel position="bottom-right" className='w-48'>
+                        <Panel position="bottom-right">
                             <Cockpit
                                 nodes={nodes} edges={edges}
                                 forecasts={forecast} reset={reset}

@@ -1,17 +1,15 @@
 import {
+    FileDownloadOutlined,
     FileUploadOutlined,
-    SaveOutlined,
-    SendOutlined,
     ReplayOutlined,
-    FileDownloadOutlined
+    SaveOutlined,
+    SendOutlined
 } from '@mui/icons-material';
-import {useCallback} from "react";
+import {type ComponentType, type MouseEventHandler, useCallback} from "react";
 import {sendData} from "../sendData.ts";
-import type {Node, Edge} from "@xyflow/react";
+import type {Edge, Node} from "@xyflow/react";
 import type {EditSidebarData} from "./SidebarComponents/NodeEditSidebar.tsx";
 import type {Forecast} from "./SidebarComponents/UploadSidebar.tsx";
-
-const buttonStyle = 'bg-white cursor-pointer hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-3 flex justify-center'
 
 type Args = {
     nodes: Node<EditSidebarData>[]
@@ -53,37 +51,32 @@ export default function Cockpit({nodes, edges, forecasts, reset, setFlowByJson}:
     }, [nodes, edges])
 
     return <>
+        <CockpitElement name={"Submit"} Icon={SendOutlined} onClick={() => sendData(nodes, edges, forecasts)}/>
+        <CockpitElement name={"Save"} Icon={SaveOutlined} onClick={save}/>
+        <CockpitElement name={"Reset"} Icon={ReplayOutlined} onClick={reset}/>
+        <CockpitElement name={"Download"} onClick={download} Icon={FileDownloadOutlined}/>
         <label htmlFor="file_upload" className={"cursor-pointer"}>
-            <div className={buttonStyle}>
-                <div className="w-13"><FileUploadOutlined/></div>
-                <div className="flex-1 pl-3">Upload</div>
-                <div className="flex-1"/>
-            </div>
+            <CockpitElement name={"Upload"} Icon={FileUploadOutlined}/>
         </label>
         <input id="file_upload" type="file" accept=".json" className="hidden" onInput={handleFileUpload}/>
-
-        <div className={buttonStyle} onClick={download}>
-            <div className="w-13"><FileDownloadOutlined/></div>
-            <div className="flex-1 pl-3">Download</div>
-            <div className="flex-1"/>
-        </div>
-        <div className={buttonStyle} onClick={() => sendData(nodes, edges, forecasts)}>
-            <div className="w-13"><SendOutlined/></div>
-            <div className="flex-1 pl-3">Submit</div>
-            <div className="flex-1"/>
-
-        </div>
-        <div className={buttonStyle} onClick={save}>
-            <div className="w-13"><SaveOutlined/></div>
-            <div className="flex-1 pl-3">Save</div>
-            <div className="flex-1"/>
-
-        </div>
-        <div className={buttonStyle} onClick={reset}>
-            <div className="w-13"><ReplayOutlined/></div>
-            <div className="flex-1 pl-3">Reset</div>
-            <div className="flex-1"/>
-        </div>
     </>
+}
 
+interface ElementArgs {
+    name: string,
+    onClick?: MouseEventHandler<HTMLDivElement>,
+    Icon: ComponentType
+}
+
+function CockpitElement({onClick, name, Icon}: ElementArgs) {
+    return (
+        <div
+            className="bg-white cursor-pointer hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-3 flex"
+            onClick={onClick}>
+            <div>
+                <Icon/>
+            </div>
+            <div className="px-3">{name}</div>
+        </div>
+    )
 }
