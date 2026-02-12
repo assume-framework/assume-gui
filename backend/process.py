@@ -4,8 +4,13 @@ from pathlib import Path
 
 import pandas as pd
 from assume import MarketConfig, MarketProduct, World
-from assume.common.forecaster import UnitForecaster, DemandForecaster, PowerplantForecaster, ExchangeForecaster, \
-    ForecastIndex
+from assume.common.forecaster import (
+    DemandForecaster,
+    ExchangeForecaster,
+    ForecastIndex,
+    PowerplantForecaster,
+    UnitForecaster,
+)
 from assume.common.market_objects import OnlyHours
 from dateutil import rrule as rr
 
@@ -26,7 +31,7 @@ def load_forecasts(forecasts: list[dict]):
     loaded = {}
     for f in forecasts:
         path = Path(__file__).parent / "tmp" / f"{f['id']}.csv"
-        loaded[f['type']] = pd.read_csv(path)
+        loaded[f["type"]] = pd.read_csv(path)
     return loaded
 
 
@@ -99,7 +104,9 @@ def add_markets(world: World, edges: dict, nodes: dict):
             )
 
 
-def forecaster_for_type(index: ForecastIndex, data: dict, global_forecasts: dict) -> UnitForecaster:
+def forecaster_for_type(
+    index: ForecastIndex, data: dict, global_forecasts: dict
+) -> UnitForecaster:
     forecasts = data["forecasts"]
     price_forecast = global_forecasts.get("price", None)
     residual_forecast = global_forecasts.get("residual_load", None)
@@ -125,7 +132,6 @@ def forecaster_for_type(index: ForecastIndex, data: dict, global_forecasts: dict
                 availability=forecasts.get("availability", 1),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
-
             )
         case "storage":
             return UnitForecaster(
@@ -150,7 +156,9 @@ def forecaster_for_type(index: ForecastIndex, data: dict, global_forecasts: dict
         #         index=index,
         #         availability=forecasts.get("availability", 1),
         #     )
-    raise NotImplementedError(f"Forecaster for unit type {data['unitType']} is not implemented.")
+    raise NotImplementedError(
+        f"Forecaster for unit type {data['unitType']} is not implemented."
+    )
 
 
 def add_units(world: World, edges: dict, nodes: dict, forecasts: dict, index):
