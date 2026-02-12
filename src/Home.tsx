@@ -203,7 +203,7 @@ export default function Home() {
     }, [setNodes, setEdges, setFlowByJson]);
 
     return (
-        <div className="dndflow">
+        <div className="flex h-full">
             <Sidebar
                 nodeData={nodeData}
                 updateValue={updateValue}
