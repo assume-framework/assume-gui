@@ -30,11 +30,6 @@ export async function uploadFile(file: File): Promise<string> {
         method: 'POST',
         body: formData,
     })
-    try {
-        const body = await result.json()
-        return body['id']
-    } catch (e) {
-        console.error(e)
-        return ''
-    }
+    const body = await result.json()
+    return body['id']
 }
