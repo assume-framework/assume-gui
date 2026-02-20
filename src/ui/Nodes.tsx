@@ -132,7 +132,7 @@ export function MarketProductNode({ data, isConnectable }: NodeProps<Node<EditSi
     )
 }
 
-function renderUnit(name: string, id: string) {
+function renderUnit(name: string | number, id: string) {
     return (
         <div className="px-3 py-1 shadow-md rounded-md bg-white border-2 border-stone-400">
             <div className='font-bold'>

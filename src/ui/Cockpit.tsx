@@ -24,7 +24,7 @@ export default function Cockpit({nodes, edges, forecasts, reset, setFlowByJson}:
         localStorage.setItem('flow', JSON.stringify({"nodes": nodes, "edges": edges, "forecasts": forecasts}));
     }, [nodes, edges, forecasts]);
 
-    const handleFileUpload = (e: React.FormEvent<HTMLInputElement>) => {
+    const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
         const inputElement = e.target as HTMLInputElement
         if (!inputElement.files || inputElement.files.length == 0) {
             console.warn("No input provided!")
