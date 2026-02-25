@@ -19,7 +19,7 @@ import {
     ReactFlow,
     useReactFlow
 } from '@xyflow/react';
-import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useRef, useState} from "react";
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
@@ -47,6 +47,7 @@ const edgeTypes = {
     'unit-market': UnitMarketEdge,
 }
 
+const initialForecast: Forecast = {price: null, residual_load: null}
 const initialEdges: Edge<EditSidebarData>[] = [];
 const initialNodes: Node<EditSidebarData>[] = [{
     id: 'world',
@@ -63,11 +64,20 @@ const isValidConnection = (connection: Connection | Edge) =>
 let id = 1;
 const getId = (type: string) => `${type}_${id++}`;
 
+const readLocalStorage = () => {
+    const data = localStorage.getItem('flow');
+    if (!data) {
+        return {};
+    }
+    return JSON.parse(data);
+}
+
 export default function Home() {
+    const loaded = readLocalStorage();
     const reactFlowWrapper = useRef(null);
-    const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(initialNodes);
-    const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(initialEdges);
-    const [forecast, setForecast] = useState<Forecast>({price: null, residual_load: null});
+    const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(loaded['nodes'] ?? initialNodes);
+    const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(loaded['edges'] ?? initialEdges);
+    const [forecast, setForecast] = useState<Forecast>(loaded['forecasts'] ?? initialForecast);
     const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
     const [type] = useContext(DnDContext);
     const {screenToFlowPosition} = useReactFlow();
@@ -179,7 +189,7 @@ export default function Home() {
         }
         setNodes(initialNodes);
         setEdges(initialEdges);
-        setForecast({price: null, residual_load: null});
+        setForecast(initialForecast);
         localStorage.removeItem('flow');
         setNodeData(null);
     }, [setNodes, setEdges, setNodeData]);
@@ -190,17 +200,10 @@ export default function Home() {
 
     const setFlowByJson = useCallback((data: string) => {
         const loaded = JSON.parse(data);
-        setNodes(loaded["nodes"] ?? []);
-        setEdges(loaded["edges"] ?? []);
-        setForecast(loaded["forecasts"] ?? []);
+        setNodes(loaded["nodes"] ?? initialNodes);
+        setEdges(loaded["edges"] ?? initialEdges);
+        setForecast(loaded["forecasts"] ?? initialForecast);
     }, [setNodes, setEdges, setForecast]);
-
-    useEffect(() => {
-        const flow = localStorage.getItem('flow');
-        if (flow) {
-            setFlowByJson(flow)
-        }
-    }, [setNodes, setEdges, setFlowByJson]);
 
     return (
         <div className="flex h-full">
