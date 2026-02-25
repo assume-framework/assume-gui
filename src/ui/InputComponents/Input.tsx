@@ -14,12 +14,15 @@ export default function Input(
         tooltip,
         disabled = false,
         required = false,
-        onChange
+        onChange,
+        errorMessage,
     }: InputProperties) {
     const id = useId()
+    const color = errorMessage ? "text-red-500" : "text-gray-700"
     return (
         <>
-            <label htmlFor={id} className="block text-gray-700 text-sm font-bold mt-2">{label}</label>
+            <label htmlFor={id}
+                   className={`block text-sm font-bold mt-2 ${color}`}>{label}</label>
             <div className="flex">
                 {type === 'textarea' ? (
                     <textarea
@@ -42,11 +45,15 @@ export default function Input(
                     />
                 )}
                 {tooltip &&
-                  <div title={tooltip} className="py-2 pl-3">
+                  <div title={tooltip}
+                       className="py-2 pl-3">
                     <HelpOutline/>
                   </div>
                 }
             </div>
+            {errorMessage && <div className="text-red-500">
+                {errorMessage}
+            </div>}
         </>
     )
 }

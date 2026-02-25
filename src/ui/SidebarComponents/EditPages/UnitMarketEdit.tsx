@@ -2,11 +2,11 @@ import { handleChange } from "../../../utils";
 import Select from "../../InputComponents/Select";
 import type { EditComponentArgs } from "../NodeEditSidebar";
 
-function UnitMarketEdit ({ id, data, updateNodeValue }: EditComponentArgs) {
+function UnitMarketEdit ({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {
     const onChange = handleChange(id, data, updateNodeValue, true);
     return (
         <>
-            <Select label="Strategy" value={data.strategy} onChange={onChange("strategy")}>
+            <Select label="Strategy" value={data.strategy} onChange={onChange("strategy")} errorMessage={getErrorMessage('strategy')}>
                 <option value="naive_eom">Naive EOM</option>
                 <option value="naive_dam">Naive DAM</option>
                 <option value="naive_pos_reserve">Naive Pos Reserve</option>

@@ -91,6 +91,13 @@ export default function Home() {
         let foundItem: T | null = null
         entryList.forEach((item: T) => {
             if (item.id === id) {
+                if (item.data && item.data.errorField
+                    && item.data[item.data.errorField] !== data[item.data.errorField]) {
+                    // fiel with error has changed, reset error
+                    data.errorField = ''
+                    data.errorMessage = ''
+                }
+
                 item.data = data;
                 foundItem = item
             }
