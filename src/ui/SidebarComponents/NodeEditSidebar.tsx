@@ -8,7 +8,8 @@ import WorldEdit from "./EditPages/WorldEdit";
 export interface EditSidebarData {
     // properties that shall be editable in the sidebar
     name: string;
-
+    errorField: string;
+    errorMessage: string;
     [key: string]: string | number;
 }
 
@@ -27,9 +28,7 @@ export type EditSidebarProps = {
 
 type updateFunction = { updateNodeValue: (id: string, data: EditSidebarData, isEdge: boolean) => void; }
 
-
 export default function EditSidebar({id, type, data, updateNodeValue}: EditSidebarProps & updateFunction) {
-    // const [internalData, setInternalData] = useState<EditSidebarData>(data);
     const onChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
         const d = {...data}
         d[key] = e.target.value
@@ -47,4 +46,3 @@ export default function EditSidebar({id, type, data, updateNodeValue}: EditSideb
         </form>
     )
 }
-

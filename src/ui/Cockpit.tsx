@@ -10,7 +10,7 @@ import {type ComponentType, type MouseEventHandler} from "react";
 type Args = {
     reset: () => void,
     setFlowByJson: (data: string) => void,
-    submit?: () => Promise<void>,
+    submit?: () => void,
     save?: () => void,
     download?: () => void
 }

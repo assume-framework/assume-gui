@@ -5,7 +5,7 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 
-from backend.process import process_data
+from backend.process import process_data, ValidationError
 
 app = FastAPI()
 
@@ -15,10 +15,16 @@ async def send_data(data: dict):
     try:
         world = process_data(data)
         world.run()
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail={
+            "message": str(e),
+            "id": e.id,
+            "field": e.field,
+        })
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=str(e))
     return {"status": "success"}
 
 

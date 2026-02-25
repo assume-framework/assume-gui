@@ -14,6 +14,14 @@ from assume.common.forecaster import (
 from assume.common.market_objects import OnlyHours
 from dateutil import rrule as rr
 
+
+class ValidationError(ValueError):
+    def __init__(self, message: str, id: str, field: str):
+        super().__init__(message)
+        self.id = id
+        self.field = field
+
+
 DBURI = os.getenv(
     "DATABASE_URL", "postgresql://assume@localhost:5432/assume?password=assume"
 )
@@ -27,11 +35,13 @@ def getType(id: str):
     return id.split("_")[0]
 
 
-def load_forecasts(forecasts: list[dict]):
+def load_forecasts(forecasts: dict):
     loaded = {}
-    for f in forecasts:
-        path = Path(__file__).parent / "tmp" / f"{f['id']}.csv"
-        loaded[f["type"]] = pd.read_csv(path)
+    for type, value in forecasts.items():
+        if value is None:
+            continue
+        path = Path(__file__).parent / "tmp" / f"{value}.csv"
+        loaded[type] = pd.read_csv(path)
     return loaded
 
 
@@ -107,7 +117,7 @@ def add_markets(world: World, edges: dict, nodes: dict):
 def forecaster_for_type(
     index: ForecastIndex, data: dict, global_forecasts: dict
 ) -> UnitForecaster:
-    forecasts = data["forecasts"]
+    forecasts = data.get("forecasts", {})
     price_forecast = global_forecasts.get("price", None)
     residual_forecast = global_forecasts.get("residual_load", None)
     match data["unitType"]:
@@ -174,7 +184,7 @@ def add_units(world: World, edges: dict, nodes: dict, forecasts: dict, index):
                 ]
             unitData = nodes[target_unit]["data"]
             world.add_unit(
-                id=target_unit,
+                id=unitData["name"],
                 unit_operator_id=target_unit_operator,
                 unit_type=unitData["unitType"],
                 unit_params={
@@ -195,6 +205,7 @@ def add_units(world: World, edges: dict, nodes: dict, forecasts: dict, index):
                 },
                 forecaster=forecaster_for_type(index, unitData, forecasts),
             )
+            raise ValidationError("min_power must be >= 0", id=unitData["name"], field="min_power")
     return world
 
 

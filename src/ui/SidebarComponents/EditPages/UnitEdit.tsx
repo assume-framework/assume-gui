@@ -10,7 +10,9 @@ export default function editUnit({id, data, updateNodeValue}: EditComponentArgs)
     const onChange = handleChange(id, data, updateNodeValue);
     const reset = (event: ChangeEvent<HTMLSelectElement>) => updateNodeValue(id, {
         name: data.name,
-        unitType: event.target.value
+        unitType: event.target.value,
+        errorField: '',
+        errorMessage: ''
     }, false)
 
     return (

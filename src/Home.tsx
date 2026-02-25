@@ -54,7 +54,7 @@ const initialNodes: Node<EditSidebarData>[] = [{
     id: 'world',
     type: "world",
     position: {x: 300, y: 0},
-    data: {name: "World Node"},
+    data: {name: "World Node", errorField: '', errorMessage: ''},
     deletable: false
 }];
 
@@ -144,7 +144,7 @@ export default function Home() {
                 target: connection.target,
                 targetHandle: connection.targetHandle,
                 type: 'default',
-                data: {name: `${connection.source}-${connection.target}`},
+                data: {name: `${connection.source}-${connection.target}`, errorField: '', errorMessage: ''},
             };
             if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
                 newEdge.type = 'unit-market';
@@ -178,6 +178,8 @@ export default function Home() {
             }),
             data: {
                 name: id,
+                errorField: '',
+                errorMessage: '',
             },
         };
         setNodes((nds) => nds.concat(newNode));
@@ -194,9 +196,21 @@ export default function Home() {
         setNodeData(null);
     }, [setNodes, setEdges, setNodeData]);
 
-    const submit = useCallback(async () => {
-        await sendData(nodes, edges, forecast)
-    }, [nodes, edges, forecast])
+    const submit = useCallback(() => {
+            sendData(nodes, edges, forecast).then(
+                response => {
+                    if (!response.success && response.id && response.field && response.message) {
+                        const found = nodes.find(n => n.data.name === response.id)
+                        if (found) {
+                            found.data.errorField = response.field
+                            found.data.errorMessage = response.message
+                            updateValue(found?.id, found?.data, false)
+                        }
+                    }
+                }
+            ).catch(e => console.error("Unknown error: ", e))
+        }, [nodes, edges, forecast, updateValue]
+    )
 
     const onPaneClick = useCallback(() => {
         setNodeData(null)

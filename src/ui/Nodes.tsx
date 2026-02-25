@@ -1,30 +1,30 @@
-import { Handle, type Node, type NodeProps, Position, useNodeConnections } from '@xyflow/react';
-import type { EditSidebarData } from './SidebarComponents/NodeEditSidebar';
+import {Handle, type Node, type NodeProps, Position, useNodeConnections} from '@xyflow/react';
+import type {EditSidebarData} from './SidebarComponents/NodeEditSidebar';
 
 
-export function WorldNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+export function WorldNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>) {
     return (
         <>
-            {renderUnit('World', data.name)}
+            {renderUnit('World', data.name, data.errorField)}
             <Handle
                 id="marketProvider_handle"
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
-                style={{ left: '25%' }}
+                style={{left: '25%'}}
             />
             <Handle
                 id="unitOperator_handle"
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
-                style={{ left: '75%' }}
+                style={{left: '75%'}}
             />
         </>
     )
 }
 
-export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+export function MarketNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>) {
     const connections = useNodeConnections({handleType: "target", handleId: "marketProvider_handle"});
     return (
         <>
@@ -40,7 +40,7 @@ export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarDa
                 position={Position.Right}
                 isConnectable={isConnectable}
             />
-            {renderUnit('Market', data.name)}
+            {renderUnit('Market', data.name, data.errorField)}
             <Handle
                 id="marketProduct_handle"
                 type="source"
@@ -51,7 +51,7 @@ export function MarketNode({ data, isConnectable }: NodeProps<Node<EditSidebarDa
     )
 }
 
-export function MarketProviderNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+export function MarketProviderNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>) {
     const connections = useNodeConnections({handleType: "target", handleId: "world_handle"});
     return (
         <>
@@ -62,7 +62,7 @@ export function MarketProviderNode({ data, isConnectable }: NodeProps<Node<EditS
                 isConnectable={isConnectable && connections.length == 0}
             />
 
-            {renderUnit('Market Provider', data.name)}
+            {renderUnit('Market Provider', data.name, data.errorField)}
             <Handle
                 id="market_handle"
                 type="source"
@@ -74,7 +74,7 @@ export function MarketProviderNode({ data, isConnectable }: NodeProps<Node<EditS
 }
 
 
-export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+export function UnitNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>) {
     const connections = useNodeConnections({handleType: "target", handleId: "unitOperator_handle"});
     return (
         <>
@@ -84,7 +84,7 @@ export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
             />
-            {renderUnit(data.unitType ?? 'Unit', data.name)}
+            {renderUnit(data.unitType as string ?? 'Unit', data.name, data.errorField)}
             <Handle
                 id="market_handle"
                 type="source"
@@ -95,7 +95,7 @@ export function UnitNode({ data, isConnectable }: NodeProps<Node<EditSidebarData
     )
 }
 
-export function UnitOperatorNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+export function UnitOperatorNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>) {
     const connections = useNodeConnections({handleType: "target", handleId: "world_handle"});
     return (
         <>
@@ -105,7 +105,7 @@ export function UnitOperatorNode({ data, isConnectable }: NodeProps<Node<EditSid
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
             />
-            {renderUnit('Unit Operator', data.name)}
+            {renderUnit('Unit Operator', data.name, data.errorField)}
             <Handle
                 id="unit_handle"
                 type="source"
@@ -116,8 +116,7 @@ export function UnitOperatorNode({ data, isConnectable }: NodeProps<Node<EditSid
     )
 }
 
-
-export function MarketProductNode({ data, isConnectable }: NodeProps<Node<EditSidebarData>>) {
+export function MarketProductNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>) {
     const connections = useNodeConnections({handleType: "target", handleId: "market_handle"});
     return (
         <>
@@ -127,14 +126,15 @@ export function MarketProductNode({ data, isConnectable }: NodeProps<Node<EditSi
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
             />
-            {renderUnit('Market Product', data.name)}
+            {renderUnit('Market Product', data.name, data.errorField)}
         </>
     )
 }
 
-function renderUnit(name: string | number, id: string) {
+function renderUnit(name: string, id: string, errorField: string) {
+    const border_color = errorField == '' ? "border-stone-400" : "border-red-400"
     return (
-        <div className="px-3 py-1 shadow-md rounded-md bg-white border-2 border-stone-400">
+        <div className={`px-3 py-1 shadow-md rounded-md bg-white border-2 ${border_color}`}>
             <div className='font-bold'>
                 {name}
             </div>
