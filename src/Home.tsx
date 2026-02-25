@@ -33,6 +33,7 @@ import Footer from './Footer';
 import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
+import {sendData} from "./sendData.ts";
 
 const nodeTypes = {
     unit: UnitNode,
@@ -179,7 +180,6 @@ export default function Home() {
                 name: id,
             },
         };
-
         setNodes((nds) => nds.concat(newNode));
     }, [screenToFlowPosition, setNodes, type]);
 
@@ -194,6 +194,10 @@ export default function Home() {
         setNodeData(null);
     }, [setNodes, setEdges, setNodeData]);
 
+    const submit = useCallback(async () => {
+        await sendData(nodes, edges, forecast)
+    }, [nodes, edges, forecast])
+
     const onPaneClick = useCallback(() => {
         setNodeData(null)
     }, [setNodeData]);
@@ -205,6 +209,21 @@ export default function Home() {
         setForecast(loaded["forecasts"] ?? initialForecast);
     }, [setNodes, setEdges, setForecast]);
 
+    const save = useCallback(() => {
+        localStorage.setItem('flow', JSON.stringify({"nodes": nodes, "edges": edges, "forecasts": forecast}));
+    }, [nodes, edges, forecast]);
+
+    const download = useCallback(() => {
+        const blob = JSON.stringify({"nodes": nodes, "edges": edges});
+        const href = URL.createObjectURL(new Blob([blob], {type: 'application/json'}));
+        const link = document.createElement('a');
+        link.href = href;
+        link.download = `simulation-${Date.now().toString()}.json`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }, [nodes, edges])
+
     return (
         <div className="flex h-full">
             <Sidebar
@@ -215,7 +234,8 @@ export default function Home() {
             />
             <div className="flex grow flex-col">
                 <Header/>
-                <div className="grow" ref={reactFlowWrapper}>
+                <div className="grow"
+                     ref={reactFlowWrapper}>
                     <ReactFlow
                         deleteKeyCode={["Delete", "Backspace"]}
                         nodes={nodes}
@@ -235,9 +255,12 @@ export default function Home() {
                         <Background/>
                         <Panel position="bottom-right">
                             <Cockpit
-                                nodes={nodes} edges={edges}
-                                forecasts={forecast} reset={reset}
-                                setFlowByJson={setFlowByJson}/>
+                                submit={submit}
+                                reset={reset}
+                                save={save}
+                                download={download}
+                                setFlowByJson={setFlowByJson}
+                            />
                         </Panel>
                     </ReactFlow>
                 </div>

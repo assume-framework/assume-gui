@@ -5,25 +5,17 @@ import {
     SaveOutlined,
     SendOutlined
 } from '@mui/icons-material';
-import {type ComponentType, type MouseEventHandler, useCallback} from "react";
-import {sendData} from "../sendData.ts";
-import type {Edge, Node} from "@xyflow/react";
-import type {EditSidebarData} from "./SidebarComponents/NodeEditSidebar.tsx";
-import type {Forecast} from "./SidebarComponents/UploadSidebar.tsx";
+import {type ComponentType, type MouseEventHandler} from "react";
 
 type Args = {
-    nodes: Node<EditSidebarData>[]
-    edges: Edge<EditSidebarData>[]
-    forecasts: Forecast
-    reset: () => void
-    setFlowByJson: (data: string) => void
+    reset: () => void,
+    setFlowByJson: (data: string) => void,
+    submit?: () => Promise<void>,
+    save?: () => void,
+    download?: () => void
 }
 
-export default function Cockpit({nodes, edges, forecasts, reset, setFlowByJson}: Args) {
-    const save = useCallback(() => {
-        localStorage.setItem('flow', JSON.stringify({"nodes": nodes, "edges": edges, "forecasts": forecasts}));
-    }, [nodes, edges, forecasts]);
-
+export default function Cockpit({reset, setFlowByJson, submit, save, download}: Args) {
     const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
         const inputElement = e.target as HTMLInputElement
         if (!inputElement.files || inputElement.files.length == 0) {
@@ -39,26 +31,29 @@ export default function Cockpit({nodes, edges, forecasts, reset, setFlowByJson}:
         }
     }
 
-    const download = useCallback(() => {
-        const blob = JSON.stringify({"nodes": nodes, "edges": edges});
-        const href = URL.createObjectURL(new Blob([blob], {type: 'application/json'}));
-        const link = document.createElement('a');
-        link.href = href;
-        link.download = `simulation-${Date.now().toString()}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }, [nodes, edges])
-
     return <>
-        <CockpitElement name={"Submit"} Icon={SendOutlined} onClick={() => sendData(nodes, edges, forecasts)}/>
-        <CockpitElement name={"Save"} Icon={SaveOutlined} onClick={save}/>
-        <CockpitElement name={"Reset"} Icon={ReplayOutlined} onClick={reset}/>
-        <CockpitElement name={"Download"} onClick={download} Icon={FileDownloadOutlined}/>
+        <CockpitElement name={"Submit"}
+                        Icon={SendOutlined}
+                        onClick={submit}/>
+        <CockpitElement name={"Save"}
+                        Icon={SaveOutlined}
+                        onClick={save}/>
+        <CockpitElement name={"Reset"}
+                        Icon={ReplayOutlined}
+                        onClick={reset}/>
+        <CockpitElement name={"Download"}
+                        onClick={download}
+                        Icon={FileDownloadOutlined}/>
         <label htmlFor="file_upload" className={"cursor-pointer"}>
             <CockpitElement name={"Upload"} Icon={FileUploadOutlined}/>
         </label>
-        <input id="file_upload" type="file" accept=".json" className="hidden" onInput={handleFileUpload}/>
+        <input
+            id="file_upload"
+            type="file"
+            accept=".json"
+            className="hidden"
+            onInput={handleFileUpload}
+        />
     </>
 }
 
