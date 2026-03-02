@@ -43,7 +43,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                 <>
                     <Input label="Max Power"
                            type="number"
-                           value={data.max_power}
+                           value={data.max_power ?? 0}
                            onChange={onChange("max_power")}
                            errorMessage={getErrorMessage('max_power')}
                            tooltip="Maximum power input (negative) of this unit in MW"/>

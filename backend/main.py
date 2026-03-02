@@ -1,11 +1,13 @@
+import logging
 import uuid
 from pathlib import Path
 
 import uvicorn
+from assume.common.exceptions import ValidationError
 from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 
-from backend.process import process_data, ValidationError
+from backend.process import process_data
 
 app = FastAPI()
 
@@ -24,6 +26,7 @@ async def send_data(data: dict):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
+        logging.error("Internal server error: ",e)
         raise HTTPException(status_code=500, detail=str(e))
     return {"status": "success"}
 
