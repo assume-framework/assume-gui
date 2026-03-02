@@ -34,6 +34,7 @@ import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData} from "./sendData.ts";
+import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
 const nodeTypes = {
     unit: UnitNode,
@@ -73,6 +74,11 @@ const readLocalStorage = () => {
     return JSON.parse(data);
 }
 
+interface AlertState {
+    message: string;
+    severity: AlertColor;
+}
+
 export default function Home() {
     const loaded = readLocalStorage();
     const reactFlowWrapper = useRef(null);
@@ -82,6 +88,7 @@ export default function Home() {
     const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
     const [type] = useContext(DnDContext);
     const {screenToFlowPosition} = useReactFlow();
+    const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         type T = Node<EditSidebarData> | Edge<EditSidebarData>;
@@ -201,21 +208,33 @@ export default function Home() {
         setForecast(initialForecast);
         localStorage.removeItem('flow');
         setNodeData(null);
+        setAlert({message: 'Flow reset successfully', severity: 'success'})
     }, [setNodes, setEdges, setNodeData]);
 
     const submit = useCallback(() => {
             sendData(nodes, edges, forecast).then(
                 response => {
-                    if (!response.success && response.id && response.field && response.message) {
+                    if (response.success) {
+                        setAlert({message: 'Flow submitted successfully', severity: 'success'})
+                        return
+                    }
+                    if (response.id && response.field && response.message) {
                         const found = nodes.find(n => n.data.name === response.id)
                         if (found) {
                             found.data.errorField = response.field
                             found.data.errorMessage = response.message
                             updateValue(found?.id, found?.data, false)
+                            setAlert({message: 'Invalid configuration', severity: 'warning'})
+                            return;
                         }
                     }
+                    console.error("Unexpected response: ", response)
+                    setAlert({message: 'An unknown error has occured', severity: 'error'})
                 }
-            ).catch(e => console.error("Unknown error: ", e))
+            ).catch(e => {
+                console.error("Unknown error: ", e)
+                setAlert({message: 'An unknown error has occured', severity: 'error'})
+            })
         }, [nodes, edges, forecast, updateValue]
     )
 
@@ -232,6 +251,7 @@ export default function Home() {
 
     const save = useCallback(() => {
         localStorage.setItem('flow', JSON.stringify({"nodes": nodes, "edges": edges, "forecasts": forecast}));
+        setAlert({message: 'Flow saved successfully', severity: 'success'})
     }, [nodes, edges, forecast]);
 
     const download = useCallback(() => {
@@ -247,6 +267,15 @@ export default function Home() {
 
     return (
         <div className="flex h-full">
+            <Snackbar open={!!alert.message}
+                      autoHideDuration={3000}
+                      anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+                      onClose={() => setAlert({...alert, message: ''})}
+                      onClick={() => setAlert({...alert, message: ''})}
+            >
+                <Alert severity={alert.severity}
+                       variant="outlined">{alert.message}</Alert>
+            </Snackbar>
             <Sidebar
                 nodeData={nodeData}
                 updateValue={updateValue}
