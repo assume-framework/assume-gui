@@ -8,6 +8,7 @@ DBURI = os.getenv(
     "DATABASE_URL", "postgresql://assume@localhost:5432/assume?password=assume"
 )
 
+
 def load_forecasts(forecasts: dict):
     loaded = {}
     for type, value in forecasts.items():
@@ -16,6 +17,7 @@ def load_forecasts(forecasts: dict):
         path = Path(__file__).parent / "tmp" / f"{value}.csv"
         loaded[type] = pd.read_csv(path)
     return loaded
+
 
 def date(date_str: str):
     return datetime.fromisoformat(date_str)

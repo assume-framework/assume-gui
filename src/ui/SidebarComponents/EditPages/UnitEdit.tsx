@@ -19,6 +19,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
         <>
             <Select label="Unit type"
                     value={data.unitType}
+                    errorMessage={getErrorMessage('unitType')}
                     onChange={reset}>
                 <option value="demand">Demand</option>
                 <option value="storage">Storage</option>

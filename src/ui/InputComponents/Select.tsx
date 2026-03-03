@@ -5,18 +5,20 @@ interface SelectProperties extends BaseProps {
     children: React.ReactNode
 }
 
-function Select ({
+export default function Select ({
     value,
     label,
     onChange,
+    errorMessage,
     disabled = false,
     required = false,
     children
 }: SelectProperties) {
     const id = useId()
+    const color = errorMessage ? "text-red-500" : "text-gray-700"
     return (
         <div>
-            <label htmlFor={id} className="block text-gray-700 text-sm font-bold mt-2">{label}</label>
+            <label htmlFor={id} className={`block text-sm font-bold mt-2 ${color}`}>{label}</label>
             <select
                 id={id}
                 value={value}
@@ -28,8 +30,9 @@ function Select ({
                 <option disabled selected value="">-- select an option --</option>
                 {children}
             </select>
+            {errorMessage && <div className="text-red-500">
+                {errorMessage}
+            </div>}
         </div>
     )
 }
-
-export default Select

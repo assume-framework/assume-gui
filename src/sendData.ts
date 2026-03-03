@@ -1,7 +1,7 @@
 import type {Node, Edge} from "@xyflow/react";
 import type {Forecast} from "./ui/SidebarComponents/UploadSidebar.tsx";
 
-interface DataResponse {
+export interface DataResponse {
     success: boolean
     id?: string
     field?: string
@@ -22,7 +22,7 @@ export async function sendData(nodes: Node[], edges: Edge[], forecasts: Forecast
         return {success: true}
     }
     const msg = await resp.json()
-    return {success: false, id: msg.detail.id, field: msg.detail.field, message: msg.detail.message}
+    return {success: false, id: msg.detail.id, field: msg.detail.field, message: msg.detail.message??msg.detail}
 }
 
 export async function uploadFile(file: File): Promise<string> {

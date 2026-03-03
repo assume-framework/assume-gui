@@ -18,7 +18,7 @@ from backend.utils import DBURI
 
 def process_data(input: dict):
     cfg = Config(input)
-    worldcfg = cfg.get_node('world')
+    worldcfg = cfg.get_node("world")
 
     world = World(database_uri=DBURI)
     world.setup(
@@ -39,13 +39,17 @@ def add_markets(world: World, cfg: Config):
         world.add_market_operator(operator_edge.target)
         for market_edge in cfg.get_edges(operator_edge.target, EdgeType.market):
             market_products = []
-            for product_edge in cfg.get_edges(market_edge.target, EdgeType.market_product):
+            for product_edge in cfg.get_edges(
+                market_edge.target, EdgeType.market_product
+            ):
                 productData = cfg.get_node(product_edge.target)
                 market_products.append(
                     MarketProduct(
                         duration=relativedelta(minutes=int(productData["duration"])),
                         count=int(productData["count"]),
-                        first_delivery=relativedelta(minutes=int(productData["first_delivery"])),
+                        first_delivery=relativedelta(
+                            minutes=int(productData["first_delivery"])
+                        ),
                         only_hours=_only_hours(productData.get("only_hours", "")),
                         eligible_lambda_function=_optional_string(
                             productData.get("eligible_lambda_function")
@@ -58,7 +62,9 @@ def add_markets(world: World, cfg: Config):
                 market_config=MarketConfig(
                     market_id=data["name"],
                     market_mechanism=data["market_mechanism"],
-                    opening_hours=rr.rrule(freq=rr.HOURLY, interval=24, dtstart=world.start, until=world.end),
+                    opening_hours=rr.rrule(
+                        freq=rr.HOURLY, interval=24, dtstart=cfg.start, until=cfg.end
+                    ),
                     opening_duration=timedelta(minutes=int(data["opening_duration"])),
                     market_products=market_products,
                 ),

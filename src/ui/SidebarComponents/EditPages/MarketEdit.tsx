@@ -19,6 +19,7 @@ function editMarket({id, data, updateNodeValue, getErrorMessage}: EditComponentA
                    errorMessage={getErrorMessage('opening_duration')}
                    onChange={onChange("opening_duration")}/>
             <Select label="Market Mechanism"
+                    errorMessage={getErrorMessage('market_mechanism')}
                     value={data.market_mechanism}
                     onChange={onChange("market_mechanism")}>
                 <option value="pay_as_clear">Pay as clear</option>

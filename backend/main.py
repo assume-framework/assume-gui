@@ -18,15 +18,19 @@ async def send_data(data: dict):
         world = process_data(data)
         world.run()
     except ValidationError as e:
-        raise HTTPException(status_code=400, detail={
-            "message": str(e),
-            "id": e.id,
-            "field": e.field,
-        })
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": str(e),
+                "id": e.id,
+                "field": e.field,
+            },
+        )
     except ValueError as e:
+        logging.error("Value error: ", e)
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logging.error("Internal server error: ",e)
+        logging.error("Internal server error: ", e)
         raise HTTPException(status_code=500, detail=str(e))
     return {"status": "success"}
 

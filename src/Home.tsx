@@ -33,7 +33,7 @@ import Footer from './Footer';
 import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
-import {sendData} from "./sendData.ts";
+import {sendData, type DataResponse} from "./sendData.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
 const nodeTypes = {
@@ -211,36 +211,35 @@ export default function Home() {
         setAlert({message: 'Flow reset successfully', severity: 'success'})
     }, [setNodes, setEdges, setNodeData]);
 
-    const submit = useCallback(() => {
-            sendData(nodes, edges, forecast).then(
-                response => {
-                    if (response.success) {
-                        setAlert({message: 'Flow submitted successfully', severity: 'success'})
-                        return
-                    }
-                    if (response.id && response.field && response.message) {
-                        const found = nodes.find(n => n.data.name === response.id)
-                        if (found) {
-                            found.data.errorField = response.field
-                            found.data.errorMessage = response.message
-                            updateValue(found?.id, found?.data, false)
-                            setAlert({message: 'Invalid configuration', severity: 'warning'})
-                            return;
-                        }
-                    }
-                    console.error("Unexpected response: ", response)
-                    setAlert({message: 'An unknown error has occured', severity: 'error'})
-                }
-            ).catch(e => {
+    const submit = useCallback(async () => {
+            let response: DataResponse;
+            try {
+                response = await sendData(nodes, edges, forecast)
+            } catch (e) {
                 console.error("Unknown error: ", e)
                 setAlert({message: 'An unknown error has occured', severity: 'error'})
-            })
-        }, [nodes, edges, forecast, updateValue]
+                return
+            }
+            if (response.success) {
+                setAlert({message: 'Flow submitted successfully', severity: 'success'})
+                return
+            }
+            // handle validation error
+            if (response.id && response.field && response.message) {
+                const foundNode = nodes.find(n => n.id === response.id)
+                const found = foundNode ?? edges.find(e => e.id === response.id)
+                if (found && found.data) {
+                    found.data.errorField = response.field
+                    found.data.errorMessage = response.message
+                    updateValue(found.id, found.data, !foundNode)
+                    setAlert({message: 'Invalid configuration: ' + response.message, severity: 'warning'})
+                    return;
+                }
+            }
+            console.error("Unknown error: ", response)
+            setAlert({message: 'An unknown error has occured: ' + response.message, severity: 'warning'})
+        }, [nodes, edges, forecast, updateValue, setAlert]
     )
-
-    const onPaneClick = useCallback(() => {
-        setNodeData(null)
-    }, [setNodeData]);
 
     const setFlowByJson = useCallback((data: string) => {
         const loaded = JSON.parse(data);
@@ -291,8 +290,8 @@ export default function Home() {
                         nodes={nodes}
                         edges={edges}
                         nodeTypes={nodeTypes}
+                        onPaneClick={useCallback(() => setNodeData(null), [setNodeData])}
                         onNodesChange={onNodesChange}
-                        onPaneClick={onPaneClick}
                         onEdgesChange={onEdgesChange}
                         onConnect={onConnect}
                         onDragOver={onDragOver}
