@@ -1,5 +1,4 @@
 import os
-from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
@@ -17,7 +16,3 @@ def load_forecasts(forecasts: dict):
         path = Path(__file__).parent / "tmp" / f"{value}.csv"
         loaded[type] = pd.read_csv(path)
     return loaded
-
-
-def date(date_str: str):
-    return datetime.fromisoformat(date_str)
