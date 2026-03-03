@@ -1,24 +1,48 @@
+import logging
+import uuid
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI, HTTPException
+from assume.common.exceptions import ValidationError
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 
-from .process import process_data
+from backend.process import process_data
 
 app = FastAPI()
 
 
 @app.post("/api/submit")
-def send_data(data: dict):
+async def send_data(data: dict):
     try:
         world = process_data(data)
         world.run()
+    except ValidationError as e:
+        raise HTTPException(
+            status_code=400,
+            detail={
+                "message": str(e),
+                "id": e.id,
+                "field": e.field,
+            },
+        )
     except ValueError as e:
+        logging.error("Value error: ", e)
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        return HTTPException(status_code=500, detail=str(e))
+        logging.error("Internal server error: ", e)
+        raise HTTPException(status_code=500, detail=str(e))
     return {"status": "success"}
+
+
+@app.post("/api/upload")
+async def upload_file(file: UploadFile):
+    uid = str(uuid.uuid4())
+    tmpfile = Path(__file__).parent / "tmp" / f"{uid}.csv"
+    tmpfile.parent.mkdir(exist_ok=True, parents=True)
+    content = (await file.read()).decode("utf-8")
+    tmpfile.open("w+").write(content)
+    return {"id": uid}
 
 
 app.mount(
