@@ -72,10 +72,15 @@ def add_markets(world: World, cfg: Config):
 
 
 def forecaster_for_type(
-    index: ForecastIndex, data: dict, global_forecasts: dict
+    index: ForecastIndex,
+    data: dict,
+    global_forecasts: dict,
+    market_ids: list[str],
 ) -> UnitForecaster:
     forecasts = data.get("forecasts", {})
     price_forecast = global_forecasts.get("price", None)
+    if price_forecast is None:
+        price_forecast = {market_id: 50 for market_id in market_ids}
     residual_forecast = global_forecasts.get("residual_load", None)
     match data["unitType"]:
         case "demand":
@@ -118,7 +123,8 @@ def add_units(world: World, cfg: Config):
         for unit_edge in cfg.get_edges(operator_edge.target, EdgeType.unit):
             bidding_strategies = {}
             for connection in cfg.get_edges(unit_edge.target, EdgeType.market):
-                bidding_strategies[connection.target] = connection["strategy"]
+                market_data = cfg.get_node(connection.target)
+                bidding_strategies[market_data["name"]] = connection["strategy"]
             unitData = cfg.get_node(unit_edge.target)
             world.add_unit(
                 id=unitData["name"],
@@ -144,7 +150,9 @@ def add_units(world: World, cfg: Config):
                     "max_soc": int(unitData.get("max_soc", 0)),
                     "min_soc": int(unitData.get("min_soc", 0)),
                 },
-                forecaster=forecaster_for_type(cfg.index, unitData, cfg.forecasts),
+                forecaster=forecaster_for_type(
+                    cfg.index, unitData, cfg.forecasts, list(bidding_strategies.keys())
+                ),
             )
     return world
 
