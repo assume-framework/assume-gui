@@ -139,7 +139,10 @@ def add_units(world: World, cfg: Config):
                     "min_downtime": int(unitData.get("min_downtime", 0)),
                     "max_power_charge": int(unitData.get("max_power_charge", 0)),
                     "max_power_discharge": int(unitData.get("max_power_discharge", 0)),
+                    "min_power_charge": int(unitData.get("min_power_charge", 0)),
+                    "min_power_discharge": int(unitData.get("min_power_discharge", 0)),
                     "max_soc": int(unitData.get("max_soc", 0)),
+                    "min_soc": int(unitData.get("min_soc", 0)),
                 },
                 forecaster=forecaster_for_type(cfg.index, unitData, cfg.forecasts),
             )

@@ -148,6 +148,12 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
             )}
             {data.unitType === "storage" && (
                 <>
+                    <Input label="Capacity"
+                           type="number"
+                           value={data.capacity}
+                           onChange={onChange("capacity")}
+                           errorMessage={getErrorMessage('capacity')}
+                           tooltip="Storage Capacity"/>
                     <Input label="Max Power Charge"
                            type="number"
                            value={data.max_power_charge}
