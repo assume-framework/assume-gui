@@ -13,5 +13,6 @@ Thats it!
 3. Install node.js and npm
 
 ### Start the App
-1. Run `npm run build` to build the Frontend
-2. Start the server with `fastapi run backend/main.py`
+1. Run `npm clean-install`
+2. Run `npm run build` to build the Frontend
+3. Start the server with `fastapi run backend/main.py`
