@@ -1,4 +1,5 @@
 import {
+    AccountTreeOutlined,
     FileDownloadOutlined,
     FileUploadOutlined,
     ReplayOutlined,
@@ -12,10 +13,11 @@ type Args = {
     setFlowByJson: (data: string) => void,
     submit?: () => void,
     save?: () => void,
-    download?: () => void
+    download?: () => void,
+    autoArrange?: () => void,
 }
 
-export default function Cockpit({reset, setFlowByJson, submit, save, download}: Args) {
+export default function Cockpit({reset, setFlowByJson, submit, save, download, autoArrange}: Args) {
     const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
         const inputElement = e.target as HTMLInputElement
         if (!inputElement.files || inputElement.files.length == 0) {
@@ -41,6 +43,9 @@ export default function Cockpit({reset, setFlowByJson, submit, save, download}: 
         <CockpitElement name={"Reset"}
                         Icon={ReplayOutlined}
                         onClick={reset}/>
+        <CockpitElement name={"Auto Arrange"}
+                        onClick={autoArrange}
+                        Icon={AccountTreeOutlined}/>
         <CockpitElement name={"Download"}
                         onClick={download}
                         Icon={FileDownloadOutlined}/>

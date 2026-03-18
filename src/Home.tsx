@@ -34,6 +34,7 @@ import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData, type DataResponse} from "./sendData.ts";
+import {getLayoutedElements} from "./layout.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
 const nodeTypes = {
@@ -87,7 +88,7 @@ export default function Home() {
     const [forecast, setForecast] = useState<Forecast>(loaded['forecasts'] ?? initialForecast);
     const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
     const [type] = useContext(DnDContext);
-    const {screenToFlowPosition} = useReactFlow();
+    const {screenToFlowPosition, fitView} = useReactFlow();
     const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
@@ -253,6 +254,11 @@ export default function Home() {
         setAlert({message: 'Flow saved successfully', severity: 'success'})
     }, [nodes, edges, forecast]);
 
+    const autoArrange = useCallback(() => {
+        setNodes((nds) => getLayoutedElements(nds, edges));
+        window.requestAnimationFrame(() => fitView({padding: 0.1}));
+    }, [edges, fitView, setNodes]);
+
     const download = useCallback(() => {
         const blob = JSON.stringify({"nodes": nodes, "edges": edges});
         const href = URL.createObjectURL(new Blob([blob], {type: 'application/json'}));
@@ -309,6 +315,7 @@ export default function Home() {
                                 save={save}
                                 download={download}
                                 setFlowByJson={setFlowByJson}
+                                autoArrange={autoArrange}
                             />
                         </Panel>
                     </ReactFlow>
