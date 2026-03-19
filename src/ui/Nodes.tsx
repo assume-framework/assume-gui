@@ -12,6 +12,7 @@ export function WorldNode({data, isConnectable}: NodeProps<Node<EditSidebarData>
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 style={{left: '25%'}}
+                title="Connect to market providers"
             />
             <Handle
                 id="unitOperator_handle"
@@ -19,6 +20,7 @@ export function WorldNode({data, isConnectable}: NodeProps<Node<EditSidebarData>
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 style={{left: '75%'}}
+                title="Connect to unit operators"
             />
         </>
     )
@@ -33,12 +35,14 @@ export function MarketNode({data, isConnectable}: NodeProps<Node<EditSidebarData
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
+                title="Connect from world (market providers)"
             />
             <Handle
                 id="unit_handle"
                 type="target"
                 position={Position.Right}
                 isConnectable={isConnectable}
+                title="Connect units to this market"
             />
             {renderUnit('Market', data.name, data.errorField)}
             <Handle
@@ -60,6 +64,7 @@ export function MarketProviderNode({data, isConnectable}: NodeProps<Node<EditSid
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
+                title="Connect from world"
             />
 
             {renderUnit('Market Provider', data.name, data.errorField)}
@@ -68,6 +73,7 @@ export function MarketProviderNode({data, isConnectable}: NodeProps<Node<EditSid
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
+                title="Connect to markets"
             />
         </>
     )
@@ -83,6 +89,7 @@ export function UnitNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
+                title="Connect from unit operator"
             />
             {renderUnit(data.unitType as string ?? 'Unit', data.name, data.errorField)}
             <Handle
@@ -90,6 +97,7 @@ export function UnitNode({data, isConnectable}: NodeProps<Node<EditSidebarData>>
                 type="source"
                 position={Position.Left}
                 isConnectable={isConnectable}
+                title="Connect to market"
             />
         </>
     )
@@ -104,6 +112,7 @@ export function UnitOperatorNode({data, isConnectable}: NodeProps<Node<EditSideb
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
+                title="Connect from world"
             />
             {renderUnit('Unit Operator', data.name, data.errorField)}
             <Handle
@@ -111,6 +120,7 @@ export function UnitOperatorNode({data, isConnectable}: NodeProps<Node<EditSideb
                 type="source"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
+                title="Connect to units"
             />
         </>
     )
@@ -125,6 +135,7 @@ export function MarketProductNode({data, isConnectable}: NodeProps<Node<EditSide
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
+                title="Connect from market"
             />
             {renderUnit('Market Product', data.name, data.errorField)}
         </>
