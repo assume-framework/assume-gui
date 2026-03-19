@@ -85,6 +85,7 @@ export default function Home() {
     const [type] = useContext(DnDContext);
     const {screenToFlowPosition} = useReactFlow();
     const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         type T = Node<EditSidebarData> | Edge<EditSidebarData>;
@@ -226,33 +227,34 @@ export default function Home() {
     }, [setNodes, setEdges, setNodeData]);
 
     const submit = useCallback(async () => {
-            let response: DataResponse;
+            if (isSubmitting) {
+                return;
+            }
+            setIsSubmitting(true);
             try {
-                response = await sendData(nodes, edges, forecast)
-            } catch (e) {
-                console.error("Unknown error: ", e)
-                setAlert({message: 'An unknown error has occured', severity: 'error'})
-                return
-            }
-            if (response.success) {
-                setAlert({message: 'Flow submitted successfully', severity: 'success'})
-                return
-            }
-            // handle validation error
-            if (response.id && response.field && response.message) {
-                const foundNode = nodes.find(n => n.id === response.id)
-                const found = foundNode ?? edges.find(e => e.id === response.id)
-                if (found && found.data) {
-                    found.data.errorField = response.field
-                    found.data.errorMessage = response.message
-                    updateValue(found.id, found.data, !foundNode)
-                    setAlert({message: 'Invalid configuration: ' + response.message, severity: 'warning'})
+                const response: DataResponse = await sendData(nodes, edges, forecast)
+                if (response.success) {
+                    setAlert({message: 'Flow submitted successfully', severity: 'success'})
                     return;
                 }
+                // handle validation error
+                if (response.id && response.field && response.message) {
+                    const foundNode = nodes.find(n => n.id === response.id)
+                    const found = foundNode ?? edges.find(e => e.id === response.id)
+                    if (found && found.data) {
+                        found.data.errorField = response.field
+                        found.data.errorMessage = response.message
+                        updateValue(found.id, found.data, !foundNode)
+                        setAlert({message: 'Invalid configuration: ' + response.message, severity: 'warning'})
+                        return;
+                    }
+                }
+                console.error("Unknown error: ", response)
+                setAlert({message: response.message ?? 'Submission failed. Please try again.', severity: 'error'})
+            } finally {
+                setIsSubmitting(false);
             }
-            console.error("Unknown error: ", response)
-            setAlert({message: 'An unknown error has occured: ' + response.message, severity: 'warning'})
-        }, [nodes, edges, forecast, updateValue, setAlert]
+        }, [nodes, edges, forecast, updateValue, setAlert, isSubmitting]
     )
 
     const setFlowByJson = useCallback((data: string) => {
@@ -319,6 +321,7 @@ export default function Home() {
                         <Panel position="bottom-right">
                             <Cockpit
                                 submit={submit}
+                                submitDisabled={isSubmitting}
                                 reset={reset}
                                 save={save}
                                 download={download}

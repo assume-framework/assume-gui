@@ -11,11 +11,12 @@ type Args = {
     reset: () => void,
     setFlowByJson: (data: string) => void,
     submit?: () => void,
+    submitDisabled?: boolean,
     save?: () => void,
     download?: () => void
 }
 
-export default function Cockpit({reset, setFlowByJson, submit, save, download}: Args) {
+export default function Cockpit({reset, setFlowByJson, submit, submitDisabled, save, download}: Args) {
     const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
         const inputElement = e.target as HTMLInputElement
         if (!inputElement.files || inputElement.files.length == 0) {
@@ -34,6 +35,7 @@ export default function Cockpit({reset, setFlowByJson, submit, save, download}: 
     return <>
         <CockpitElement name={"Submit"}
                         Icon={SendOutlined}
+                        disabled={submitDisabled}
                         onClick={submit}/>
         <CockpitElement name={"Save"}
                         Icon={SaveOutlined}
@@ -60,14 +62,19 @@ export default function Cockpit({reset, setFlowByJson, submit, save, download}: 
 interface ElementArgs {
     name: string,
     onClick?: MouseEventHandler<HTMLDivElement>,
+    disabled?: boolean,
     Icon: ComponentType
 }
 
-function CockpitElement({onClick, name, Icon}: ElementArgs) {
+function CockpitElement({onClick, name, Icon, disabled = false}: ElementArgs) {
     return (
         <div
-            className="bg-white cursor-pointer hover:bg-neutral-100 active:bg-neutral-300 border rounded w-full my-2 py-1 px-3 flex"
-            onClick={onClick}
+            className={`bg-white border rounded w-full my-2 py-1 px-3 flex ${
+                disabled
+                    ? "cursor-not-allowed opacity-60"
+                    : "cursor-pointer hover:bg-neutral-100 active:bg-neutral-300"
+            }`}
+            onClick={disabled ? undefined : onClick}
         >
             <Icon/>
             <div className="px-3">{name}</div>
