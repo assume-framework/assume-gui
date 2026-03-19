@@ -321,7 +321,7 @@ export default function Home() {
                         <Panel position="bottom-right">
                             <Cockpit
                                 submit={submit}
-                                submitDisabled={isSubmitting}
+                                processing={isSubmitting}
                                 reset={reset}
                                 save={save}
                                 download={download}
