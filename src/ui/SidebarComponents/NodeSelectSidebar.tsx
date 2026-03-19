@@ -25,11 +25,12 @@ export default function SelectSidebar() {
         <>
             <div className="px-8 pt-6 pb-8 mb-4">
                 <div className="mb-4">You can drag these nodes to the pane on the right.</div>
-                <Node type={"unit"} name={"Unit Node"}/>
-                <Node type={"unitOperator"} name={"Unit Operator Node"}/>
-                <Node type={"market"} name={"Market Node"}/>
                 <Node type={"marketProvider"} name={"Market Provider Node"}/>
+                <Node type={"market"} name={"Market Node"}/>
                 <Node type={"marketProduct"} name={"Market Product Node"}/>
+                <div className="h-2" />
+                <Node type={"unitOperator"} name={"Unit Operator Node"}/>
+                <Node type={"unit"} name={"Unit Node"}/>
             </div>
         </>
     )
