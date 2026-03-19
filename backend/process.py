@@ -15,6 +15,16 @@ from dateutil.relativedelta import relativedelta
 from backend.config import Config, EdgeType
 from backend.utils import DBURI
 
+import dateutil.rrule as rr
+
+rrule_from_string = {
+    "HOURLY": rr.HOURLY,
+    "DAILY": rr.DAILY,
+    "WEEKLY": rr.WEEKLY,
+    "MONTHLY": rr.MONTHLY,
+}
+
+
 
 def process_data(input: dict):
     cfg = Config(input)
@@ -63,7 +73,7 @@ def add_markets(world: World, cfg: Config):
                     market_id=data["name"],
                     market_mechanism=data["market_mechanism"],
                     opening_hours=rr.rrule(
-                        freq=rr.HOURLY, interval=24, dtstart=cfg.start, until=cfg.end
+                        freq=rrule_from_string[data["opening_hours"]], interval=1, dtstart=cfg.start, until=cfg.end
                     ),
                     opening_duration=timedelta(minutes=int(data["opening_duration"])),
                     market_products=market_products,

@@ -8,14 +8,18 @@ function editMarket({id, data, updateNodeValue, getErrorMessage}: EditComponentA
 
     return (
         <>
-            <Input disabled
+            <Select
                    label="Opening Hours"
-                   type="text"
-                   value="Every hour"
-                   onChange={onChange("opening_hours")}/>
+                   errorMessage={getErrorMessage('opening_hours')}
+                   value={data.opening_hours}
+                   onChange={onChange("opening_hours")}>
+                <option value="HOURLY">Every Hour</option>
+                <option value="DAILY">Daily</option>
+                <option value="WEEKLY">Weekly</option>
+            </Select>
             <Input label="Opening Duration (min)"
                    type="number"
-                   value={data.opening_duration}
+                   value={data.opening_duration} 
                    errorMessage={getErrorMessage('opening_duration')}
                    onChange={onChange("opening_duration")}/>
             <Select label="Market Mechanism"

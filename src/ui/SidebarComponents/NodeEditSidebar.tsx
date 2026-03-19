@@ -52,7 +52,7 @@ export default function EditSidebar({id, type, data, updateNodeValue}: EditSideb
                    value={data.name}
                    onChange={onChange("name")}
                    errorMessage={getErrorMessage("name")}
-                   tooltip="Hier könnten Ihre Tooltips stehen!"/>
+                   tooltip="Identifier of the component - can be any string"/>
             {type === "unit" &&
               <UnitEdit
                 id={id}
