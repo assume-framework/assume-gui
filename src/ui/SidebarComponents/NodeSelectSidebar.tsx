@@ -23,8 +23,8 @@ function Node({type, name}: { type: string, name: string }) {
 export default function SelectSidebar() {
     return (
         <>
-            <div className="px-8 pt-6 pb-8 mb-4">
-                <div className="mb-4">You can drag these nodes to the pane on the right.</div>
+            <div className="px-4 pt-4 pb-6 mb-2 text-sm">
+                <div className="mb-4">Drag nodes into the canvas.</div>
                 <Node type={"marketProvider"} name={"Market Provider Node"}/>
                 <Node type={"market"} name={"Market Node"}/>
                 <Node type={"marketProduct"} name={"Market Product Node"}/>
