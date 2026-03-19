@@ -72,7 +72,7 @@ interface ElementArgs {
     onClick?: MouseEventHandler<HTMLDivElement>,
     disabled?: boolean,
     Icon: ComponentType,
-    processing: boolean,
+    processing?: boolean,
 }
 
 function CockpitElement({onClick, name, Icon, processing = false}: ElementArgs) {
