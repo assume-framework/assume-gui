@@ -1,4 +1,4 @@
-export default function Header() {
+export default function Header({onDiscussSimulation}: {onDiscussSimulation?: () => void} = {}) {
     const header_classes = "p-2 m-1 text-xl rounded-md hover:bg-gray-300";
     
     return (
@@ -8,8 +8,16 @@ export default function Header() {
                 <ul>
                     <a className={header_classes} href="/grafana">Results</a>
                     <a className={header_classes} href="/rl_params">Reinforcement Learning</a>
-                    <a className={header_classes} href="/ai">Discuss Simulation</a>
-                    <a className={header_classes} href="https://github.com/assume-framework/assume-gui">Repository</a>
+                    <button
+                        type="button"
+                        className={header_classes}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onDiscussSimulation?.();
+                        }}
+                    >
+                        Discuss Simulation
+                    </button>
                 </ul>
             </nav>
         </header>

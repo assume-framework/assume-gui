@@ -19,7 +19,7 @@ import {
     ReactFlow,
     useReactFlow
 } from '@xyflow/react';
-import React, {useCallback, useContext, useRef, useState} from "react";
+import React, {useCallback, useContext, useMemo, useRef, useState} from "react";
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
@@ -32,6 +32,7 @@ import Header from './Header';
 import Footer from './Footer';
 import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
+import DiscussSimulationChat from "./ui/DiscussSimulationChat.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData, type DataResponse} from "./sendData.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
@@ -86,6 +87,9 @@ export default function Home() {
     const {screenToFlowPosition} = useReactFlow();
     const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showDiscuss, setShowDiscuss] = useState(false);
+
+    const worldJson = useMemo(() => JSON.stringify({nodes: nodes, edges: edges}), [nodes, edges]);
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         type T = Node<EditSidebarData> | Edge<EditSidebarData>;
@@ -298,7 +302,7 @@ export default function Home() {
                 updateForecast={updateForecast}
             />
             <div className="flex grow flex-col">
-                <Header/>
+                <Header onDiscussSimulation={() => setShowDiscuss(true)}/>
                 <div className="grow"
                      ref={reactFlowWrapper}>
                     <ReactFlow
@@ -332,6 +336,12 @@ export default function Home() {
                 </div>
                 <Footer/>
             </div>
+            {showDiscuss && (
+                <DiscussSimulationChat
+                    worldJson={worldJson}
+                    onClose={() => setShowDiscuss(false)}
+                />
+            )}
         </div>
     );
 }
