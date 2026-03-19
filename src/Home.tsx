@@ -59,10 +59,6 @@ const initialNodes: Node<EditSidebarData>[] = [{
     deletable: false
 }];
 
-const isValidConnection = (connection: Connection | Edge) =>
-    connection.targetHandle?.split("_")[0] == connection.source?.split("_")[0] &&
-    connection.sourceHandle?.split("_")[0] === connection.target?.split("_")[0];
-
 let id = 1;
 const getId = (type: string) => `${type}_${id++}`;
 
@@ -148,6 +144,24 @@ export default function Home() {
             }
         },
         [edges, setEdges, setNodeData],
+    );
+
+    const isValidConnectionCb = useCallback(
+        (connection: Connection | Edge) => {
+            const sameFromHandles =
+                connection.targetHandle?.split("_")[0] === connection.source?.split("_")[0];
+            const sameToHandles =
+                connection.sourceHandle?.split("_")[0] === connection.target?.split("_")[0];
+            const ok = !!sameFromHandles && !!sameToHandles;
+            if (!ok) {
+                setAlert({
+                    message: 'These node types cannot be connected. Please connect according to the handle hints.',
+                    severity: 'warning',
+                });
+            }
+            return ok;
+        },
+        [setAlert],
     );
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((eds) => {
@@ -295,7 +309,7 @@ export default function Home() {
                         onEdgesChange={onEdgesChange}
                         onConnect={onConnect}
                         onDragOver={onDragOver}
-                        isValidConnection={isValidConnection}
+                        isValidConnection={isValidConnectionCb}
                         onDrop={onDrop}
                         edgeTypes={edgeTypes}
                         fitView
