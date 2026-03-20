@@ -4,11 +4,12 @@ from pathlib import Path
 
 import uvicorn
 from assume.common.exceptions import ValidationError
+from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.staticfiles import StaticFiles
+
 from backend.process import process_data
 from backend.proxy_routes import router as proxy_router
 from backend.utils import write_file
-from fastapi import FastAPI, HTTPException, UploadFile
-from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.include_router(proxy_router)
