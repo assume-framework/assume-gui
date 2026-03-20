@@ -8,8 +8,10 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 
 from backend.process import process_data
+from backend.proxy_routes import router as proxy_router
 
 app = FastAPI()
+app.include_router(proxy_router)
 
 
 @app.post("/api/submit")
