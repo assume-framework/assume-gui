@@ -1,5 +1,6 @@
 from datetime import timedelta
 
+import dateutil.rrule as rr
 from assume import MarketConfig, MarketProduct, World
 from assume.common.forecaster import (
     DemandForecaster,
@@ -9,11 +10,10 @@ from assume.common.forecaster import (
     UnitForecaster,
 )
 from assume.common.market_objects import OnlyHours
-from dateutil import rrule as rr
 from dateutil.relativedelta import relativedelta
 
 from backend.config import Config, EdgeType
-from backend.utils import DBURI
+from backend.utils import DBURI, read_file
 
 rrule_from_string = {
     "HOURLY": rr.HOURLY,
@@ -81,6 +81,12 @@ def add_markets(world: World, cfg: Config):
             )
 
 
+def _file_or_value(entry: str | float | int):
+    if type(entry) == str and len(entry) == 36:
+        return read_file(entry)
+    return entry
+
+
 def forecaster_for_type(
     index: ForecastIndex,
     data: dict,
@@ -92,33 +98,34 @@ def forecaster_for_type(
     if price_forecast is None:
         price_forecast = {market_id: 50 for market_id in market_ids}
     residual_forecast = global_forecasts.get("residual_load", None)
+    availability = _file_or_value(forecasts.get("availability", 1))
     match data["unitType"]:
         case "demand":
             return DemandForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
-                demand=forecasts.get("demand", -100),
+                availability=availability,
+                demand=_file_or_value(forecasts.get("demand", -100)),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
         case "power_plant":
             return PowerplantForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
+                availability=availability,
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
         case "exchange":
             return ExchangeForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
+                availability=availability,
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
         case "storage":
             return UnitForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
+                availability=availability,
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
