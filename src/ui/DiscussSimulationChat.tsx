@@ -93,9 +93,11 @@ export default function DiscussSimulationChat({
 
         try {
             const prompt = [
-                'You are a helpful assistant that explains and reasons about a simulation graph.',
+                'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
+                'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
+                'The market design is configurable. If there are multiple markets, help the user to structure the order of the markets.',
                 'Use the following world JSON as authoritative context.',
-                'If you mention IDs, quote them exactly as they appear in the JSON.',
+                'Remember that the user does not know about the json - but sees the graph visualized. Do not quote position fields or json - they are irrelevant.',
                 '',
                 'WORLD_JSON:',
                 worldJson,
@@ -113,6 +115,7 @@ export default function DiscussSimulationChat({
                 body: JSON.stringify({
                     model: selectedModel,
                     prompt,
+                    think: false,
                     stream: true,
                 }),
             });
