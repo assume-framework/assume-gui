@@ -8,8 +8,7 @@ type ChatMessage = {role: ChatRole; content: string};
 type OllamaModel = {name: string};
 
 const OLLAMA_MODEL_KEY = 'ollama_model';
-const GLOBAL_OLLAMA_MODEL = (import.meta as {env: Record<string, unknown>}).env
-    ?.VITE_OLLAMA_MODEL;
+const GLOBAL_OLLAMA_MODEL = (import.meta as {env: Record<string, unknown>}).env?.DEFAULT_OLLAMA_MODEL;
 const HAS_GLOBAL_OLLAMA_MODEL =
     typeof GLOBAL_OLLAMA_MODEL === 'string' && GLOBAL_OLLAMA_MODEL.trim().length > 0;
 
