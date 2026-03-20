@@ -43,7 +43,6 @@ async def _proxy_stream(
     if query:
         upstream_url = f"{upstream_url}?{query}"
 
-    body = await request.body()
     headers = _filter_request_headers(request.headers)
     # Avoid transparent encoding differences when proxying streaming responses.
     headers.pop("accept-encoding", None)

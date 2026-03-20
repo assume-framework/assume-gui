@@ -15,8 +15,6 @@ from dateutil.relativedelta import relativedelta
 from backend.config import Config, EdgeType
 from backend.utils import DBURI
 
-import dateutil.rrule as rr
-
 rrule_from_string = {
     "HOURLY": rr.HOURLY,
     "DAILY": rr.DAILY,
