@@ -1,5 +1,7 @@
 import {CircularProgress} from '@mui/material';
 import {useEffect, useMemo, useRef, useState} from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 type ChatRole = 'user' | 'assistant' | 'system';
 type ChatMessage = {role: ChatRole; content: string};
@@ -223,7 +225,33 @@ export default function DiscussSimulationChat({
                         }`}
                     >
                         <div className="text-xs font-bold text-gray-600 mb-1">{m.role}</div>
-                        <div className="whitespace-pre-wrap text-sm text-gray-900">{m.content}</div>
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                code(props: any) {
+                                    const {inline, children, className, ...rest} = props;
+                                    if (inline) {
+                                        return (
+                                            <code
+                                                className={`bg-gray-100 rounded px-1 py-0.5 ${className ?? ''}`}
+                                                {...rest}
+                                            >
+                                                {children}
+                                            </code>
+                                        );
+                                    }
+                                    return (
+                                        <pre className="bg-gray-900 text-gray-100 rounded-sm p-1 overflow-x-auto">
+                                            <code className={className ?? ''} {...rest}>
+                                                {children}
+                                            </code>
+                                        </pre>
+                                    );
+                                }
+                            }}
+                        >
+                            {m.content}
+                        </ReactMarkdown>
                     </div>
                 ))}
                 {isSending && (
