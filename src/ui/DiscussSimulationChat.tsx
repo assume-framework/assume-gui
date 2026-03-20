@@ -35,13 +35,24 @@ export default function DiscussSimulationChat({
         HAS_GLOBAL_OLLAMA_MODEL ? GLOBAL_OLLAMA_MODEL : localStorage.getItem(OLLAMA_MODEL_KEY) ?? '',
     );
     const [isLoadingModels, setIsLoadingModels] = useState(false);
+    const [isAtBottom, setIsAtBottom] = useState(true);
     const endRef = useRef<HTMLDivElement | null>(null);
+    const scrollContainerRef = useRef<HTMLDivElement | null>(null);
 
     const history = useMemo(() => messages.filter((m) => m.role !== 'system'), [messages]);
 
     useEffect(() => {
+        if (!isAtBottom) return;
         endRef.current?.scrollIntoView({behavior: 'smooth'});
-    }, [messages, isSending]);
+    }, [messages, isSending, isAtBottom]);
+
+    const onScroll = () => {
+        const el = scrollContainerRef.current;
+        if (!el) return;
+        const distanceFromBottom = el.scrollHeight - el.scrollTop - el.clientHeight;
+        // When we're very close to the bottom, keep auto-scrolling.
+        setIsAtBottom(distanceFromBottom < 24);
+    };
 
     const fetchModels = async () => {
         setIsLoadingModels(true);
@@ -217,7 +228,11 @@ export default function DiscussSimulationChat({
                 )}
             </div>
 
-            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+            <div
+                className="flex-1 overflow-y-auto p-3 space-y-2"
+                ref={scrollContainerRef}
+                onScroll={onScroll}
+            >
                 {messages.map((m, idx) => (
                     <div
                         key={idx}
