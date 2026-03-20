@@ -1,8 +1,17 @@
+import os
+
 import httpx
 from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import StreamingResponse
 
 router = APIRouter()
+
+OLLAMA_UPSTREAM_BASE_URL = os.getenv(
+    "OLLAMA_BASE_URL", "http://localhost:11434"
+).rstrip("/")
+GRAFANA_UPSTREAM_BASE_URL = os.getenv(
+    "GRAFANA_BASE_URL", "http://localhost:3000"
+).rstrip("/")
 
 HOP_BY_HOP_HEADERS = {
     "host",
@@ -87,7 +96,7 @@ async def ollama_tags_proxy(request: Request) -> StreamingResponse:
     # Tags responses are small JSON; streaming proxy is still fine and simpler.
     return await _proxy_stream(
         request,
-        upstream_base="http://localhost:11434",
+        upstream_base=OLLAMA_UPSTREAM_BASE_URL,
         upstream_path="api/tags",
     )
 
@@ -97,25 +106,29 @@ async def ollama_generate_proxy(request: Request) -> StreamingResponse:
     # Streaming must be preserved for `stream: true`.
     return await _proxy_stream(
         request,
-        upstream_base="http://localhost:11434",
+        upstream_base=OLLAMA_UPSTREAM_BASE_URL,
         upstream_path="api/generate",
     )
 
 
-@router.api_route("/grafana/{path:path}", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+@router.api_route(
+    "/grafana/{path:path}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"],
+)
 async def grafana_proxy(path: str, request: Request) -> StreamingResponse:
     return await _proxy_stream(
         request,
-        upstream_base="http://localhost:3000",
+        upstream_base=GRAFANA_UPSTREAM_BASE_URL,
         upstream_path=path,
     )
 
 
-@router.api_route("/grafana", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"])
+@router.api_route(
+    "/grafana", methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
+)
 async def grafana_proxy_root(request: Request) -> StreamingResponse:
     return await _proxy_stream(
         request,
-        upstream_base="http://localhost:3000",
+        upstream_base=GRAFANA_UPSTREAM_BASE_URL,
         upstream_path="",
     )
-

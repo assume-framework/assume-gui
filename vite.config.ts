@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
 // https://vite.dev/config/
+const apiTarget = process.env.VITE_API_TARGET ?? 'http://localhost:8000';
+const grafanaTarget = process.env.GRAFANA_BASE_URL ?? 'http://localhost:3000';
+const ollamaTarget = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+
 export default defineConfig({
   plugins: [
     react(),
@@ -10,14 +14,14 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      '/api': 'http://localhost:8000',
+      '/api': apiTarget,
       '/grafana': {
-        target: 'http://localhost:3000',
+        target: grafanaTarget,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/grafana/, ''),
       },
       '/ollama': {
-        target: 'http://localhost:11434',
+        target: ollamaTarget,
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/ollama/, ''),
       },

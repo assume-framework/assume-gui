@@ -23,7 +23,6 @@ rrule_from_string = {
 }
 
 
-
 def process_data(input: dict):
     cfg = Config(input)
     worldcfg = cfg.get_node("world")
@@ -71,7 +70,10 @@ def add_markets(world: World, cfg: Config):
                     market_id=data["name"],
                     market_mechanism=data["market_mechanism"],
                     opening_hours=rr.rrule(
-                        freq=rrule_from_string[data["opening_hours"]], interval=1, dtstart=cfg.start, until=cfg.end
+                        freq=rrule_from_string[data["opening_hours"]],
+                        interval=1,
+                        dtstart=cfg.start,
+                        until=cfg.end,
                     ),
                     opening_duration=timedelta(minutes=int(data["opening_duration"])),
                     market_products=market_products,
