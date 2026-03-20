@@ -1,4 +1,4 @@
-export default function Header({onDiscussSimulation}: {onDiscussSimulation?: () => void} = {}) {
+export default function Header({onDiscussSimulation, onReinforcementLearning}: {onDiscussSimulation?: () => void, onReinforcementLearning?: () => void} = {}) {
     const header_classes = "p-2 m-1 text-xl rounded-md hover:bg-gray-300";
     
     return (
@@ -7,7 +7,16 @@ export default function Header({onDiscussSimulation}: {onDiscussSimulation?: () 
             <nav>
                 <ul>
                     <a className={header_classes} href="/grafana">Results</a>
-                    <a className={header_classes} href="/rl_params">Reinforcement Learning</a>
+                    <button
+                        type="button" 
+                        className={header_classes}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            onReinforcementLearning?.();
+                        }}
+                    >
+                        Reinforcement Learning
+                    </button>
                     <button
                         type="button"
                         className={header_classes}

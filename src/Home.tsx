@@ -88,6 +88,7 @@ export default function Home() {
     const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showDiscuss, setShowDiscuss] = useState(false);
+    const [showRlComingSoon, setShowRlComingSoon] = useState(false);
 
     const worldJson = useMemo(() => JSON.stringify({nodes: nodes, edges: edges}), [nodes, edges]);
 
@@ -218,6 +219,8 @@ export default function Home() {
         setNodes((nds) => nds.concat(newNode));
     }, [screenToFlowPosition, setNodes, type]);
 
+    const onPaneClick = useCallback(() => setNodeData(null), [setNodeData]);
+
     const reset = useCallback(() => {
         if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
             return;
@@ -302,7 +305,25 @@ export default function Home() {
                 updateForecast={updateForecast}
             />
             <div className="flex grow flex-col">
-                <Header onDiscussSimulation={() => setShowDiscuss(true)}/>
+                <Header
+                    onDiscussSimulation={() => setShowDiscuss(true)}
+                    onReinforcementLearning={() => setShowRlComingSoon(true)}
+                />
+                {showRlComingSoon && (
+                    <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
+                        <div>
+                            <div className="font-bold text-sm">Reinforcement Learning</div>
+                            <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
+                        </div>
+                        <button
+                            type="button"
+                            className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
+                            onClick={() => setShowRlComingSoon(false)}
+                        >
+                            Dismiss
+                        </button>
+                    </div>
+                )}
                 <div className="grow"
                      ref={reactFlowWrapper}>
                     <ReactFlow
@@ -310,7 +331,7 @@ export default function Home() {
                         nodes={nodes}
                         edges={edges}
                         nodeTypes={nodeTypes}
-                        onPaneClick={useCallback(() => setNodeData(null), [setNodeData])}
+                        onPaneClick={onPaneClick}
                         onNodesChange={onNodesChange}
                         onEdgesChange={onEdgesChange}
                         onConnect={onConnect}

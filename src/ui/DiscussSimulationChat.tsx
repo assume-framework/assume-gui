@@ -246,13 +246,12 @@ export default function DiscussSimulationChat({
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                                code(props: any) {
-                                    const {inline, children, className, ...rest} = props;
+                                code(props: {inline?: boolean; children?: React.ReactNode; className?: string}) {
+                                    const {inline, children, className} = props;
                                     if (inline) {
                                         return (
                                             <code
                                                 className={`bg-gray-100 rounded px-1 py-0.5 ${className ?? ''}`}
-                                                {...rest}
                                             >
                                                 {children}
                                             </code>
@@ -260,7 +259,7 @@ export default function DiscussSimulationChat({
                                     }
                                     return (
                                         <pre className="bg-gray-900 text-gray-100 rounded-sm p-1 overflow-x-auto">
-                                            <code className={className ?? ''} {...rest}>
+                                            <code className={className ?? ''}>
                                                 {children}
                                             </code>
                                         </pre>
