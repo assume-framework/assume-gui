@@ -19,14 +19,18 @@ export default function UploadSidebar({updateForecast, forecast}: UploadSidebarP
     return (
         <div className="px-8 pt-6 pb-8 mb-4">
             <p>Forecasts</p>
-            <UploadButton
-                name={"Price"}
-                uploaded={!!forecast.price}
-                setDocumentID={setDocumentID("price")}/>
-            <UploadButton
-                name={"Resiudal load"}
-                uploaded={!!forecast.residual_load}
-                setDocumentID={setDocumentID("residual_load")}/>
+            <div className="my-4">
+                <UploadButton
+                    name={"Price"}
+                    uploaded={!!forecast.price}
+                    setDocumentID={setDocumentID("price")}/>
+            </div>
+            <div className="my-4">
+                <UploadButton
+                    name={"Resiudal load"}
+                    uploaded={!!forecast.residual_load}
+                    setDocumentID={setDocumentID("residual_load")}/>
+            </div>
         </div>
     )
 }

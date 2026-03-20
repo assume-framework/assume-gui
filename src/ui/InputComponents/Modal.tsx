@@ -16,7 +16,7 @@ function Modal({name, children}: ModalProps) {
                 {name}
             </h1>
             {open && (
-                <div className="border-l-3 pl-3 border-gray-300">
+                <div>
                     {children}
                 </div>
             )}
