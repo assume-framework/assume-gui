@@ -45,7 +45,7 @@ export default function UploadButton({name, uploaded, setDocumentID}: UploadButt
     }
 
     return (
-        <div className={"my-4 px-2 flex border rounded-xl " + color}>
+        <div className={"px-2 flex flex-grow border rounded-xl " + color}>
             <label className="flex py-2 flex-grow" htmlFor={id}>
                 {uploaded ? <CheckCircleOutlined/> : <UploadFileOutlined/>}
                 <div className="pl-3">

@@ -23,6 +23,6 @@ RUN pip install --no-cache-dir -e .
 
 COPY --from=build-frontend /frontend/backend/static /server/backend/static
 
-EXPOSE 9090
+EXPOSE 8000
 CMD ["assume-gui"]
 
