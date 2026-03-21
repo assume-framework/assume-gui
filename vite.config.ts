@@ -12,6 +12,18 @@ export default defineConfig({
     react(),
     tailwindcss(),
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return;
+          if (id.includes('@xyflow')) return 'xyflow';
+          if (id.includes('@mui') || id.includes('@emotion')) return 'mui';
+          if (id.includes('react-markdown') || id.includes('remark-')) return 'markdown';
+        },
+      },
+    },
+  },
   server: {
     proxy: {
       '/api': apiTarget,

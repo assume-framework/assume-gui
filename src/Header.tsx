@@ -1,5 +1,5 @@
 export default function Header({onDiscussSimulation, onReinforcementLearning}: {onDiscussSimulation?: () => void, onReinforcementLearning?: () => void} = {}) {
-    const header_classes = "p-2 m-1 text-xl rounded-md hover:bg-gray-300";
+    const header_classes = "p-2 m-1 text-xl rounded-md hover:bg-gray-300 cursor-pointer";
     
     return (
         <header className="bg-gray p-2 color-black flex justify-between items-center border-b-1 border-gray-300">

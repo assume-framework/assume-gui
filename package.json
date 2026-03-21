@@ -16,10 +16,10 @@
     "@mui/material": "^7.3.8",
     "@tailwindcss/vite": "^4.1.17",
     "@xyflow/react": "^12.10.0",
-    "react-markdown": "*",
-    "remark-gfm": "*",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
@@ -35,5 +35,6 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1"
-  }
+  },
+  "browserslist": ["defaults"]
 }

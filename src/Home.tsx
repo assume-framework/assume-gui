@@ -304,7 +304,7 @@ export default function Home() {
                 forecast={forecast}
                 updateForecast={updateForecast}
             />
-            <div className="flex grow flex-col">
+            <div className="flex grow flex-col select-none">
                 <Header
                     onDiscussSimulation={() => setShowDiscuss(true)}
                     onReinforcementLearning={() => setShowRlComingSoon(true)}

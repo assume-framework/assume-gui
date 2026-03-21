@@ -8,9 +8,9 @@ type ChatMessage = {role: ChatRole; content: string};
 type OllamaModel = {name: string};
 
 const OLLAMA_MODEL_KEY = 'ollama_model';
-const GLOBAL_OLLAMA_MODEL = (import.meta as {env: Record<string, unknown>}).env?.DEFAULT_OLLAMA_MODEL;
-const HAS_GLOBAL_OLLAMA_MODEL =
-    typeof GLOBAL_OLLAMA_MODEL === 'string' && GLOBAL_OLLAMA_MODEL.trim().length > 0;
+/** Build-time default; must use the `VITE_` prefix so Vite exposes it to the client. */
+const GLOBAL_OLLAMA_MODEL = import.meta.env.VITE_OLLAMA_MODEL?.trim() ?? '';
+const HAS_GLOBAL_OLLAMA_MODEL = GLOBAL_OLLAMA_MODEL.length > 0;
 
 export default function DiscussSimulationChat({
     worldJson,
@@ -179,7 +179,7 @@ export default function DiscussSimulationChat({
     };
 
     return (
-        <div className="fixed right-4 top-16 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[60vh] max-h-[calc(100vh-4rem)] bg-white border border-gray-300 rounded-lg shadow-lg flex flex-col overflow-hidden">
+        <div className="fixed right-4 top-16 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[60vh] max-h-[calc(100vh-4rem)] bg-white border border-gray-300 rounded-lg shadow-lg flex flex-col overflow-hidden select-text">
             <div className="flex items-center justify-between p-3 border-b border-gray-200">
                 <div className="font-bold">Discuss Simulation</div>
                 <button
