@@ -19,6 +19,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
     return (
         <>
             <Select label="Unit type"
+                    tooltip="The type of the unit. This allows to specify additional properties, depending on the model."
                     value={data.unitType}
                     errorMessage={getErrorMessage('unitType')}
                     onChange={reset}>
@@ -36,6 +37,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                 <>
                     <Input label="Technology"
                            type="text"
+                           tooltip="A text field for a technology - used to filter limitations or aggregate results."
                            errorMessage={getErrorMessage("technology")}
                            value={data.technology}
                            onChange={onChange("technology")}/>
@@ -98,20 +100,20 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            value={data.emission_factor ?? 0}
                            onChange={onChange("emission_factor")}
                            errorMessage={getErrorMessage('emission_factor')}
-                           tooltip="CO2 emissions per megawatt of power output"/>
+                           tooltip="CO2 emissions in tons of CO2 equivalent per MWh of thermal energy output"/>
                     <Input label="Efficiency"
                            type="number"
                            value={data.efficiency ?? 1}
                            tooltip="Efficiency in converting fuel to power output (between 0 and 1)"
                            errorMessage={getErrorMessage('efficiency')}
                            onChange={onChange("efficiency")}/>
-                    <Input label="Ramp Down"
+                    <Input label="Ramp Down (MW/step)"
                            type="number"
                            value={data.ramp_down ?? 0}
                            onChange={onChange("ramp_down")}
                            errorMessage={getErrorMessage('ramp_down')}
                            tooltip="Maximum Power decrease in MW per timestep"/>
-                    <Input label="Ramp Up (MW/min)"
+                    <Input label="Ramp Up (MW/step)"
                            type="number"
                            value={data.ramp_up ?? 0}
                            onChange={onChange("ramp_up")}
@@ -123,12 +125,12 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            onChange={onChange("min_operating_time")}
                            errorMessage={getErrorMessage('min_operating_time')}
                            tooltip="Min timesteps the unit must operate once started"/>
-                    <Input label="Min Downtime (min)"
+                    <Input label="Min Downtime"
                            type="number"
                            value={data.min_downtime ?? 1}
                            onChange={onChange("min_downtime")}
                            errorMessage={getErrorMessage('min_downtime')}
-                           tooltip="Min timesteps after shutdown before restart"/>
+                           tooltip="Min timesteps the powerplant needs to be turned off before restart"/>
                     <Modal name="Forecast settings">
                         <InputOrUpload
                             label="Forecast availability"
@@ -155,7 +157,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            value={data.capacity}
                            onChange={onChange("capacity")}
                            errorMessage={getErrorMessage('capacity')}
-                           tooltip="Storage Capacity"/>
+                           tooltip="Capacity of the Storage in kWh"/>
                     <Input label="Max Power Charge"
                            type="number"
                            value={data.max_power_charge}
@@ -214,11 +216,13 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                     <Input type="number"
                            label="Volume import"
                            value={data.volume_import}
+                           tooltip="The maximum line capacity for the import line."
                            onChange={onChange("volume_import")}
                            errorMessage={getErrorMessage('volume_import')}/>
                     <Input type="number"
                            label="Volume export"
                            value={data.volume_export}
+                           tooltip="The maximum line capacity for the export line."
                            onChange={onChange("volume_export")}
                            errorMessage={getErrorMessage('volume_export')}/>
                     <Modal name="Forecast settings">
