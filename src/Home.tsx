@@ -35,6 +35,7 @@ import Sidebar from "./ui/Sidebar.tsx";
 import DiscussSimulationChat from "./ui/DiscussSimulationChat.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData, type DataResponse} from "./sendData.ts";
+import {buildGrafanaResultsHref} from "./utils.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
 const nodeTypes = {
@@ -125,6 +126,12 @@ export default function Home() {
     const [showRlComingSoon, setShowRlComingSoon] = useState(false);
 
     const worldJson = useMemo(() => JSON.stringify({nodes: nodes, edges: edges}), [nodes, edges]);
+
+    const grafanaResultsHref = useMemo(() => {
+        const world = nodes.find((n) => n.type === 'world');
+        if (!world?.data) return '/grafana';
+        return buildGrafanaResultsHref(world.data.start, world.data.end);
+    }, [nodes]);
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         type T = Node<EditSidebarData> | Edge<EditSidebarData>;
@@ -340,6 +347,7 @@ export default function Home() {
             />
             <div className="flex grow flex-col select-none">
                 <Header
+                    grafanaResultsHref={grafanaResultsHref}
                     onDiscussSimulation={() => setShowDiscuss(true)}
                     onReinforcementLearning={() => setShowRlComingSoon(true)}
                 />
