@@ -38,7 +38,7 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                     </div>
                 }
                 <div className="flex items-center px-2">
-                    <button onClick={toggleUpload}>
+                    <button type="button" className="cursor-pointer" onClick={toggleUpload}>
                         {upload ?
                             <ToggleOnOutlined/> :
                             <ToggleOffOutlined/>
