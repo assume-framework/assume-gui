@@ -179,7 +179,7 @@ export default function DiscussSimulationChat({
     };
 
     return (
-        <div className="fixed right-4 top-16 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[60vh] max-h-[calc(100vh-4rem)] bg-white border border-gray-300 rounded-lg shadow-lg flex flex-col overflow-hidden">
+        <div className="fixed right-4 top-16 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[60vh] max-h-[calc(100vh-4rem)] bg-white border border-gray-300 rounded-lg shadow-lg flex flex-col overflow-hidden select-text">
             <div className="flex items-center justify-between p-3 border-b border-gray-200">
                 <div className="font-bold">Discuss Simulation</div>
                 <button
