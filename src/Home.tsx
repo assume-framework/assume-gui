@@ -35,6 +35,7 @@ import Sidebar from "./ui/Sidebar.tsx";
 import DiscussSimulationChat from "./ui/DiscussSimulationChat.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData, type DataResponse} from "./sendData.ts";
+import {buildGrafanaResultsHref} from "./utils.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
 const nodeTypes = {
@@ -50,15 +51,47 @@ const edgeTypes = {
     'unit-market': UnitMarketEdge,
 }
 
+// string for midnight on a given calendar day.
+function formatDatetimeLocalMidnight(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}T00:00`;
+}
+
+// calculate default for start and end of simulation world
+function defaultWorldStartEnd(): { start: string; end: string } {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
+    return {
+        start: formatDatetimeLocalMidnight(start),
+        end: formatDatetimeLocalMidnight(end),
+    };
+}
+
+function createInitialNodes(): Node<EditSidebarData>[] {
+    const { start, end } = defaultWorldStartEnd();
+    return [
+        {
+            id: 'world',
+            type: 'world',
+            position: { x: 300, y: 0 },
+            data: {
+                name: 'World Node',
+                errorField: '',
+                errorMessage: '',
+                start,
+                end,
+            },
+            deletable: false,
+        },
+    ];
+}
+
 const initialForecast: Forecast = {price: null, residual_load: null}
 const initialEdges: Edge<EditSidebarData>[] = [];
-const initialNodes: Node<EditSidebarData>[] = [{
-    id: 'world',
-    type: "world",
-    position: {x: 300, y: 0},
-    data: {name: "World Node", errorField: '', errorMessage: ''},
-    deletable: false
-}];
 
 let id = 1;
 const getId = (type: string) => `${type}_${id++}`;
@@ -79,7 +112,9 @@ interface AlertState {
 export default function Home() {
     const loaded = readLocalStorage();
     const reactFlowWrapper = useRef(null);
-    const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(loaded['nodes'] ?? initialNodes);
+    const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(
+        () => loaded['nodes'] ?? createInitialNodes()
+    );
     const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(loaded['edges'] ?? initialEdges);
     const [forecast, setForecast] = useState<Forecast>(loaded['forecasts'] ?? initialForecast);
     const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
@@ -91,6 +126,12 @@ export default function Home() {
     const [showRlComingSoon, setShowRlComingSoon] = useState(false);
 
     const worldJson = useMemo(() => JSON.stringify({nodes: nodes, edges: edges}), [nodes, edges]);
+
+    const grafanaResultsHref = useMemo(() => {
+        const world = nodes.find((n) => n.type === 'world');
+        if (!world?.data) return '/grafana';
+        return buildGrafanaResultsHref(world.data.start, world.data.end);
+    }, [nodes]);
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         type T = Node<EditSidebarData> | Edge<EditSidebarData>;
@@ -225,7 +266,7 @@ export default function Home() {
         if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
             return;
         }
-        setNodes(initialNodes);
+        setNodes(createInitialNodes());
         setEdges(initialEdges);
         setForecast(initialForecast);
         localStorage.removeItem('flow');
@@ -266,7 +307,7 @@ export default function Home() {
 
     const setFlowByJson = useCallback((data: string) => {
         const loaded = JSON.parse(data);
-        setNodes(loaded["nodes"] ?? initialNodes);
+        setNodes(loaded['nodes'] ?? createInitialNodes());
         setEdges(loaded["edges"] ?? initialEdges);
         setForecast(loaded["forecasts"] ?? initialForecast);
     }, [setNodes, setEdges, setForecast]);
@@ -306,6 +347,7 @@ export default function Home() {
             />
             <div className="flex grow flex-col select-none">
                 <Header
+                    grafanaResultsHref={grafanaResultsHref}
                     onDiscussSimulation={() => setShowDiscuss(true)}
                     onReinforcementLearning={() => setShowRlComingSoon(true)}
                 />

@@ -1,4 +1,13 @@
-export default function Header({onDiscussSimulation, onReinforcementLearning}: {onDiscussSimulation?: () => void, onReinforcementLearning?: () => void} = {}) {
+export default function Header({
+    onDiscussSimulation,
+    onReinforcementLearning,
+    grafanaResultsHref = '/grafana',
+}: {
+    onDiscussSimulation?: () => void;
+    onReinforcementLearning?: () => void;
+    // World time range for Grafana, e.g. `/grafana/?from=...&to=...`
+    grafanaResultsHref?: string;
+} = {}) {
     const header_classes = "p-2 m-1 text-xl rounded-md hover:bg-gray-300 cursor-pointer";
     
     return (
@@ -6,7 +15,7 @@ export default function Header({onDiscussSimulation, onReinforcementLearning}: {
             <a href="/"><img src="assume_logo.png" alt="ASSUME Logo" className="w-20" /></a>
             <nav>
                 <ul>
-                    <a className={header_classes} href="/grafana">Results</a>
+                    <a className={header_classes} href={grafanaResultsHref}>Results</a>
                     <button
                         type="button" 
                         className={header_classes}
