@@ -73,7 +73,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                         />
                         <InputOrUpload
                             label="Forecast Demand"
-                            value={data.forecast_demand ?? 100}
+                            value={data.forecast_demand ?? -100}
                             errorMessage={getErrorMessage('forecast_demand')}
                             onChange={onChange("forecast_demand")}/>
                     </Modal>
