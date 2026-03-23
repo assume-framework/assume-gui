@@ -90,9 +90,7 @@ class Config:
         return (
             start,
             end,
-            pd.date_range(
-                start=start, end=end, freq=world_cfg["frequency"]
-            ),
+            pd.date_range(start=start, end=end, freq=world_cfg["frequency"]),
         )
 
     def get_node(self, unit_id: str) -> NodeConfig:

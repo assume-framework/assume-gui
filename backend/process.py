@@ -144,7 +144,9 @@ def add_units(world: World, cfg: Config):
                 market_data = cfg.get_node(connection.target)
                 bidding_strategies[market_data["name"]] = connection["strategy"]
             unitData = cfg.get_node(unit_edge.target)
-            forecaster = forecaster_for_type(cfg.index, unitData, cfg.forecasts, list(bidding_strategies.keys()))
+            forecaster = forecaster_for_type(
+                cfg.index, unitData, cfg.forecasts, list(bidding_strategies.keys())
+            )
             world.add_unit(
                 id=unitData["name"],
                 unit_operator_id=operator_edge.target,
