@@ -2,6 +2,7 @@ from datetime import timedelta
 
 import dateutil.rrule as rr
 from assume import MarketConfig, MarketProduct, World
+from assume.common.exceptions import ValidationError
 from assume.common.forecaster import (
     DemandForecaster,
     ExchangeForecaster,
@@ -26,13 +27,15 @@ rrule_from_string = {
 def process_data(input: dict):
     cfg = Config(input)
     worldcfg = cfg.get_node("world")
+    if not worldcfg.get("simulation_id", "").strip():
+        raise ValidationError("simulation_id must be set", "world", "simulation_id")
 
     world = World(database_uri=DBURI)
     world.setup(
         start=cfg.start,
         end=cfg.end,
         save_frequency_hours=int(worldcfg["save_frequency_hours"]),
-        simulation_id=worldcfg["simulation_id"],
+        simulation_id=worldcfg["simulation_id"].strip(),
     )
 
     add_markets(world, cfg)
