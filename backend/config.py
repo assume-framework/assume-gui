@@ -85,7 +85,7 @@ class Config:
             start,
             end,
             pd.date_range(
-                start=start, end=end + timedelta(hours=24), freq=world_cfg["frequency"]
+                start=start, end=end, freq=world_cfg["frequency"]
             ),
         )
 
