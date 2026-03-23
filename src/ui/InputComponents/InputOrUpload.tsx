@@ -4,13 +4,13 @@ import {HelpOutline, ToggleOffOutlined, ToggleOnOutlined} from "@mui/icons-mater
 import type {BaseProps} from "./types.ts";
 
 export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: BaseProps) {
-    const [upload, setUpload] = useState(false)
+    const hasFile = typeof value === "string" && value.length == 36;
+    const [upload, setUpload] = useState(hasFile);
     const toggleUpload = () => setUpload(!upload);
     const id = useId()
     const color = errorMessage ? "text-red-500" : "text-gray-700"
 
     const simulateChange = (onChange: ChangeEventHandler) => (value: string | null) => {
-        console.log("simulate change", value)
         const e = {target: {value: value}}
         onChange(e as React.ChangeEvent<HTMLInputElement>)
     }
@@ -23,8 +23,9 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                     <div className="w-50">
                         <UploadButton
                             name="Upload a file"
-                            uploaded={typeof value === "string"}
-                            setDocumentID={simulateChange(onChange)}/>
+                            uploaded={hasFile}
+                            setDocumentID={simulateChange(onChange)}
+                        />
                     </div>
                     :
                     <div className="w-50">

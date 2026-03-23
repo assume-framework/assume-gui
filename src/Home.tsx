@@ -94,7 +94,8 @@ const initialForecast: Forecast = {price: null, residual_load: null}
 const initialEdges: Edge<EditSidebarData>[] = [];
 
 let id = 1;
-const getId = (type: string) => `${type}_${id++}`;
+const getId = (type: string) => `${type}_${crypto.randomUUID()}`;
+const getName = (type: string) => `${type}_${id++}`;
 
 const readLocalStorage = () => {
     const data = localStorage.getItem('flow');
@@ -219,7 +220,7 @@ export default function Home() {
                 target: connection.target,
                 targetHandle: connection.targetHandle,
                 type: 'default',
-                data: {name: `${connection.source}-${connection.target}`, errorField: '', errorMessage: ''},
+                data: {name: 'a connection', errorField: '', errorMessage: ''},
             };
             if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
                 newEdge.type = 'unit-market';
@@ -243,16 +244,15 @@ export default function Home() {
     const onDrop = useCallback((event: React.DragEvent) => {
         event.preventDefault();
         if (!type) return;
-        const id = getId(type)
         const newNode: Node<EditSidebarData> = {
-            id: id,
+            id: getId(type),
             type,
             position: screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY
             }),
             data: {
-                name: id,
+                name: getName(type),
                 errorField: '',
                 errorMessage: '',
             },
