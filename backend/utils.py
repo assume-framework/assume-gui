@@ -13,12 +13,14 @@ def load_forecasts(forecasts: dict):
     for type, value in forecasts.items():
         if value is None:
             continue
-        loaded[type] = read_file(value)
+        loaded[type] = read_file(value, series=False)
     return loaded
 
 
-def read_file(id: str):
+def read_file(id: str, series: bool = True) -> pd.Series | pd.DataFrame:
     path = Path(__file__).parent / "tmp" / f"{id}.csv"
+    if series:
+        return pd.read_csv(path, header=None)[0]
     return pd.read_csv(path)
 
 
