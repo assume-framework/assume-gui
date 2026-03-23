@@ -87,7 +87,6 @@ def forecaster_for_type(
     global_forecasts: dict,
     market_ids: list[str],
 ) -> UnitForecaster:
-    forecasts = data.get("forecasts", {})
     price_forecast = global_forecasts.get("price", None)
     if price_forecast is None:
         # TODO this is a weird default, maybe change it in assume itself
@@ -103,7 +102,7 @@ def forecaster_for_type(
             return DemandForecaster(
                 index=index,
                 availability=availability,
-                demand=forecasts.get("forecast_demand", -100),
+                demand=data.get_optional_file("forecast_demand", -100),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
@@ -119,8 +118,8 @@ def forecaster_for_type(
             return ExchangeForecaster(
                 index=index,
                 availability=availability,
-                volume_export=forecasts.get("forecast_volume_export", 0),
-                volume_import=forecasts.get("forecast_volume_import", 0),
+                volume_export=data.get_optional_file("forecast_volume_export", 0),
+                volume_import=data.get_optional_file("forecast_volume_import", 0),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
