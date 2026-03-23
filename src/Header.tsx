@@ -15,7 +15,7 @@ export default function Header({
             <a href="/"><img src="assume_logo.png" alt="ASSUME Logo" className="w-20" /></a>
             <nav>
                 <ul>
-                    <a className={header_classes} href={grafanaResultsHref}>Results</a>
+                    <a className={header_classes} href={grafanaResultsHref} target="_blank" rel="noopener noreferrer">Results</a>
                     <button
                         type="button" 
                         className={header_classes}
