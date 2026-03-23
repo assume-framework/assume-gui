@@ -41,11 +41,18 @@ class NodeConfig:
         """Get an optional field from the node data. Returns default if the field is missing."""
         return self.data.get(key, default)
 
-    def get_optional_file(self, key: str, default=None):
+    def get_optional_file(self, key: str, default=None, index=None):
         entry = self.get(key, default)
         if isinstance(entry, str):
             if len(entry) == 36:
-                return read_file(entry)
+                data = read_file(entry)
+                if index is not None and len(data.index) != len(index):
+                    raise ValidationError(
+                        message=f"uploaded file needs to have len {len(index)} but has len {len(data.index)}",
+                        id=self.id,
+                        field=key,
+                    )
+                return data
             return float(entry)  # try to convert to float
         return entry
 
