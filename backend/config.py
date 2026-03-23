@@ -43,8 +43,10 @@ class NodeConfig:
 
     def get_optional_file(self, key: str, default=None):
         entry = self.get(key, default)
-        if isinstance(entry, str) and len(entry) == 36:
-            return read_file(entry)
+        if isinstance(entry, str):
+            if len(entry) == 36:
+                return read_file(entry)
+            return float(entry)  # try to convert to float
         return entry
 
 
