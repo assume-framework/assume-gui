@@ -131,7 +131,7 @@ export default function Home() {
     const grafanaResultsHref = useMemo(() => {
         const world = nodes.find((n) => n.type === 'world');
         if (!world?.data) return '/grafana';
-        return buildGrafanaResultsHref(world.data.start, world.data.end);
+        return buildGrafanaResultsHref(world.data.start as string, world.data.end as string, world.data.simulation_id as string);
     }, [nodes]);
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {

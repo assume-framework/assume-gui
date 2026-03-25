@@ -1,8 +1,7 @@
 import type {EditSidebarData} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 
 /** Parse world `datetime-local` strings as local wall time. */
-export function parseWorldDatetimeLocal(value: unknown): Date | null {
-    if (typeof value !== 'string') return null;
+export function parseWorldDatetimeLocal(value: string): Date | null {
     const s = value.trim();
     if (!s) return null;
     const dateOnly = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s);
@@ -36,13 +35,14 @@ export function parseWorldDatetimeLocal(value: unknown): Date | null {
  * `/grafana` proxy URL with `from` / `to` as UTC ISO strings (Grafana-style), from world start/end.
  * Falls back to `/grafana` if either value is missing or invalid.
  */
-export function buildGrafanaResultsHref(start: unknown, end: unknown): string {
+export function buildGrafanaResultsHref(start: string, end: string, simulation_id: string): string {
     const fromDate = parseWorldDatetimeLocal(start);
     const toDate = parseWorldDatetimeLocal(end);
     if (!fromDate || !toDate) return '/grafana';
     const params = new URLSearchParams({
         from: fromDate.toISOString(),
         to: toDate.toISOString(),
+        'var-simulation': simulation_id,
     });
     return `/grafana/?${params.toString()}`;
 }
