@@ -309,4 +309,3 @@ export default function DiscussSimulationChat({
         </div>
     );
 }
-
