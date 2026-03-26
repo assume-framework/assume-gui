@@ -1,4 +1,5 @@
 import {
+    AccountTreeOutlined,
     FileDownloadOutlined,
     FileUploadOutlined,
     ReplayOutlined,
@@ -14,7 +15,8 @@ type Args = {
     submit?: () => void,
     processing?: boolean,
     save?: () => void,
-    download?: () => void
+    download?: () => void,
+    autoArrange?: () => void,
 }
 
 export default function Cockpit({
@@ -24,6 +26,7 @@ export default function Cockpit({
     processing = false,
     save,
     download,
+    autoArrange,
 }: Args) {
     const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
         const inputElement = e.target as HTMLInputElement
@@ -51,6 +54,9 @@ export default function Cockpit({
         <CockpitElement name={"Reset"}
                         Icon={ReplayOutlined}
                         onClick={reset}/>
+        <CockpitElement name={"Auto Arrange"}
+                        onClick={autoArrange}
+                        Icon={AccountTreeOutlined}/>
         <CockpitElement name={"Download"}
                         onClick={download}
                         Icon={FileDownloadOutlined}/>
