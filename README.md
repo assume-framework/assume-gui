@@ -14,5 +14,5 @@ Thats it!
 
 ### Start the App
 1. Run `npm clean-install`
-2. Run `npm run build` to build the Frontend
+2. Run `npm run build` to build the Frontend (or run `npm run dev` to start the development server)
 3. Start the server with `fastapi run backend/main.py`

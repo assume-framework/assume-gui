@@ -11,7 +11,7 @@ interface SidebarProps {
 
 export default function Sidebar({nodeData, updateForecast, updateValue, forecast}: SidebarProps) {
     return (
-        <aside className="w-full h-full max-w-xs border-r border-gray-300 overflow-y-scroll">
+        <aside className="w-full h-full max-w-xs border-r border-gray-300 overflow-y-auto select-none">
             {nodeData ?
                 <EditSidebar
                     id={nodeData.id}

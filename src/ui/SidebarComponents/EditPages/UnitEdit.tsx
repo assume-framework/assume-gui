@@ -4,6 +4,7 @@ import type {EditComponentArgs} from "../NodeEditSidebar";
 import Select from "../../InputComponents/Select";
 import Input from "../../InputComponents/Input";
 import Modal from "../../InputComponents/Modal";
+import {InputOrUpload} from "../../InputComponents/InputOrUpload.tsx";
 
 
 export default function editUnit({id, data, updateNodeValue, getErrorMessage}: EditComponentArgs) {
@@ -18,6 +19,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
     return (
         <>
             <Select label="Unit type"
+                    tooltip="The type of the unit. This allows to specify additional properties, depending on the model."
                     value={data.unitType}
                     errorMessage={getErrorMessage('unitType')}
                     onChange={reset}>
@@ -35,6 +37,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                 <>
                     <Input label="Technology"
                            type="text"
+                           tooltip="A text field for a technology - used to filter limitations or aggregate results."
                            errorMessage={getErrorMessage("technology")}
                            value={data.technology}
                            onChange={onChange("technology")}/>
@@ -62,16 +65,17 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            tooltip="TODO" //TODO
                     />
                     <Modal name="Forecast settings">
-                        <Input label="Forecast availability"
-                               type="number"
-                               value={data.forecast_availability ?? 1}
-                               errorMessage={getErrorMessage('forecast_availability')}
-                               onChange={onChange("forecast_availability")}/>
-                        <Input label="Forecast Demand"
-                               type="number"
-                               value={data.forecast_demand ?? 100}
-                               errorMessage={getErrorMessage('forecast_demand')}
-                               onChange={onChange("forecast_demand")}/>
+                        <InputOrUpload
+                            label="Forecast availability"
+                            value={data.forecast_availability ?? 1}
+                            errorMessage={getErrorMessage('forecast_availability')}
+                            onChange={onChange("forecast_availability")}
+                        />
+                        <InputOrUpload
+                            label="Forecast Demand"
+                            value={data.forecast_demand ?? -100}
+                            errorMessage={getErrorMessage('forecast_demand')}
+                            onChange={onChange("forecast_demand")}/>
                     </Modal>
                 </>
             )}
@@ -96,20 +100,20 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            value={data.emission_factor ?? 0}
                            onChange={onChange("emission_factor")}
                            errorMessage={getErrorMessage('emission_factor')}
-                           tooltip="CO2 emissions per megawatt of power output"/>
+                           tooltip="CO2 emissions in tons of CO2 equivalent per MWh of thermal energy output"/>
                     <Input label="Efficiency"
                            type="number"
                            value={data.efficiency ?? 1}
                            tooltip="Efficiency in converting fuel to power output (between 0 and 1)"
                            errorMessage={getErrorMessage('efficiency')}
                            onChange={onChange("efficiency")}/>
-                    <Input label="Ramp Down"
+                    <Input label="Ramp Down (MW/step)"
                            type="number"
                            value={data.ramp_down ?? 0}
                            onChange={onChange("ramp_down")}
                            errorMessage={getErrorMessage('ramp_down')}
                            tooltip="Maximum Power decrease in MW per timestep"/>
-                    <Input label="Ramp Up (MW/min)"
+                    <Input label="Ramp Up (MW/step)"
                            type="number"
                            value={data.ramp_up ?? 0}
                            onChange={onChange("ramp_up")}
@@ -121,28 +125,28 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            onChange={onChange("min_operating_time")}
                            errorMessage={getErrorMessage('min_operating_time')}
                            tooltip="Min timesteps the unit must operate once started"/>
-                    <Input label="Min Downtime (min)"
+                    <Input label="Min Downtime"
                            type="number"
                            value={data.min_downtime ?? 1}
                            onChange={onChange("min_downtime")}
                            errorMessage={getErrorMessage('min_downtime')}
-                           tooltip="Min timesteps after shutdown before restart"/>
+                           tooltip="Min timesteps the powerplant needs to be turned off before restart"/>
                     <Modal name="Forecast settings">
-                        <Input label="Forecast availability"
-                               type="number"
-                               value={data.forecast_availability ?? 1}
-                               errorMessage={getErrorMessage('forecast_availability')}
-                               onChange={onChange("forecast_availability")}/>
-                        <Input label="Forecast fuel price"
-                               type="number"
-                               value={data.forecast_fuel_price ?? 10}
-                               errorMessage={getErrorMessage('forecast_fuel_price')}
-                               onChange={onChange("forecast_fuel_price")}/>
-                        <Input label="Forecast CO2 price"
-                               type="number"
-                               value={data.forecast_co2_price ?? 10}
-                               errorMessage={getErrorMessage('forecast_co2_price')}
-                               onChange={onChange("forecast_co2_price")}/>
+                        <InputOrUpload
+                            label="Forecast availability"
+                            value={data.forecast_availability ?? 1}
+                            errorMessage={getErrorMessage('forecast_availability')}
+                            onChange={onChange("forecast_availability")}/>
+                        <InputOrUpload
+                            label="Forecast fuel price"
+                            value={data.forecast_fuel_price ?? 10}
+                            errorMessage={getErrorMessage('forecast_fuel_price')}
+                            onChange={onChange("forecast_fuel_price")}/>
+                        <InputOrUpload
+                            label="Forecast CO2 price"
+                            value={data.forecast_co2_price ?? 10}
+                            errorMessage={getErrorMessage('forecast_co2_price')}
+                            onChange={onChange("forecast_co2_price")}/>
                     </Modal>
                 </>
             )}
@@ -153,7 +157,7 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            value={data.capacity}
                            onChange={onChange("capacity")}
                            errorMessage={getErrorMessage('capacity')}
-                           tooltip="Storage Capacity"/>
+                           tooltip="Capacity of the Storage in kWh"/>
                     <Input label="Max Power Charge"
                            type="number"
                            value={data.max_power_charge}
@@ -199,11 +203,11 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                            tooltip="Initial state of charge (between 0 and 1)"
                     />
                     <Modal name="Forecast settings">
-                        <Input label="Forecast availability"
-                               type="number"
-                               errorMessage={getErrorMessage('forecast_availability')}
-                               value={data.forecast_availability ?? 1}
-                               onChange={onChange("forecast_availability")}/>
+                        <InputOrUpload
+                            label="Forecast availability"
+                            errorMessage={getErrorMessage('forecast_availability')}
+                            value={data.forecast_availability ?? 1}
+                            onChange={onChange("forecast_availability")}/>
                     </Modal>
                 </>
             )}
@@ -212,29 +216,31 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                     <Input type="number"
                            label="Volume import"
                            value={data.volume_import}
+                           tooltip="The maximum line capacity for the import line."
                            onChange={onChange("volume_import")}
                            errorMessage={getErrorMessage('volume_import')}/>
                     <Input type="number"
                            label="Volume export"
                            value={data.volume_export}
+                           tooltip="The maximum line capacity for the export line."
                            onChange={onChange("volume_export")}
                            errorMessage={getErrorMessage('volume_export')}/>
                     <Modal name="Forecast settings">
-                        <Input label="Forecast availability"
-                               type="number"
-                               value={data.forecast_availability ?? 1}
-                               onChange={onChange("forecast_availability")}
-                               errorMessage={getErrorMessage('forecast_availability')}/>
-                        <Input label="Forecast import volume"
-                               type="number"
-                               value={data.forecast_volume_import ?? 0}
-                               onChange={onChange("forecast_volume_import")}
-                               errorMessage={getErrorMessage('forecast_volume_import')}/>
-                        <Input label="Forecast export volume"
-                               type="number"
-                               value={data.forecast_volume_export ?? 0}
-                               onChange={onChange("forecast_volume_export")}
-                               errorMessage={getErrorMessage('forecast_volume_export')}/>
+                        <InputOrUpload
+                            label="Forecast availability"
+                            value={data.forecast_availability ?? 1}
+                            onChange={onChange("forecast_availability")}
+                            errorMessage={getErrorMessage('forecast_availability')}/>
+                        <InputOrUpload
+                            label="Forecast import volume"
+                            value={data.forecast_volume_import ?? 0}
+                            onChange={onChange("forecast_volume_import")}
+                            errorMessage={getErrorMessage('forecast_volume_import')}/>
+                        <InputOrUpload
+                            label="Forecast export volume"
+                            value={data.forecast_volume_export ?? 0}
+                            onChange={onChange("forecast_volume_export")}
+                            errorMessage={getErrorMessage('forecast_volume_export')}/>
                     </Modal>
                 </>
             )}

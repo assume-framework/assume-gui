@@ -8,8 +8,11 @@ from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.staticfiles import StaticFiles
 
 from backend.process import process_data
+from backend.proxy_routes import router as proxy_router
+from backend.utils import write_file
 
 app = FastAPI()
+app.include_router(proxy_router)
 
 
 @app.post("/api/submit")
@@ -38,10 +41,8 @@ async def send_data(data: dict):
 @app.post("/api/upload")
 async def upload_file(file: UploadFile):
     uid = str(uuid.uuid4())
-    tmpfile = Path(__file__).parent / "tmp" / f"{uid}.csv"
-    tmpfile.parent.mkdir(exist_ok=True, parents=True)
-    content = (await file.read()).decode("utf-8")
-    tmpfile.open("w+").write(content)
+    content = await file.read()
+    write_file(uid, content.decode("utf-8"))
     return {"id": uid}
 
 
@@ -53,7 +54,7 @@ app.mount(
 
 
 def cli():
-    uvicorn.run(app, host="0.0.0.0", port=9090, loop="asyncio")
+    uvicorn.run(app, host="0.0.0.0", loop="asyncio")
 
 
 if __name__ == "__main__":

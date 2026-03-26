@@ -33,7 +33,8 @@ dependencies = [
     "fastapi[standard] >=0.119.0",
     "assume-framework >=0.5.5",
     "uvicorn >= 0.37.0",
-    "pandas<3" # TODO
+    "pandas",
+    "httpx",
 ]
 
 [project.optional-dependencies]

@@ -19,7 +19,7 @@ import {
     ReactFlow,
     useReactFlow
 } from '@xyflow/react';
-import React, {useCallback, useContext, useRef, useState} from "react";
+import React, {useCallback, useContext, useMemo, useRef, useState} from "react";
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
@@ -32,8 +32,10 @@ import Header from './Header';
 import Footer from './Footer';
 import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
+import DiscussSimulationChat from "./ui/DiscussSimulationChat.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData, type DataResponse} from "./sendData.ts";
+import {buildGrafanaResultsHref} from "./utils.ts";
 import {getLayoutedElements} from "./layout.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
@@ -50,22 +52,51 @@ const edgeTypes = {
     'unit-market': UnitMarketEdge,
 }
 
+// string for midnight on a given calendar day.
+function formatDatetimeLocalMidnight(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}T00:00`;
+}
+
+// calculate default for start and end of simulation world
+function defaultWorldStartEnd(): { start: string; end: string } {
+    const start = new Date();
+    start.setHours(0, 0, 0, 0);
+    const end = new Date(start);
+    end.setMonth(end.getMonth() + 1);
+    return {
+        start: formatDatetimeLocalMidnight(start),
+        end: formatDatetimeLocalMidnight(end),
+    };
+}
+
+function createInitialNodes(): Node<EditSidebarData>[] {
+    const { start, end } = defaultWorldStartEnd();
+    return [
+        {
+            id: 'world',
+            type: 'world',
+            position: { x: 300, y: 0 },
+            data: {
+                name: 'World Node',
+                errorField: '',
+                errorMessage: '',
+                start,
+                end,
+            },
+            deletable: false,
+        },
+    ];
+}
+
 const initialForecast: Forecast = {price: null, residual_load: null}
 const initialEdges: Edge<EditSidebarData>[] = [];
-const initialNodes: Node<EditSidebarData>[] = [{
-    id: 'world',
-    type: "world",
-    position: {x: 300, y: 0},
-    data: {name: "World Node", errorField: '', errorMessage: ''},
-    deletable: false
-}];
-
-const isValidConnection = (connection: Connection | Edge) =>
-    connection.targetHandle?.split("_")[0] == connection.source?.split("_")[0] &&
-    connection.sourceHandle?.split("_")[0] === connection.target?.split("_")[0];
 
 let id = 1;
-const getId = (type: string) => `${type}_${id++}`;
+const getId = (type: string) => `${type}_${crypto.randomUUID()}`;
+const getName = (type: string) => `${type}_${id++}`;
 
 const readLocalStorage = () => {
     const data = localStorage.getItem('flow');
@@ -83,13 +114,26 @@ interface AlertState {
 export default function Home() {
     const loaded = readLocalStorage();
     const reactFlowWrapper = useRef(null);
-    const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(loaded['nodes'] ?? initialNodes);
+    const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(
+        () => loaded['nodes'] ?? createInitialNodes()
+    );
     const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(loaded['edges'] ?? initialEdges);
     const [forecast, setForecast] = useState<Forecast>(loaded['forecasts'] ?? initialForecast);
     const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
     const [type] = useContext(DnDContext);
     const {screenToFlowPosition, fitView} = useReactFlow();
     const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [showDiscuss, setShowDiscuss] = useState(false);
+    const [showRlComingSoon, setShowRlComingSoon] = useState(false);
+
+    const worldJson = useMemo(() => JSON.stringify({nodes: nodes, edges: edges}), [nodes, edges]);
+
+    const grafanaResultsHref = useMemo(() => {
+        const world = nodes.find((n) => n.type === 'world');
+        if (!world?.data) return '/grafana';
+        return buildGrafanaResultsHref(world.data.start as string, world.data.end as string, world.data.simulation_id as string);
+    }, [nodes]);
 
     const updateValue = useCallback((id: string, data: EditSidebarData, isEdge: boolean) => {
         type T = Node<EditSidebarData> | Edge<EditSidebarData>;
@@ -150,6 +194,24 @@ export default function Home() {
         },
         [edges, setEdges, setNodeData],
     );
+
+    const isValidConnectionCb = useCallback(
+        (connection: Connection | Edge) => {
+            const sameFromHandles =
+                connection.targetHandle?.split("_")[0] === connection.source?.split("_")[0];
+            const sameToHandles =
+                connection.sourceHandle?.split("_")[0] === connection.target?.split("_")[0];
+            const ok = !!sameFromHandles && !!sameToHandles;
+            if (!ok) {
+                setAlert({
+                    message: 'These node types cannot be connected. Please connect according to the handle hints.',
+                    severity: 'warning',
+                });
+            }
+            return ok;
+        },
+        [setAlert],
+    );
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((eds) => {
             const newEdge: Edge<EditSidebarData> = {
@@ -159,7 +221,7 @@ export default function Home() {
                 target: connection.target,
                 targetHandle: connection.targetHandle,
                 type: 'default',
-                data: {name: `${connection.source}-${connection.target}`, errorField: '', errorMessage: ''},
+                data: {name: 'a connection', errorField: '', errorMessage: ''},
             };
             if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
                 newEdge.type = 'unit-market';
@@ -183,16 +245,15 @@ export default function Home() {
     const onDrop = useCallback((event: React.DragEvent) => {
         event.preventDefault();
         if (!type) return;
-        const id = getId(type)
         const newNode: Node<EditSidebarData> = {
-            id: id,
+            id: getId(type),
             type,
             position: screenToFlowPosition({
                 x: event.clientX,
                 y: event.clientY
             }),
             data: {
-                name: id,
+                name: getName(type),
                 errorField: '',
                 errorMessage: '',
             },
@@ -200,11 +261,13 @@ export default function Home() {
         setNodes((nds) => nds.concat(newNode));
     }, [screenToFlowPosition, setNodes, type]);
 
+    const onPaneClick = useCallback(() => setNodeData(null), [setNodeData]);
+
     const reset = useCallback(() => {
         if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
             return;
         }
-        setNodes(initialNodes);
+        setNodes(createInitialNodes());
         setEdges(initialEdges);
         setForecast(initialForecast);
         localStorage.removeItem('flow');
@@ -213,38 +276,39 @@ export default function Home() {
     }, [setNodes, setEdges, setNodeData]);
 
     const submit = useCallback(async () => {
-            let response: DataResponse;
+            if (isSubmitting) {
+                return;
+            }
+            setIsSubmitting(true);
             try {
-                response = await sendData(nodes, edges, forecast)
-            } catch (e) {
-                console.error("Unknown error: ", e)
-                setAlert({message: 'An unknown error has occured', severity: 'error'})
-                return
-            }
-            if (response.success) {
-                setAlert({message: 'Flow submitted successfully', severity: 'success'})
-                return
-            }
-            // handle validation error
-            if (response.id && response.field && response.message) {
-                const foundNode = nodes.find(n => n.id === response.id)
-                const found = foundNode ?? edges.find(e => e.id === response.id)
-                if (found && found.data) {
-                    found.data.errorField = response.field
-                    found.data.errorMessage = response.message
-                    updateValue(found.id, found.data, !foundNode)
-                    setAlert({message: 'Invalid configuration: ' + response.message, severity: 'warning'})
+                const response: DataResponse = await sendData(nodes, edges, forecast)
+                if (response.success) {
+                    setAlert({message: 'Flow submitted successfully', severity: 'success'})
                     return;
                 }
+                // handle validation error
+                if (response.id && response.field && response.message) {
+                    const foundNode = nodes.find(n => n.id === response.id)
+                    const found = foundNode ?? edges.find(e => e.id === response.id)
+                    if (found && found.data) {
+                        found.data.errorField = response.field
+                        found.data.errorMessage = response.message
+                        updateValue(found.id, found.data, !foundNode)
+                        setAlert({message: 'Invalid configuration: ' + response.message, severity: 'warning'})
+                        return;
+                    }
+                }
+                console.error("Unknown error: ", response)
+                setAlert({message: response.message ?? 'Submission failed. Please try again.', severity: 'error'})
+            } finally {
+                setIsSubmitting(false);
             }
-            console.error("Unknown error: ", response)
-            setAlert({message: 'An unknown error has occured: ' + response.message, severity: 'warning'})
-        }, [nodes, edges, forecast, updateValue, setAlert]
+        }, [nodes, edges, forecast, updateValue, setAlert, isSubmitting]
     )
 
     const setFlowByJson = useCallback((data: string) => {
         const loaded = JSON.parse(data);
-        setNodes(loaded["nodes"] ?? initialNodes);
+        setNodes(loaded['nodes'] ?? createInitialNodes());
         setEdges(loaded["edges"] ?? initialEdges);
         setForecast(loaded["forecasts"] ?? initialForecast);
     }, [setNodes, setEdges, setForecast]);
@@ -287,8 +351,27 @@ export default function Home() {
                 forecast={forecast}
                 updateForecast={updateForecast}
             />
-            <div className="flex grow flex-col">
-                <Header/>
+            <div className="flex grow flex-col select-none">
+                <Header
+                    grafanaResultsHref={grafanaResultsHref}
+                    onDiscussSimulation={() => setShowDiscuss(true)}
+                    onReinforcementLearning={() => setShowRlComingSoon(true)}
+                />
+                {showRlComingSoon && (
+                    <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
+                        <div>
+                            <div className="font-bold text-sm">Reinforcement Learning</div>
+                            <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
+                        </div>
+                        <button
+                            type="button"
+                            className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
+                            onClick={() => setShowRlComingSoon(false)}
+                        >
+                            Dismiss
+                        </button>
+                    </div>
+                )}
                 <div className="grow"
                      ref={reactFlowWrapper}>
                     <ReactFlow
@@ -296,12 +379,12 @@ export default function Home() {
                         nodes={nodes}
                         edges={edges}
                         nodeTypes={nodeTypes}
-                        onPaneClick={useCallback(() => setNodeData(null), [setNodeData])}
+                        onPaneClick={onPaneClick}
                         onNodesChange={onNodesChange}
                         onEdgesChange={onEdgesChange}
                         onConnect={onConnect}
                         onDragOver={onDragOver}
-                        isValidConnection={isValidConnection}
+                        isValidConnection={isValidConnectionCb}
                         onDrop={onDrop}
                         edgeTypes={edgeTypes}
                         fitView
@@ -311,6 +394,7 @@ export default function Home() {
                         <Panel position="bottom-right">
                             <Cockpit
                                 submit={submit}
+                                processing={isSubmitting}
                                 reset={reset}
                                 save={save}
                                 download={download}
@@ -322,6 +406,12 @@ export default function Home() {
                 </div>
                 <Footer/>
             </div>
+            {showDiscuss && (
+                <DiscussSimulationChat
+                    worldJson={worldJson}
+                    onClose={() => setShowDiscuss(false)}
+                />
+            )}
         </div>
     );
 }

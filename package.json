@@ -1,7 +1,6 @@
 {
   "name": "assume-gui",
   "private": true,
-  "proxy": "http://localhost:8000",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -19,6 +18,8 @@
     "@xyflow/react": "^12.10.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
@@ -34,5 +35,6 @@
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1"
-  }
+  },
+  "browserslist": ["defaults"]
 }

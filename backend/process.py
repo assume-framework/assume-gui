@@ -1,6 +1,8 @@
 from datetime import timedelta
 
+import dateutil.rrule as rr
 from assume import MarketConfig, MarketProduct, World
+from assume.common.exceptions import ValidationError
 from assume.common.forecaster import (
     DemandForecaster,
     ExchangeForecaster,
@@ -9,23 +11,31 @@ from assume.common.forecaster import (
     UnitForecaster,
 )
 from assume.common.market_objects import OnlyHours
-from dateutil import rrule as rr
 from dateutil.relativedelta import relativedelta
 
-from backend.config import Config, EdgeType
+from backend.config import Config, EdgeType, NodeConfig
 from backend.utils import DBURI
+
+rrule_from_string = {
+    "HOURLY": rr.HOURLY,
+    "DAILY": rr.DAILY,
+    "WEEKLY": rr.WEEKLY,
+    "MONTHLY": rr.MONTHLY,
+}
 
 
 def process_data(input: dict):
     cfg = Config(input)
     worldcfg = cfg.get_node("world")
+    if not worldcfg.get("simulation_id", "").strip():
+        raise ValidationError("simulation_id must be set", "world", "simulation_id")
 
     world = World(database_uri=DBURI)
     world.setup(
         start=cfg.start,
         end=cfg.end,
         save_frequency_hours=int(worldcfg["save_frequency_hours"]),
-        simulation_id=worldcfg["simulation_id"],
+        simulation_id=worldcfg["simulation_id"].strip(),
     )
 
     add_markets(world, cfg)
@@ -63,7 +73,10 @@ def add_markets(world: World, cfg: Config):
                     market_id=data["name"],
                     market_mechanism=data["market_mechanism"],
                     opening_hours=rr.rrule(
-                        freq=rr.HOURLY, interval=24, dtstart=cfg.start, until=cfg.end
+                        freq=rrule_from_string[data["opening_hours"]],
+                        interval=1,
+                        dtstart=cfg.start,
+                        until=cfg.end,
                     ),
                     opening_duration=timedelta(minutes=int(data["opening_duration"])),
                     market_products=market_products,
@@ -73,42 +86,50 @@ def add_markets(world: World, cfg: Config):
 
 def forecaster_for_type(
     index: ForecastIndex,
-    data: dict,
+    data: NodeConfig,
     global_forecasts: dict,
     market_ids: list[str],
 ) -> UnitForecaster:
-    forecasts = data.get("forecasts", {})
     price_forecast = global_forecasts.get("price", None)
     if price_forecast is None:
+        # TODO this is a weird default, maybe change it in assume itself
         price_forecast = {market_id: 50 for market_id in market_ids}
     residual_forecast = global_forecasts.get("residual_load", None)
+    availability = data.get_optional_file("forecast_availability", 1)
+    fuel_prices = {
+        "co2": data.get_optional_file("forecast_co2_price", 10),
+        "others": data.get_optional_file("forecast_fuel_price", 10),
+    }
     match data["unitType"]:
         case "demand":
             return DemandForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
-                demand=forecasts.get("demand", -100),
+                availability=availability,
+                demand=data.get_optional_file("forecast_demand", -100),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
         case "power_plant":
             return PowerplantForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
+                availability=availability,
+                fuel_prices=fuel_prices,
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
         case "exchange":
             return ExchangeForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
+                availability=availability,
+                volume_export=data.get_optional_file("forecast_volume_export", 0),
+                volume_import=data.get_optional_file("forecast_volume_import", 0),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
         case "storage":
             return UnitForecaster(
                 index=index,
-                availability=forecasts.get("availability", 1),
+                availability=availability,
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
@@ -126,6 +147,9 @@ def add_units(world: World, cfg: Config):
                 market_data = cfg.get_node(connection.target)
                 bidding_strategies[market_data["name"]] = connection["strategy"]
             unitData = cfg.get_node(unit_edge.target)
+            forecaster = forecaster_for_type(
+                cfg.index, unitData, cfg.forecasts, list(bidding_strategies.keys())
+            )
             world.add_unit(
                 id=unitData["name"],
                 unit_operator_id=operator_edge.target,
@@ -150,9 +174,7 @@ def add_units(world: World, cfg: Config):
                     "max_soc": int(unitData.get("max_soc", 0)),
                     "min_soc": int(unitData.get("min_soc", 0)),
                 },
-                forecaster=forecaster_for_type(
-                    cfg.index, unitData, cfg.forecasts, list(bidding_strategies.keys())
-                ),
+                forecaster=forecaster,
             )
     return world
 

@@ -45,8 +45,8 @@ export default function UploadButton({name, uploaded, setDocumentID}: UploadButt
     }
 
     return (
-        <div className={"my-4 px-2 flex border rounded-xl " + color}>
-            <label className="flex py-2 flex-grow" htmlFor={id}>
+        <div className={"px-2 flex flex-grow border rounded-xl " + color}>
+            <label className="flex py-2 flex-grow cursor-pointer" htmlFor={id}>
                 {uploaded ? <CheckCircleOutlined/> : <UploadFileOutlined/>}
                 <div className="pl-3">
                     {name}
@@ -57,12 +57,12 @@ export default function UploadButton({name, uploaded, setDocumentID}: UploadButt
             {uploaded && <>
             </>}
             {!!file && !uploaded &&
-              <button className="ml-auto pr-3" onClick={upload}>
+              <button type="button" className="ml-auto pr-3 cursor-pointer" onClick={upload}>
                 <PublishOutlined/>
               </button>}
             {uploaded &&
               <div className="ml-auto pr-3 py-2">
-                <button onClick={clearForecast}><Clear/></button>
+                <button type="button" className="cursor-pointer" onClick={clearForecast}><Clear/></button>
               </div>}
         </div>
     )
