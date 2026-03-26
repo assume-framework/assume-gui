@@ -11,7 +11,7 @@ export function getLayoutedElements<T extends Record<string, unknown>>(
 ): Node<T>[] {
     const graph = new dagre.graphlib.Graph();
     graph.setDefaultEdgeLabel(() => ({}));
-    graph.setGraph({rankdir: direction, nodesep: 80, ranksep: 100});
+    graph.setGraph({rankdir: direction, nodesep: 80, ranksep: 100, edgesep: 100});
 
     nodes.forEach((node) => {
         graph.setNode(node.id, {
