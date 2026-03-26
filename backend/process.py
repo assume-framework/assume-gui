@@ -67,7 +67,7 @@ def add_markets(world: World, cfg: Config):
                     )
                 )
             data = cfg.get_node(market_edge.target)
-            additional_fields = data.get_comma_array("additional_fields", "")
+            additional_fields = data.get_comma_array("additional_fields")
             market_config = MarketConfig(
                 market_id=data["name"],
                 market_mechanism=data["market_mechanism"],
@@ -80,9 +80,9 @@ def add_markets(world: World, cfg: Config):
                 opening_duration=timedelta(minutes=int(data["opening_duration"])),
                 market_products=market_products,
                 product_type=data.get("product_type", "energy"),
-                maximum_bid_volume=data.get("maximum_bid_volume", 3000),
-                maximum_bid_price=data.get("maximum_bid_price", 9999),
-                minimum_bid_price=data.get("minimum_bid_price", -500),
+                maximum_bid_volume=float(data.get("maximum_bid_volume", 3000)),
+                maximum_bid_price=float(data.get("maximum_bid_price", 9999)),
+                minimum_bid_price=float(data.get("minimum_bid_price", -500)),
                 additional_fields=additional_fields,
                 volume_unit=data.get("volume_unit", "MW"),
                 volume_tick=data.get("volume_tick"),
