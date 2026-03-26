@@ -59,16 +59,20 @@ export async function sendData(nodes: Node[], edges: Edge[], forecasts: Forecast
             body: JSON.stringify({nodes: n, edges: e, forecasts: forecasts}),
         });
     } catch {
-        return {success: false, message: 'Could not reach the server. Please check that the backend is running and try again.'};
+        return {
+            success: false,
+            message: 'Could not reach the server. Please check that the backend is running and try again.'
+        };
     }
     if (resp.ok) {
         return {success: true}
     }
-    let body: unknown;
+    let body = await resp.text();
     try {
-        body = await resp.json();
+        body = JSON.parse(body);
     } catch {
-        body = await resp.text();
+        // fall through with plain text body when JSON parsing fails
+        console.warn("Could not parse response as json")
     }
     return parseErrorResponse(resp, body);
 }
