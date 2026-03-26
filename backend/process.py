@@ -67,20 +67,32 @@ def add_markets(world: World, cfg: Config):
                     )
                 )
             data = cfg.get_node(market_edge.target)
+            additional_fields = data.get_comma_array("additional_fields", "")
+            market_config = MarketConfig(
+                market_id=data["name"],
+                market_mechanism=data["market_mechanism"],
+                opening_hours=rr.rrule(
+                    freq=rrule_from_string[data["opening_hours"]],
+                    interval=1,
+                    dtstart=cfg.start,
+                    until=cfg.end,
+                ),
+                opening_duration=timedelta(minutes=int(data["opening_duration"])),
+                market_products=market_products,
+                product_type=data.get("product_type", "energy"),
+                maximum_bid_volume=data.get("maximum_bid_volume", 3000),
+                maximum_bid_price=data.get("maximum_bid_price", 9999),
+                minimum_bid_price=data.get("minimum_bid_price", -500),
+                additional_fields=additional_fields,
+                volume_unit=data.get("volume_unit", "MW"),
+                volume_tick=data.get("volume_tick"),
+                price_unit=data.get("price_unit", "€/MW"),
+                price_tick=data.get("price_tick"),
+                supports_get_unmatched=data.get("supports_get_unmatched", False),
+            )
             world.add_market(
                 market_operator_id=operator_edge.target,
-                market_config=MarketConfig(
-                    market_id=data["name"],
-                    market_mechanism=data["market_mechanism"],
-                    opening_hours=rr.rrule(
-                        freq=rrule_from_string[data["opening_hours"]],
-                        interval=1,
-                        dtstart=cfg.start,
-                        until=cfg.end,
-                    ),
-                    opening_duration=timedelta(minutes=int(data["opening_duration"])),
-                    market_products=market_products,
-                ),
+                market_config=market_config,
             )
 
 
@@ -162,7 +174,7 @@ def add_units(world: World, cfg: Config):
                     "min_power": float(unitData.get("min_power", 0)),
                     "max_power": float(unitData.get("max_power", 0)),
                     "capacity": float(unitData.get("capacity", 0)),
-                    "price": float(unitData.get("price", 0)),
+                    "price": float(unitData.get("price", 3000)),
                     "efficiency": float(unitData.get("efficiency", 1.0)),
                     "ramp_up": float(unitData.get("ramp_up", 0)),
                     "ramp_down": float(unitData.get("ramp_down", 0)),

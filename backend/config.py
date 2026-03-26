@@ -42,6 +42,11 @@ class NodeConfig:
         """Get an optional field from the node data. Returns default if the field is missing."""
         return self.data.get(key, default)
 
+    def get_comma_array(self, key: str, default=[]):
+        """Get an optional field from the node data. Returns default if the field is missing."""
+        str_list = self.data.get(key, default)
+        return [value.strip() for value in str_list.split(",")]
+
     def get_optional_file(self, key: str, default=None, index=None):
         entry = self.get(key, default)
         if isinstance(entry, str):

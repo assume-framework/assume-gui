@@ -35,6 +35,56 @@ function editMarket({id, data, updateNodeValue, getErrorMessage}: EditComponentA
                 <option value="complex_clearing">Complex clearing</option>
                 <option value="pay_as_clear_complex_dmas">Pay as clear complex dmas</option>
             </Select>
+            <Input label="Product type"
+                   type="text"
+                   errorMessage={getErrorMessage('product_type')}
+                   value={data.product_type ?? 'energy'}
+                   onChange={onChange("product_type")}
+                   tooltip="Defines the type of product this market clears (ASSUME semantics)."/>
+            <Input label="Maximum bid volume"
+                   type="number"
+                   errorMessage={getErrorMessage('maximum_bid_volume')}
+                   value={data.maximum_bid_volume ?? 2000.0}
+                   onChange={onChange("maximum_bid_volume")}
+                   tooltip="Optional cap for bid volume. Clear the field to set it to `None`."/>
+            <Input label="Maximum bid price"
+                   type="number"
+                   errorMessage={getErrorMessage('maximum_bid_price')}
+                   value={data.maximum_bid_price ?? 3000.0}
+                   onChange={onChange("maximum_bid_price")}
+                   tooltip="Optional cap for bid price. Clear the field to set it to `None`."/>
+            <Input label="Minimum bid price"
+                   type="number"
+                   errorMessage={getErrorMessage('minimum_bid_price')}
+                   value={data.minimum_bid_price ?? -500.0}
+                   onChange={onChange("minimum_bid_price")}
+                   tooltip="Lower bound for bid price."/>
+            <Input label="Additional fields (comma-separated)"
+                   type="text"
+                   errorMessage={getErrorMessage('additional_fields')}
+                   value={data.additional_fields}
+                   onChange={onChange("additional_fields")}
+                   tooltip="Optional list of additional market fields. Comma-separated."/>
+            <Input label="Volume unit"
+                   type="text"
+                   value={data.volume_unit ?? 'MW'}
+                   onChange={onChange("volume_unit")}
+                   tooltip="Unit used for volume values (e.g. MW). Label only"/>
+            <Input label="Volume tick"
+                   type="number"
+                   value={data.volume_tick ?? ''}
+                   onChange={onChange("volume_tick")}
+                   tooltip="Optional step size for volume adjustments. Clear to set `None`."/>
+            <Input label="Price unit"
+                   type="text"
+                   value={data.price_unit ?? '€/MWh'}
+                   onChange={onChange("price_unit")}
+                   tooltip="Unit used for price values (e.g. €/MWh). Label only"/>
+            <Input label="Price tick"
+                   type="number"
+                   value={data.price_tick ?? ''}
+                   onChange={onChange("price_tick")}
+                   tooltip="Optional step size for price adjustments. Clear to set `None`."/>
         </>
     )
 }
