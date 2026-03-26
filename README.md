@@ -8,8 +8,8 @@ Thats it!
 
 ## Build manually
 ### Prerequirements
-1. Install [Assume](https://github.com/assume-framework/assume)
-2. Install Fastapi using `pip install -r requirements.txt`
+1. Install [Assume](https://github.com/assume-framework/assume) (or use `pip install git+https://github.com/assume-framework/assume` for most recent changes)
+2. Install Fastapi using `pip install .`
 3. Install node.js and npm
 
 ### Start the App
