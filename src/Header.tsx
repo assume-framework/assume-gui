@@ -9,7 +9,7 @@ export default function Header({
     grafanaResultsHref?: string;
 } = {}) {
     const header_classes = "p-2 m-1 text-xl rounded-md hover:bg-gray-300 cursor-pointer";
-    
+
     return (
         <header className="bg-gray p-2 color-black flex justify-between items-center border-b-1 border-gray-300">
             <a href="/"><img src="assume_logo.png" alt="ASSUME Logo" className="w-20" /></a>
@@ -17,7 +17,7 @@ export default function Header({
                 <ul>
                     <a className={header_classes} href={grafanaResultsHref} target="_blank" rel="noopener noreferrer">Results</a>
                     <button
-                        type="button" 
+                        type="button"
                         className={header_classes}
                         onClick={(e) => {
                             e.preventDefault();

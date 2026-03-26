@@ -1,7 +1,9 @@
 from enum import Enum
+from pathlib import Path
 
 import pandas as pd
 from assume.common.exceptions import ValidationError
+from assume.common.utils import load_index_file
 
 from backend.utils import read_file
 
@@ -44,10 +46,15 @@ class NodeConfig:
         entry = self.get(key, default)
         if isinstance(entry, str):
             if len(entry) == 36:
-                data = read_file(entry)
-                if index is not None and len(data.index) != len(index):
+                path = Path(__file__).parent / "tmp" / f"{entry}.csv"
+                if index is None:
+                    return read_file(path)
+                try:
+                    data = load_index_file(path, index)
+                    data = data[data.columns[0]]
+                except Exception as e:
                     raise ValidationError(
-                        message=f"uploaded file needs to have len {len(index)} but has len {len(data.index)}",
+                        message=f"uploaded file {entry} for {key} did have {e}",
                         id=self.id,
                         field=key,
                     )

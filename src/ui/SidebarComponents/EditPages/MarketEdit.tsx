@@ -20,7 +20,7 @@ function editMarket({id, data, updateNodeValue, getErrorMessage}: EditComponentA
             </Select>
             <Input label="Opening Duration (min)"
                    type="number"
-                   value={data.opening_duration} 
+                   value={data.opening_duration}
                    errorMessage={getErrorMessage('opening_duration')}
                    tooltip="How long the market stays open after opening and before clearing the market. In this interval, bids can be sent to the market."
                    onChange={onChange("opening_duration")}/>

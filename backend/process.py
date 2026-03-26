@@ -95,17 +95,19 @@ def forecaster_for_type(
         # TODO this is a weird default, maybe change it in assume itself
         price_forecast = {market_id: 50 for market_id in market_ids}
     residual_forecast = global_forecasts.get("residual_load", None)
-    availability = data.get_optional_file("forecast_availability", 1)
+    availability = data.get_optional_file("forecast_availability", 1, index=index)
     fuel_prices = {
-        "co2": data.get_optional_file("forecast_co2_price", 10),
-        "others": data.get_optional_file("forecast_fuel_price", 10),
+        "co2": data.get_optional_file("forecast_co2_price", 10, index=index),
+        "others": data.get_optional_file("forecast_fuel_price", 10, index=index),
     }
     match data["unitType"]:
         case "demand":
             return DemandForecaster(
                 index=index,
                 availability=availability,
-                demand=data.get_optional_file("forecast_demand", -100),
+                demand=-abs(
+                    data.get_optional_file("forecast_demand", -100, index=index)
+                ),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
@@ -157,22 +159,26 @@ def add_units(world: World, cfg: Config):
                 unit_params={
                     "bidding_strategies": bidding_strategies,
                     "technology": unitData.get("technology"),
-                    "min_power": int(unitData.get("min_power", 0)),
-                    "max_power": int(unitData.get("max_power", 0)),
+                    "min_power": float(unitData.get("min_power", 0)),
+                    "max_power": float(unitData.get("max_power", 0)),
                     "capacity": float(unitData.get("capacity", 0)),
                     "price": float(unitData.get("price", 0)),
                     "efficiency": float(unitData.get("efficiency", 1.0)),
-                    "ramp_up": int(unitData.get("ramp_up", 0)),
-                    "ramp_down": int(unitData.get("ramp_down", 0)),
+                    "ramp_up": float(unitData.get("ramp_up", 0)),
+                    "ramp_down": float(unitData.get("ramp_down", 0)),
                     "emission_factor": float(unitData.get("emission_factor", 0)),
                     "min_operating_time": int(unitData.get("min_operating_time", 0)),
                     "min_downtime": int(unitData.get("min_downtime", 0)),
-                    "max_power_charge": int(unitData.get("max_power_charge", 0)),
-                    "max_power_discharge": int(unitData.get("max_power_discharge", 0)),
-                    "min_power_charge": int(unitData.get("min_power_charge", 0)),
-                    "min_power_discharge": int(unitData.get("min_power_discharge", 0)),
-                    "max_soc": int(unitData.get("max_soc", 0)),
-                    "min_soc": int(unitData.get("min_soc", 0)),
+                    "max_power_charge": float(unitData.get("max_power_charge", 0)),
+                    "max_power_discharge": float(
+                        unitData.get("max_power_discharge", 0)
+                    ),
+                    "min_power_charge": float(unitData.get("min_power_charge", 0)),
+                    "min_power_discharge": float(
+                        unitData.get("min_power_discharge", 0)
+                    ),
+                    "max_soc": float(unitData.get("max_soc", 0)),
+                    "min_soc": float(unitData.get("min_soc", 0)),
                 },
                 forecaster=forecaster,
             )

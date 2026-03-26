@@ -25,4 +25,3 @@ COPY --from=build-frontend /frontend/backend/static /server/backend/static
 
 EXPOSE 8000
 CMD ["assume-gui"]
-
