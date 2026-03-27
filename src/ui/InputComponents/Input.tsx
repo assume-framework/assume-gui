@@ -3,7 +3,7 @@ import {useId} from "react";
 import {HelpOutline} from "@mui/icons-material";
 
 interface InputProperties extends BaseProps {
-    type: React.HTMLInputTypeAttribute | "textarea";
+    type: React.HTMLInputTypeAttribute;
 }
 
 export default function Input(
@@ -22,31 +22,22 @@ export default function Input(
     return (
         <>
             <label htmlFor={id}
+                   title={tooltip}
                    className={`block text-sm font-bold mt-2 ${color}`}>{label}</label>
             <div className="flex">
-                {type === 'textarea' ? (
-                    <textarea
-                        id={id}
-                        value={value}
-                        disabled={disabled}
-                        required={required}
-                        onChange={onChange}
-                        className={classNames}
-                    />
-                ) : (
-                    <input
-                        type={type}
-                        id={id}
-                        value={value}
-                        disabled={disabled}
-                        onChange={onChange}
-                        required={required}
-                        className={classNames}
-                    />
-                )}
+                <input
+                    type={type}
+                    id={id}
+                    value={value}
+                    disabled={disabled}
+                    onChange={onChange}
+                    required={required}
+                    className={classNames}
+                    title={tooltip}
+                />
                 {tooltip &&
                   <div title={tooltip}
-                       className="py-2 pl-3">
+                       className="py-2 pl-3 cursor-help">
                     <HelpOutline/>
                   </div>
                 }

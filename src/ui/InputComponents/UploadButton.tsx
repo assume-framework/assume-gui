@@ -6,10 +6,11 @@ import React, {useId, useState} from "react";
 interface UploadButtonProps {
     name: string,
     uploaded: boolean,
+    tooltip?: string
     setDocumentID: (value: string | null) => void
 }
 
-export default function UploadButton({name, uploaded, setDocumentID}: UploadButtonProps) {
+export default function UploadButton({name, uploaded, tooltip, setDocumentID}: UploadButtonProps) {
     const id = useId()
     const [file, setFile] = useState<File | null>(null);
 
@@ -46,13 +47,13 @@ export default function UploadButton({name, uploaded, setDocumentID}: UploadButt
 
     return (
         <div className={"px-2 flex flex-grow border rounded-xl " + color}>
-            <label className="flex py-2 flex-grow cursor-pointer" htmlFor={id}>
+            <label className="flex py-2 flex-grow" title={tooltip} htmlFor={id}>
                 {uploaded ? <CheckCircleOutlined/> : <UploadFileOutlined/>}
                 <div className="pl-3">
                     {name}
                 </div>
             </label>
-            <input className="hidden" accept="text/csv" id={id} type={"file"}
+            <input title={tooltip} className="hidden" accept="text/csv" id={id} type={"file"}
                    onChange={set}/>
             {uploaded && <>
             </>}
