@@ -24,6 +24,7 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                         <UploadButton
                             name="Upload a file"
                             uploaded={hasFile}
+                            tooltip={tooltip}
                             setDocumentID={simulateChange(onChange)}
                         />
                     </div>
@@ -34,6 +35,7 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                             id={id}
                             value={value}
                             onChange={onChange}
+                            title={tooltip}
                             className="shadow text-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
                         />
                     </div>
@@ -48,7 +50,7 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                 </div>
                 {tooltip &&
                   <div title={tooltip}
-                       className="py-2 pl-3">
+                       className="py-2 pl-3 cursor-help">
                     <HelpOutline/>
                   </div>
                 }
