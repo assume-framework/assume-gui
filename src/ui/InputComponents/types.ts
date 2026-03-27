@@ -10,4 +10,4 @@ export interface BaseProps {
     errorMessage?: string
 }
 
-export const classNames = "shadow appearance-none border rounded w-50 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
+export const classNames = "shadow text-sm appearance-none border rounded w-50 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
