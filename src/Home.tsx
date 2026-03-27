@@ -261,7 +261,7 @@ export default function Home() {
         setNodes((nds) => nds.concat(newNode));
     }, [screenToFlowPosition, setNodes, type]);
 
-    const onPaneClick = useCallback(() => setNodeData(null), [setNodeData]);
+    const stopEditView = useCallback(() => setNodeData(null), [setNodeData]);
 
     const reset = useCallback(() => {
         if (!confirm("Are you sure you want to reset the flow? This action cannot be undone.")) {
@@ -350,6 +350,7 @@ export default function Home() {
                 updateValue={updateValue}
                 forecast={forecast}
                 updateForecast={updateForecast}
+                close={stopEditView}
             />
             <div className="flex grow flex-col select-none">
                 <Header
@@ -379,7 +380,7 @@ export default function Home() {
                         nodes={nodes}
                         edges={edges}
                         nodeTypes={nodeTypes}
-                        onPaneClick={onPaneClick}
+                        onPaneClick={stopEditView}
                         onNodesChange={onNodesChange}
                         onEdgesChange={onEdgesChange}
                         onConnect={onConnect}
