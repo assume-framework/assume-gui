@@ -19,7 +19,7 @@ import {
     ReactFlow,
     useReactFlow
 } from '@xyflow/react';
-import React, {useCallback, useContext, useMemo, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
@@ -202,7 +202,7 @@ export default function Home() {
                 connection.targetHandle?.split("_")[0] === connection.source?.split("_")[0];
             const sameToHandles =
                 connection.sourceHandle?.split("_")[0] === connection.target?.split("_")[0];
-            const ok = !!sameFromHandles && !!sameToHandles;
+            const ok = sameFromHandles && sameToHandles;
             if (!ok) {
                 setAlert({
                     message: 'These node types cannot be connected. Please connect according to the handle hints.',
@@ -334,6 +334,15 @@ export default function Home() {
         link.click();
         document.body.removeChild(link);
     }, [nodes, edges])
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                stopEditView()
+            }
+        }
+        window.addEventListener('keydown', handleKeyDown);
+    }, [stopEditView]);
 
     return (
         <div className="flex h-full">
