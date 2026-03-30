@@ -13,9 +13,11 @@ const GLOBAL_OLLAMA_MODEL = import.meta.env.VITE_OLLAMA_MODEL?.trim() ?? '';
 const HAS_GLOBAL_OLLAMA_MODEL = GLOBAL_OLLAMA_MODEL.length > 0;
 
 export default function DiscussSimulationChat({
+    open,
     worldJson,
     onClose,
 }: {
+    open: boolean;
     worldJson: string;
     onClose: () => void;
 }) {
@@ -179,7 +181,12 @@ export default function DiscussSimulationChat({
     };
 
     return (
-        <div className="fixed right-4 top-16 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[60vh] max-h-[calc(100vh-4rem)] bg-white border border-gray-300 rounded-lg shadow-lg flex flex-col overflow-hidden select-text">
+        <div
+            className={`fixed right-4 top-16 z-50 w-[420px] max-w-[calc(100vw-2rem)] h-[60vh] max-h-[calc(100vh-4rem)] bg-white border border-gray-300 rounded-lg shadow-lg flex flex-col overflow-hidden select-text ${
+                open ? '' : 'hidden'
+            }`}
+            aria-hidden={!open}
+        >
             <div className="flex items-center justify-between p-3 border-b border-gray-200">
                 <div className="font-bold">Discuss Simulation</div>
                 <button
@@ -289,11 +296,10 @@ export default function DiscussSimulationChat({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => {
-                        if (e.key === 'Enter') send();
+                        if (e.key === 'Enter' && !isSending) send();
                     }}
                     placeholder="Ask about the simulation..."
                     className="flex-1 border rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200"
-                    disabled={isSending}
                 />
                 <button
                     type="button"

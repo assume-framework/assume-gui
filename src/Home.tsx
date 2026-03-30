@@ -125,6 +125,7 @@ export default function Home() {
     const [alert, setAlert] = useState<AlertState>({'message': '', 'severity': 'info'})
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showDiscuss, setShowDiscuss] = useState(false);
+    const [discussChatMounted, setDiscussChatMounted] = useState(false);
     const [showRlComingSoon, setShowRlComingSoon] = useState(false);
 
     const worldJson = useMemo(() => JSON.stringify({nodes: nodes, edges: edges}), [nodes, edges]);
@@ -355,7 +356,10 @@ export default function Home() {
             <div className="flex grow flex-col select-none">
                 <Header
                     grafanaResultsHref={grafanaResultsHref}
-                    onDiscussSimulation={() => setShowDiscuss(true)}
+                    onDiscussSimulation={() => {
+                        setDiscussChatMounted(true);
+                        setShowDiscuss(true);
+                    }}
                     onReinforcementLearning={() => setShowRlComingSoon(true)}
                 />
                 {showRlComingSoon && (
@@ -407,8 +411,9 @@ export default function Home() {
                 </div>
                 <Footer/>
             </div>
-            {showDiscuss && (
+            {discussChatMounted && (
                 <DiscussSimulationChat
+                    open={showDiscuss}
                     worldJson={worldJson}
                     onClose={() => setShowDiscuss(false)}
                 />
