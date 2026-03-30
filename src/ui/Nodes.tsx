@@ -103,10 +103,10 @@ export function UnitNode({data, isConnectable, selected}: NodeProps<Node<EditSid
                 title="Connect from unit operator"
             />
             {renderUnit(
-                data.unitType as string ?? 'Unit',
+                getUnitTypeLabel(data.unitType as string),
                 data.name,
                 data.errorField,
-                getUnitTypeIcon(data.unitType as string | undefined),
+                getUnitTypeIcon(data.unitType as string),
                 selected
             )}
             <Handle
@@ -159,7 +159,22 @@ export function MarketProductNode({data, isConnectable, selected}: NodeProps<Nod
     )
 }
 
-function getUnitTypeIcon(unitType?: string): SvgIconComponent {
+function getUnitTypeLabel(unitTpye: string): string {
+    switch (unitTpye) {
+    case 'storage':
+        return 'Storage';
+    case 'power_plant':
+        return 'Power plant';
+    case 'demand':
+        return 'Demand';
+    case 'exchange':
+        return 'Exchange';
+    default:
+        return 'Unit';
+    }
+}
+
+function getUnitTypeIcon(unitType: string): SvgIconComponent {
     switch (unitType) {
     case 'storage':
         return BatteryChargingFullOutlinedIcon;
@@ -187,10 +202,10 @@ function renderUnit(name: string, id: string, errorField: string, Icon: SvgIconC
                     <Icon sx={{fontSize: 20}}/>
                 </div>
                 <div className='font-semibold'>
-                    {name}
+                    {id}
                 </div>
                 <div className='text-[10px] text-gray-500 truncate max-w-[120px]'>
-                    {id}
+                    {name}
                 </div>
             </div>
         </div>
