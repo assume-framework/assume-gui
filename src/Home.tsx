@@ -197,7 +197,7 @@ export default function Home() {
         [edges, setEdges, setNodeData],
     );
 
-    const isValidConnectionCb = useCallback(
+    const isValidConnection = useCallback(
         (connection: Connection | Edge) => {
             const sameFromHandles =
                 connection.targetHandle?.split("_")[0] === connection.source?.split("_")[0];
@@ -236,7 +236,7 @@ export default function Home() {
     const onConnectEnd = useCallback(
         (event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
             // if normal onConnect, fromHandle missing, starting not from 'source' or missing handle id: stop
-            if (connectionState.isValid || !connectionState.fromHandle) return;
+            if (connectionState.isValid != null || !connectionState.fromHandle) return;
             if (connectionState.fromHandle.type !== 'source' || !connectionState.fromHandle.id) return;
 
             // Logic to get correct Node type and Handle id
@@ -460,7 +460,7 @@ export default function Home() {
                         onConnect={onConnect}
                         onConnectEnd={onConnectEnd}
                         onDragOver={onDragOver}
-                        isValidConnection={isValidConnectionCb}
+                        isValidConnection={isValidConnection}
                         onDrop={onDrop}
                         edgeTypes={edgeTypes}
                         fitView
