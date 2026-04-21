@@ -1,11 +1,10 @@
-type ChangeEventHandler = React.ChangeEventHandler<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>;
 
 export interface BaseProps {
     label: string
-    value: number | string
+    value: string
     disabled?: boolean
     required?: boolean
-    onChange: ChangeEventHandler
+    onChange: (arg0: string) => void
     tooltip?: string
     errorMessage?: string
 }

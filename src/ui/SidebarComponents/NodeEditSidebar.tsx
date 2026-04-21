@@ -4,6 +4,7 @@ import MarketProductEdit from "./EditPages/MarketProductEdit";
 import UnitEdit from "./EditPages/UnitEdit";
 import UnitMarketEdit from "./EditPages/UnitMarketEdit";
 import WorldEdit from "./EditPages/WorldEdit";
+import {handleChange} from "../../utils.ts";
 
 export interface EditSidebarData {
     // properties that shall be editable in the sidebar
@@ -11,7 +12,7 @@ export interface EditSidebarData {
     errorField: string;
     errorMessage: string;
 
-    [key: string]: string | number;
+    [key: string]: string;
 }
 
 export type EditComponentArgs = {
@@ -31,11 +32,7 @@ export type EditSidebarProps = {
 type updateFunction = { updateNodeValue: (id: string, data: EditSidebarData, isEdge: boolean) => void; }
 
 export default function EditSidebar({id, type, data, updateNodeValue}: EditSidebarProps & updateFunction) {
-    const onChange = (key: string) => (e: React.ChangeEvent<HTMLInputElement>) => {
-        const d = {...data}
-        d[key] = e.target.value
-        updateNodeValue(id, d, false);
-    }
+    const onChange = handleChange(id, data, updateNodeValue)
 
     const getErrorMessage = (field: string): string | undefined => {
         if (data.errorField && data.errorField == field) {
