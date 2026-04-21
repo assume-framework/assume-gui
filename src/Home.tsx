@@ -9,6 +9,7 @@ import {
     Controls,
     type Edge,
     type EdgeChange,
+    type FinalConnectionState,
     type Node,
     type NodeChange,
     type NodeSelectionChange,
@@ -196,7 +197,7 @@ export default function Home() {
         [edges, setEdges, setNodeData],
     );
 
-    const isValidConnectionCb = useCallback(
+    const isValidConnection = useCallback(
         (connection: Connection | Edge) => {
             const sameFromHandles =
                 connection.targetHandle?.split("_")[0] === connection.source?.split("_")[0];
@@ -230,6 +231,66 @@ export default function Home() {
             return addEdge(newEdge, eds);
         }),
         [setEdges],
+    );
+
+    const onConnectEnd = useCallback(
+        (event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
+            // if normal onConnect, fromHandle missing, starting not from 'source' or missing handle id: stop
+            if (connectionState.isValid != null || !connectionState.fromHandle) return;
+            if (connectionState.fromHandle.type !== 'source' || !connectionState.fromHandle.id) return;
+
+            // Logic to get correct Node type and Handle id
+            const sourceNodeId = connectionState.fromHandle.nodeId;
+            const sourceHandleId = connectionState.fromHandle.id;
+
+            // NOTE: this only works if no '_' in handle except at end!
+            // New node type from source handle prefix (e.g., "market_handle" → "market")
+            const newNodeType = sourceHandleId.split('_')[0];
+            // Target handle = source node type prefix + "_handle"
+            const sourcePrefix = sourceNodeId.split('_')[0];
+            const targetHandleId = `${sourcePrefix}_handle`;
+
+            // Gets position independent of mouse and touchscreen
+            const clientX = 'changedTouches' in event
+                ? event.changedTouches[0].clientX
+                : event.clientX;
+            const clientY = 'changedTouches' in event
+                ? event.changedTouches[0].clientY
+                : event.clientY;
+
+            // create new Node at canvas coords corresponding to mouse postion
+            const newNodeId = getId(newNodeType);
+            const newNode: Node<EditSidebarData> = {
+                id: newNodeId,
+                type: newNodeType,
+                position: screenToFlowPosition({x: clientX, y: clientY}),
+                data: {
+                    name: getName(newNodeType),
+                    errorField: '',
+                    errorMessage: '',
+                },
+            };
+
+            // Build edge like in onConnect
+            const newEdge: Edge<EditSidebarData> = {
+                id: `${sourceNodeId}#${sourceHandleId}#${newNodeId}#${targetHandleId}`,
+                source: sourceNodeId,
+                sourceHandle: sourceHandleId,
+                target: newNodeId,
+                targetHandle: targetHandleId,
+                type: 'default',
+                data: {name: 'a connection', errorField: '', errorMessage: ''},
+            };
+
+            // Special edge treatment if unit to market
+            if (sourceNodeId.startsWith('unit') && newNodeId.startsWith('market')) {
+                newEdge.type = 'unit-market';
+            }
+
+            setNodes((nds) => nds.concat(newNode));
+            setEdges((eds) => eds.concat(newEdge));
+        },
+        [screenToFlowPosition, setNodes, setEdges],
     );
 
     const updateForecast = useCallback((type: keyof Forecast, value: string | null) => {
@@ -397,8 +458,9 @@ export default function Home() {
                         onNodesChange={onNodesChange}
                         onEdgesChange={onEdgesChange}
                         onConnect={onConnect}
+                        onConnectEnd={onConnectEnd}
                         onDragOver={onDragOver}
-                        isValidConnection={isValidConnectionCb}
+                        isValidConnection={isValidConnection}
                         onDrop={onDrop}
                         edgeTypes={edgeTypes}
                         fitView

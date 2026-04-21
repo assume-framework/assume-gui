@@ -20,6 +20,7 @@ export function WorldNode({data, isConnectable, selected}: NodeProps<Node<EditSi
             <Handle
                 id="marketProvider_handle"
                 type="source"
+                className="!bg-sky-400"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 style={{left: '25%'}}
@@ -28,6 +29,7 @@ export function WorldNode({data, isConnectable, selected}: NodeProps<Node<EditSi
             <Handle
                 id="unitOperator_handle"
                 type="source"
+                className="!bg-fuchsia-400"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 style={{left: '75%'}}
@@ -44,6 +46,7 @@ export function MarketNode({data, isConnectable, selected}: NodeProps<Node<EditS
             <Handle
                 id="marketProvider_handle"
                 type="target"
+                className="!bg-teal-400"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
                 title="Connect from world (market providers)"
@@ -59,6 +62,7 @@ export function MarketNode({data, isConnectable, selected}: NodeProps<Node<EditS
             <Handle
                 id="marketProduct_handle"
                 type="source"
+                className="!bg-lime-400"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
             />
@@ -73,6 +77,7 @@ export function MarketProviderNode({data, isConnectable, selected}: NodeProps<No
             <Handle
                 id="world_handle"
                 type="target"
+                className="!bg-sky-400"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
                 title="Connect from world"
@@ -82,6 +87,7 @@ export function MarketProviderNode({data, isConnectable, selected}: NodeProps<No
             <Handle
                 id="market_handle"
                 type="source"
+                className="!bg-teal-400"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 title="Connect to markets"
@@ -98,6 +104,7 @@ export function UnitNode({data, isConnectable, selected}: NodeProps<Node<EditSid
             <Handle
                 id="unitOperator_handle"
                 type="target"
+                className="!bg-violet-400"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
                 title="Connect from unit operator"
@@ -126,6 +133,7 @@ export function UnitOperatorNode({data, isConnectable, selected}: NodeProps<Node
         <>
             <Handle
                 id="world_handle"
+                className="!bg-fuchsia-400"
                 type="target"
                 position={Position.Top}
                 isConnectable={isConnectable && connections.length == 0}
@@ -135,6 +143,7 @@ export function UnitOperatorNode({data, isConnectable, selected}: NodeProps<Node
             <Handle
                 id="unit_handle"
                 type="source"
+                className="!bg-violet-400"
                 position={Position.Bottom}
                 isConnectable={isConnectable}
                 title="Connect to units"
@@ -151,6 +160,7 @@ export function MarketProductNode({data, isConnectable, selected}: NodeProps<Nod
                 id="market_handle"
                 type="target"
                 position={Position.Top}
+                className="!bg-lime-400"
                 isConnectable={isConnectable && connections.length == 0}
                 title="Connect from market"
             />
