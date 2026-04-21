@@ -27,7 +27,7 @@ rrule_from_string = {
 def process_data(input: dict):
     cfg = Config(input)
     worldcfg = cfg.get_node("world")
-    if not worldcfg.get("simulation_id", "").strip():
+    if not worldcfg["simulation_id"].strip():
         raise ValidationError("simulation_id must be set", "world", "simulation_id")
 
     world = World(database_uri=DBURI)
@@ -60,9 +60,9 @@ def add_markets(world: World, cfg: Config):
                         first_delivery=relativedelta(
                             minutes=int(productData["first_delivery"])
                         ),
-                        only_hours=_only_hours(productData.get("only_hours", "")),
+                        only_hours=_only_hours(productData["only_hours"]),
                         eligible_lambda_function=_optional_string(
-                            productData.get("eligible_lambda_function")
+                            productData["eligible_lambda_function"]
                         ),
                     )
                 )
@@ -79,16 +79,16 @@ def add_markets(world: World, cfg: Config):
                 ),
                 opening_duration=timedelta(minutes=int(data["opening_duration"])),
                 market_products=market_products,
-                product_type=data.get("product_type", "energy"),
-                maximum_bid_volume=float(data.get("maximum_bid_volume", 3000)),
-                maximum_bid_price=float(data.get("maximum_bid_price", 9999)),
-                minimum_bid_price=float(data.get("minimum_bid_price", -500)),
+                product_type=data["product_type"],
+                maximum_bid_volume=float(data["maximum_bid_volume"]),
+                maximum_bid_price=float(data["maximum_bid_price"]),
+                minimum_bid_price=float(data["minimum_bid_price"]),
                 additional_fields=additional_fields,
-                volume_unit=data.get("volume_unit", "MW"),
-                volume_tick=data.get("volume_tick"),
-                price_unit=data.get("price_unit", "€/MW"),
-                price_tick=data.get("price_tick"),
-                supports_get_unmatched=data.get("supports_get_unmatched", False),
+                volume_unit=data["volume_unit"],
+                volume_tick=float(data["volume_tick"]),
+                price_unit=data["price_unit"],
+                price_tick=float(data["price_tick"]),
+                # supports_get_unmatched=data["supports_get_unmatched"], # TODO
             )
             world.add_market(
                 market_operator_id=operator_edge.target,
@@ -170,27 +170,23 @@ def add_units(world: World, cfg: Config):
                 unit_type=unitData["unitType"],
                 unit_params={
                     "bidding_strategies": bidding_strategies,
-                    "technology": unitData.get("technology"),
-                    "min_power": float(unitData.get("min_power", 0)),
-                    "max_power": float(unitData.get("max_power", 0)),
-                    "capacity": float(unitData.get("capacity", 0)),
-                    "price": float(unitData.get("price", 3000)),
-                    "efficiency": float(unitData.get("efficiency", 1.0)),
-                    "ramp_up": float(unitData.get("ramp_up", 0)),
-                    "ramp_down": float(unitData.get("ramp_down", 0)),
-                    "emission_factor": float(unitData.get("emission_factor", 0)),
-                    "min_operating_time": int(unitData.get("min_operating_time", 0)),
-                    "min_downtime": int(unitData.get("min_downtime", 0)),
-                    "max_power_charge": float(unitData.get("max_power_charge", 0)),
-                    "max_power_discharge": float(
-                        unitData.get("max_power_discharge", 0)
-                    ),
-                    "min_power_charge": float(unitData.get("min_power_charge", 0)),
-                    "min_power_discharge": float(
-                        unitData.get("min_power_discharge", 0)
-                    ),
-                    "max_soc": float(unitData.get("max_soc", 0)),
-                    "min_soc": float(unitData.get("min_soc", 0)),
+                    "technology": unitData["technology"],
+                    "min_power": float(unitData["min_power"]),
+                    "max_power": float(unitData["max_power"]),
+                    "capacity": float(unitData["capacity"]),
+                    "price": float(unitData["price"]),
+                    "efficiency": float(unitData["efficiency"]),
+                    "ramp_up": float(unitData["ramp_up"]),
+                    "ramp_down": float(unitData["ramp_down"]),
+                    "emission_factor": float(unitData["emission_factor"]),
+                    "min_operating_time": int(unitData["min_operating_time"]),
+                    "min_downtime": int(unitData["min_downtime"]),
+                    "max_power_charge": float(unitData["max_power_charge"]),
+                    "max_power_discharge": float(unitData["max_power_discharge"]),
+                    "min_power_charge": float(unitData["min_power_charge"]),
+                    "min_power_discharge": float(unitData["min_power_discharge"]),
+                    "max_soc": float(unitData["max_soc"]),
+                    "min_soc": float(unitData["min_soc"]),
                 },
                 forecaster=forecaster,
             )

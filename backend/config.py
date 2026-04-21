@@ -22,7 +22,7 @@ class NodeConfig:
         self.id = cfg["id"]
         self.type = cfg["type"]
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> str:
         """
         Get a required field from the node data. Raises ValidationError if the field is missing.
         """
