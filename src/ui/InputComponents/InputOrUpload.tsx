@@ -1,19 +1,14 @@
-import {type ChangeEventHandler, useId, useState} from "react";
+import {useId, useState} from "react";
 import UploadButton from "./UploadButton.tsx";
 import {HelpOutline, ToggleOffOutlined, ToggleOnOutlined} from "@mui/icons-material";
 import type {BaseProps} from "./types.ts";
 
 export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: BaseProps) {
-    const hasFile = typeof value === "string" && value.length == 36;
+    const hasFile = /^[\da-f]{8}-[\da-f]{4}-[0-9a-f]{4}-[\da-f]{4}-[\da-f]{12}$/.test(value); // UUID regex
     const [upload, setUpload] = useState(hasFile);
     const toggleUpload = () => setUpload(!upload);
     const id = useId()
     const color = errorMessage ? "text-red-500" : "text-gray-700"
-
-    const simulateChange = (onChange: ChangeEventHandler) => (value: string | null) => {
-        const e = {target: {value: value}}
-        onChange(e as React.ChangeEvent<HTMLInputElement>)
-    }
 
     return (
         <div className="my-4">
@@ -25,7 +20,7 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                             name="Upload a file"
                             uploaded={hasFile}
                             tooltip={tooltip}
-                            setDocumentID={simulateChange(onChange)}
+                            setDocumentID={onChange}
                         />
                     </div>
                     :
@@ -34,7 +29,7 @@ export function InputOrUpload({onChange, errorMessage, value, label, tooltip}: B
                             type="number"
                             id={id}
                             value={value}
-                            onChange={onChange}
+                            onChange={e => onChange(e.target.value)}
                             title={tooltip}
                             className="shadow text-sm appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline disabled:bg-neutral-100"
                         />
