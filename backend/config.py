@@ -1,3 +1,4 @@
+import re
 from enum import Enum
 from pathlib import Path
 
@@ -16,58 +17,67 @@ class EdgeType(Enum):
     market = "market"
 
 
+class FieldConfig:
+    def __init__(self, field: str, id: str, cfg: str):
+        self.field = field
+        self.id = id
+        self.content = cfg
+
+    def int(self) -> int:
+        return int(self.content)
+
+    def float(self) -> float:
+        return float(self.content)
+
+    def str(self) -> str:
+        return self.content
+
+    def optional_str(self) -> str | None:
+        if self.content == "":
+            return None
+        return self.content
+
+    def date(self) -> pd.Timestamp:
+        return pd.to_datetime(self.content)
+
+    def comma_array(self) -> list[str]:
+        return [value.strip() for value in self.content.split(",")]
+
+    def optional_file(self, index=None) -> float | pd.DataFrame:
+        if not re.match(
+            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+            self.content,
+        ):
+            return self.float()
+        # load file
+        path = Path(__file__).parent / "tmp" / f"{self.content}.csv"
+        if index is None:
+            return read_file(path)
+        try:
+            data = load_index_file(path, index)
+            data = data[data.columns[0]]
+        except Exception as e:
+            raise ValidationError(
+                message=f"uploaded file {self.content} for {self.key} did have {e}",
+                id=self.id,
+                field=self.key,
+            )
+        return data
+
+
 class NodeConfig:
     def __init__(self, cfg: dict):
         self.data = cfg["data"]
         self.id = cfg["id"]
         self.type = cfg["type"]
 
-    def __getitem__(self, key: str) -> str:
+    def __getitem__(self, key: str) -> FieldConfig:
         """
         Get a required field from the node data. Raises ValidationError if the field is missing.
         """
-        try:
-            return self.data[key]
-        except KeyError:
-            raise ValidationError(f"{key} is required", id=self.id, field=key)
-
-    def get_date(self, key: str, default="") -> pd.Timestamp:
-        date_field = self[key] if default == "" else self.get(key, default)
-        try:
-            return pd.to_datetime(date_field)
-        except Exception:
-            raise ValidationError("invalid date", id=self.id, field=key)
-
-    def get(self, key: str, default=None):
-        """Get an optional field from the node data. Returns default if the field is missing."""
-        return self.data.get(key, default)
-
-    def get_comma_array(self, key: str, default=[]):
-        """Get an optional field from the node data. Returns default if the field is missing."""
-        str_list = self.data.get(key, default)
-        if not str_list:
-            return default
-        return [value.strip() for value in str_list.split(",")]
-
-    def get_optional_file(self, key: str, default=None, index=None):
-        entry = self.get(key, default)
-        if isinstance(entry, str):
-            if len(entry) == 36:
-                path = Path(__file__).parent / "tmp" / f"{entry}.csv"
-                if index is None:
-                    return read_file(path)
-                try:
-                    data = load_index_file(path, index)
-                    data = data[data.columns[0]]
-                except Exception as e:
-                    raise ValidationError(
-                        message=f"uploaded file {entry} for {key} did have {e}",
-                        id=self.id,
-                        field=key,
-                    )
-                return data
-            return float(entry)  # try to convert to float
-        return entry
+        if key in self.data and self.data[key] != "":
+            return FieldConfig(key, self.id, self.data[key])
+        raise ValidationError(f"{key} is required", id=self.id, field=key)
 
 
 class EdgeConfig:
@@ -99,12 +109,12 @@ class Config:
 
     def _simulation_time(self) -> tuple[pd.Timestamp, pd.Timestamp, pd.DatetimeIndex]:
         world_cfg = self.get_node("world")
-        start = world_cfg.get_date("start")
-        end = world_cfg.get_date("end")
+        start = world_cfg["start"].date()
+        end = world_cfg["end"].date()
         return (
             start,
             end,
-            pd.date_range(start=start, end=end, freq=world_cfg["frequency"]),
+            pd.date_range(start=start, end=end, freq=world_cfg["frequency"].str()),
         )
 
     def get_node(self, unit_id: str) -> NodeConfig:

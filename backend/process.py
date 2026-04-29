@@ -55,39 +55,39 @@ def add_markets(world: World, cfg: Config):
                 productData = cfg.get_node(product_edge.target)
                 market_products.append(
                     MarketProduct(
-                        duration=relativedelta(minutes=int(productData["duration"])),
-                        count=int(productData["count"]),
+                        duration=relativedelta(minutes=(productData["duration"].int())),
+                        count=(productData["count"].int()),
                         first_delivery=relativedelta(
-                            minutes=int(productData["first_delivery"])
+                            minutes=(productData["first_delivery"].int())
                         ),
-                        only_hours=_only_hours(productData["only_hours"]),
+                        only_hours=_only_hours(productData["only_hours"].str()),
                         eligible_lambda_function=_optional_string(
-                            productData["eligible_lambda_function"]
+                            productData["eligible_lambda_function"].str()
                         ),
                     )
                 )
             data = cfg.get_node(market_edge.target)
             additional_fields = data.get_comma_array("additional_fields")
             market_config = MarketConfig(
-                market_id=data["name"],
-                market_mechanism=data["market_mechanism"],
+                market_id=data["name"].str(),
+                market_mechanism=data["market_mechanism"].str(),
                 opening_hours=rr.rrule(
-                    freq=rrule_from_string[data["opening_hours"]],
+                    freq=rrule_from_string[data["opening_hours"].str()],
                     interval=1,
                     dtstart=cfg.start,
                     until=cfg.end,
                 ),
-                opening_duration=timedelta(minutes=int(data["opening_duration"])),
+                opening_duration=timedelta(minutes=data["opening_duration"].int()),
                 market_products=market_products,
-                product_type=data["product_type"],
-                maximum_bid_volume=float(data["maximum_bid_volume"]),
-                maximum_bid_price=float(data["maximum_bid_price"]),
-                minimum_bid_price=float(data["minimum_bid_price"]),
-                additional_fields=additional_fields,
-                volume_unit=data["volume_unit"],
-                volume_tick=float(data["volume_tick"]),
-                price_unit=data["price_unit"],
-                price_tick=float(data["price_tick"]),
+                product_type=data["product_type"].str(),
+                maximum_bid_volume=data["maximum_bid_volume"].float(),
+                maximum_bid_price=data["maximum_bid_price"].float(),
+                minimum_bid_price=data["minimum_bid_price"].float(),
+                additional_fields=additional_fields.str(),
+                volume_unit=data["volume_unit"].str(),
+                volume_tick=data["volume_tick"].float(),
+                price_unit=data["price_unit"].str(),
+                price_tick=data["price_tick"].float(),
                 # supports_get_unmatched=data["supports_get_unmatched"], # TODO
             )
             world.add_market(
@@ -107,19 +107,17 @@ def forecaster_for_type(
         # TODO this is a weird default, maybe change it in assume itself
         price_forecast = {market_id: 50 for market_id in market_ids}
     residual_forecast = global_forecasts.get("residual_load", None)
-    availability = data.get_optional_file("forecast_availability", 1, index=index)
+    availability = data["forecast_availability"].optional_file(index)
     fuel_prices = {
-        "co2": data.get_optional_file("forecast_co2_price", 10, index=index),
-        "others": data.get_optional_file("forecast_fuel_price", 10, index=index),
+        "co2": data["forecast_co2_price"].optional_file(index),
+        "others": data["forecast_fuel_price"].optional_file(index),
     }
     match data["unitType"]:
         case "demand":
             return DemandForecaster(
                 index=index,
                 availability=availability,
-                demand=-abs(
-                    data.get_optional_file("forecast_demand", -100, index=index)
-                ),
+                demand=-abs(data["forecast_demand"].optional_file(index)),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
@@ -135,8 +133,8 @@ def forecaster_for_type(
             return ExchangeForecaster(
                 index=index,
                 availability=availability,
-                volume_export=data.get_optional_file("forecast_volume_export", 0),
-                volume_import=data.get_optional_file("forecast_volume_import", 0),
+                volume_export=data["forecast_volume_export"].optional_file(index),
+                volume_import=data["forecast_volume_import"].optional_file(index),
                 market_prices=price_forecast,
                 residual_load=residual_forecast,
             )
@@ -170,23 +168,23 @@ def add_units(world: World, cfg: Config):
                 unit_type=unitData["unitType"],
                 unit_params={
                     "bidding_strategies": bidding_strategies,
-                    "technology": unitData["technology"],
-                    "min_power": float(unitData["min_power"]),
-                    "max_power": float(unitData["max_power"]),
-                    "capacity": float(unitData["capacity"]),
-                    "price": float(unitData["price"]),
-                    "efficiency": float(unitData["efficiency"]),
-                    "ramp_up": float(unitData["ramp_up"]),
-                    "ramp_down": float(unitData["ramp_down"]),
-                    "emission_factor": float(unitData["emission_factor"]),
-                    "min_operating_time": int(unitData["min_operating_time"]),
-                    "min_downtime": int(unitData["min_downtime"]),
-                    "max_power_charge": float(unitData["max_power_charge"]),
-                    "max_power_discharge": float(unitData["max_power_discharge"]),
-                    "min_power_charge": float(unitData["min_power_charge"]),
-                    "min_power_discharge": float(unitData["min_power_discharge"]),
-                    "max_soc": float(unitData["max_soc"]),
-                    "min_soc": float(unitData["min_soc"]),
+                    "technology": unitData["technology"].str(),
+                    "min_power": unitData["min_power"].float(),
+                    "max_power": unitData["max_power"].float(),
+                    "capacity": unitData["capacity"].float(),
+                    "price": unitData["price"].float(),
+                    "efficiency": unitData["efficiency"].float(),
+                    "ramp_up": unitData["ramp_up"].float(),
+                    "ramp_down": unitData["ramp_down".float()],
+                    "emission_factor": unitData["emission_factor"].float(),
+                    "min_operating_time": unitData["min_operating_time"].int(),
+                    "min_downtime": unitData["min_downtime"].int(),
+                    "max_power_charge": unitData["max_power_charge"].float(),
+                    "max_power_discharge": unitData["max_power_discharge"].float(),
+                    "min_power_charge": unitData["min_power_charge"].float(),
+                    "min_power_discharge": unitData["min_power_discharge"].float(),
+                    "max_soc": unitData["max_soc"].float(),
+                    "min_soc": unitData["min_soc"].float(),
                 },
                 forecaster=forecaster,
             )
