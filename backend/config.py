@@ -1,9 +1,11 @@
 import re
 from enum import Enum
 from pathlib import Path
+from typing import TypeAlias
 
 import pandas as pd
 from assume.common.exceptions import ValidationError
+from assume.common.market_objects import OnlyHours
 from assume.common.utils import load_index_file
 
 from backend.utils import read_file
@@ -18,9 +20,9 @@ class EdgeType(Enum):
 
 
 # use alias so python doesn't confuse the base types with methods of FieldConfig
-type s = str
-type i = int
-type f = float
+s: TypeAlias = str
+i: TypeAlias = int
+f: TypeAlias = float
 
 
 class FieldConfig:
@@ -45,7 +47,7 @@ class FieldConfig:
         self._check_value()
         return float(self.content)
 
-    def optional_float(self, default: f=None) -> None | f:
+    def optional_float(self, default: f = None) -> None | f:
         if self.content == "":
             return default
         return float(self.content)
@@ -55,9 +57,15 @@ class FieldConfig:
         return self.content
 
     def only_hours(self) -> s:
-        if self.content is None or self.content == "" or len(self.content.split(",")) != 2:
+        if (
+            self.content is None
+            or self.content == ""
+            or len(self.content.split(",")) != 2
+        ):
             return None
-        return OnlyHours(int(self.content.split(",")[0]), int(self.content.split(",")[1]))
+        return OnlyHours(
+            int(self.content.split(",")[0]), int(self.content.split(",")[1])
+        )
 
     def optional_str(self, default: s = None):
         if self.content == "":

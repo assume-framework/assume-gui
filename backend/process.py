@@ -4,18 +4,18 @@ import dateutil.rrule as rr
 from assume import MarketConfig, MarketProduct, World
 from assume.common.base import BaseUnit
 from assume.common.exceptions import ValidationError
-from assume.strategies import deprecated_bidding_strategies
 from assume.common.forecaster import (
     DemandForecaster,
     ExchangeForecaster,
     PowerplantForecaster,
     UnitForecaster,
 )
-from assume.common.market_objects import OnlyHours
+from assume.strategies import deprecated_bidding_strategies
 from assume.units import Demand, Exchange, PowerPlant, Storage
+from dateutil.relativedelta import relativedelta
+
 from backend.config import Config, EdgeType
 from backend.utils import DBURI
-from dateutil.relativedelta import relativedelta
 
 rrule_from_string = {
     "HOURLY": rr.HOURLY,
@@ -40,6 +40,7 @@ def process_data(input: dict):
     add_markets(world, cfg)
     add_units(world, cfg)
     return world
+
 
 def add_units(world: World, cfg: Config):
     for operator_edge in cfg.get_edges("world", EdgeType.unit_operator):
@@ -70,7 +71,9 @@ def add_markets(world: World, cfg: Config):
                             minutes=(productData["first_delivery"].int())
                         ),
                         only_hours=productData["only_hours"].only_hours(),
-                        eligible_lambda_function=productData["eligible_lambda_function"].optional_str()
+                        eligible_lambda_function=productData[
+                            "eligible_lambda_function"
+                        ].optional_str(),
                     )
                 )
             data = cfg.get_node(market_edge.target)
@@ -112,7 +115,8 @@ def instanciate_unit(
     strategies = {}
     for connection in cfg.get_edges(unit_id, EdgeType.market):
         market_data = cfg.get_node(connection.target)
-        strategies[market_data["name"]] = deprecated_bidding_strategies[connection["strategy"]]()
+        strat = connection["strategy"]
+        strategies[market_data["name"]] = deprecated_bidding_strategies[strat]()
     residual_forecast = cfg.forecasts.get("residual_load", None)
     price_forecast = cfg.forecasts.get("price", None)
     if price_forecast is None:
@@ -131,7 +135,9 @@ def instanciate_unit(
                     min_power=data["min_power"].float(),
                     forecaster=DemandForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        availability=data["forecast_availability"].optional_file(
+                            cfg.index
+                        ),
                         demand=-abs(data["forecast_demand"].optional_file(cfg.index)),
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
@@ -153,10 +159,14 @@ def instanciate_unit(
                     min_down_time=data["min_downtime"].int(),
                     forecaster=PowerplantForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        availability=data["forecast_availability"].optional_file(
+                            cfg.index
+                        ),
                         fuel_prices={
                             "co2": data["forecast_co2_price"].optional_file(cfg.index),
-                            "others": data["forecast_fuel_price"].optional_file(cfg.index),
+                            "others": data["forecast_fuel_price"].optional_file(
+                                cfg.index
+                            ),
                         },
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
@@ -169,7 +179,9 @@ def instanciate_unit(
                     bidding_strategies=strategies,
                     forecaster=ExchangeForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        availability=data["forecast_availability"].optional_file(
+                            cfg.index
+                        ),
                         volume_export=data["forecast_volume_export"].optional_file(
                             cfg.index
                         ),
@@ -195,7 +207,9 @@ def instanciate_unit(
                     min_soc=data["min_soc"].float(),
                     forecaster=UnitForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        availability=data["forecast_availability"].optional_file(
+                            cfg.index
+                        ),
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
                     ),
