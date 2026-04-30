@@ -146,9 +146,9 @@ def instanciate_unit(
             case "power_plant":
                 return PowerPlant(
                     id=data["name"].str(),
+                    technology=data["technology"].optional_str(""),
                     unit_operator=unit_operator_id,
                     bidding_strategies=strategies,
-                    technology=data["technology"].optional_str(""),
                     min_power=data["min_power"].float(),
                     max_power=data["max_power"].float(),
                     efficiency=data["efficiency"].float(),
