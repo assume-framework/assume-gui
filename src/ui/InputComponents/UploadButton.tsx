@@ -7,7 +7,7 @@ interface UploadButtonProps {
     name: string,
     uploaded: boolean,
     tooltip?: string
-    setDocumentID: (value: string | null) => void
+    setDocumentID: (value: string) => void
 }
 
 export default function UploadButton({name, uploaded, tooltip, setDocumentID}: UploadButtonProps) {
@@ -37,7 +37,7 @@ export default function UploadButton({name, uploaded, tooltip, setDocumentID}: U
 
     const clearForecast = () => {
         setFile(null)
-        setDocumentID(null)
+        setDocumentID('')
     }
 
     let color = "bg-green-200";

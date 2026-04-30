@@ -36,7 +36,7 @@ import Sidebar from "./ui/Sidebar.tsx";
 import DiscussSimulationChat from "./ui/DiscussSimulationChat.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
 import {sendData, type DataResponse} from "./sendData.ts";
-import {buildGrafanaResultsHref} from "./utils.ts";
+import {buildGrafanaResultsHref, getId, initial_data, initial_world} from "./utils.ts";
 import {getLayoutedElements} from "./layout.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
 
@@ -53,40 +53,14 @@ const edgeTypes = {
     'unit-market': UnitMarketEdge,
 }
 
-// string for midnight on a given calendar day.
-function formatDatetimeLocalMidnight(d: Date): string {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}T00:00`;
-}
-
-// calculate default for start and end of simulation world
-function defaultWorldStartEnd(): { start: string; end: string } {
-    const start = new Date();
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(start);
-    end.setMonth(end.getMonth() + 1);
-    return {
-        start: formatDatetimeLocalMidnight(start),
-        end: formatDatetimeLocalMidnight(end),
-    };
-}
 
 function createInitialNodes(): Node<EditSidebarData>[] {
-    const { start, end } = defaultWorldStartEnd();
     return [
         {
             id: 'world',
             type: 'world',
-            position: { x: 300, y: 0 },
-            data: {
-                name: 'World Node',
-                errorField: '',
-                errorMessage: '',
-                start,
-                end,
-            },
+            position: {x: 300, y: 0},
+            data: initial_world(),
             deletable: false,
         },
     ];
@@ -94,10 +68,6 @@ function createInitialNodes(): Node<EditSidebarData>[] {
 
 const initialForecast: Forecast = {price: null, residual_load: null}
 const initialEdges: Edge<EditSidebarData>[] = [];
-
-let id = 1;
-const getId = (type: string) => `${type}_${crypto.randomUUID()}`;
-const getName = (type: string) => `${type}_${id++}`;
 
 const readLocalStorage = () => {
     const data = localStorage.getItem('flow');
@@ -264,11 +234,7 @@ export default function Home() {
                 id: newNodeId,
                 type: newNodeType,
                 position: screenToFlowPosition({x: clientX, y: clientY}),
-                data: {
-                    name: getName(newNodeType),
-                    errorField: '',
-                    errorMessage: '',
-                },
+                data: initial_data(newNodeType),
             };
 
             // Build edge like in onConnect
@@ -314,11 +280,7 @@ export default function Home() {
                 x: event.clientX,
                 y: event.clientY
             }),
-            data: {
-                name: getName(type),
-                errorField: '',
-                errorMessage: '',
-            },
+            data: initial_data(type),
         };
         setNodes((nds) => nds.concat(newNode));
     }, [screenToFlowPosition, setNodes, type]);

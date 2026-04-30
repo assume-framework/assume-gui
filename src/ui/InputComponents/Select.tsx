@@ -26,7 +26,7 @@ export default function Select ({
                     id={id}
                     value={value}
                     disabled={disabled}
-                    onChange={onChange}
+                    onChange={e => onChange(e.target.value)}
                     required={required}
                     className={classNames}
                 >
