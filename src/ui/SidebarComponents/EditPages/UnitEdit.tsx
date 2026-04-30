@@ -137,12 +137,12 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
                             onChange={onChange("forecast_availability")}/>
                         <InputOrUpload
                             label="Forecast fuel price"
-                            value={data.forecast_fuel_price0}
+                            value={data.forecast_fuel_price}
                             errorMessage={getErrorMessage('forecast_fuel_price')}
                             onChange={onChange("forecast_fuel_price")}/>
                         <InputOrUpload
                             label="Forecast CO2 price"
-                            value={data.forecast_co2_price0}
+                            value={data.forecast_co2_price}
                             errorMessage={getErrorMessage('forecast_co2_price')}
                             onChange={onChange("forecast_co2_price")}/>
                     </Modal>
