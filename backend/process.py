@@ -177,6 +177,7 @@ def instanciate_unit(
                     id=data["name"].str(),
                     unit_operator=unit_operator_id,
                     bidding_strategies=strategies,
+                    technology=data["technology"].optional_str(""),
                     price_import=data["price_import"].float(),
                     price_export=data["price_export"].float(),
                     forecaster=ExchangeForecaster(
