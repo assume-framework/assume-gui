@@ -17,33 +17,64 @@ class EdgeType(Enum):
     market = "market"
 
 
+# use alias so python doesn't confuse the base types with methods of FieldConfig
+type s = str
+type i = int
+type f = float
+
+
 class FieldConfig:
-    def __init__(self, field: str, id: str, cfg: str):
+    def __init__(self, field: s, id: s, cfg: s):
         self.field = field
         self.id = id
         self.content = cfg
 
-    def int(self) -> int:
+    def _check_value(self):
+        if self.content.strip() == "":
+            raise ValidationError(
+                message=f"{self.field} is required",
+                id=self.id,
+                field=self.field,
+            )
+
+    def int(self) -> i:
+        self._check_value()
         return int(self.content)
 
-    def float(self) -> float:
+    def float(self) -> f:
+        self._check_value()
         return float(self.content)
 
-    def str(self) -> str:
+    def optional_float(self, default: f=None) -> None | f:
+        if self.content == "":
+            return default
+        return float(self.content)
+
+    def str(self) -> s:
+        self._check_value()
         return self.content
 
-    def optional_str(self) -> str | None:
-        if self.content == "":
+    def only_hours(self) -> s:
+        if self.content is None or self.content == "" or len(self.content.split(",")) != 2:
             return None
+        return OnlyHours(int(self.content.split(",")[0]), int(self.content.split(",")[1]))
+
+    def optional_str(self, default: s = None):
+        if self.content == "":
+            return default
         return self.content
 
     def date(self) -> pd.Timestamp:
+        self._check_value()
         return pd.to_datetime(self.content)
 
-    def comma_array(self) -> list[str]:
+    def comma_array(self, required=False) -> list[s]:
+        if required:
+            self._check_value()
         return [value.strip() for value in self.content.split(",")]
 
-    def optional_file(self, index=None) -> float | pd.DataFrame:
+    def optional_file(self, index: pd.DatetimeIndex = None) -> f | pd.DataFrame:
+        self._check_value()
         if not re.match(
             r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
             self.content,
@@ -75,7 +106,7 @@ class NodeConfig:
         """
         Get a required field from the node data. Raises ValidationError if the field is missing.
         """
-        if key in self.data and self.data[key] != "":
+        if key in self.data:
             return FieldConfig(key, self.id, self.data[key])
         raise ValidationError(f"{key} is required", id=self.id, field=key)
 

@@ -2,19 +2,20 @@ from datetime import timedelta
 
 import dateutil.rrule as rr
 from assume import MarketConfig, MarketProduct, World
+from assume.common.base import BaseUnit
 from assume.common.exceptions import ValidationError
+from assume.strategies import deprecated_bidding_strategies
 from assume.common.forecaster import (
     DemandForecaster,
     ExchangeForecaster,
-    ForecastIndex,
     PowerplantForecaster,
     UnitForecaster,
 )
 from assume.common.market_objects import OnlyHours
-from dateutil.relativedelta import relativedelta
-
-from backend.config import Config, EdgeType, NodeConfig
+from assume.units import Demand, Exchange, PowerPlant, Storage
+from backend.config import Config, EdgeType
 from backend.utils import DBURI
+from dateutil.relativedelta import relativedelta
 
 rrule_from_string = {
     "HOURLY": rr.HOURLY,
@@ -27,19 +28,27 @@ rrule_from_string = {
 def process_data(input: dict):
     cfg = Config(input)
     worldcfg = cfg.get_node("world")
-    if not worldcfg["simulation_id"].strip():
-        raise ValidationError("simulation_id must be set", "world", "simulation_id")
 
     world = World(database_uri=DBURI)
     world.setup(
         start=cfg.start,
         end=cfg.end,
-        save_frequency_hours=int(worldcfg["save_frequency_hours"]),
-        simulation_id=worldcfg["simulation_id"].strip(),
+        save_frequency_hours=worldcfg["save_frequency_hours"].int(),
+        simulation_id=worldcfg["simulation_id"].str().strip(),
     )
 
     add_markets(world, cfg)
     add_units(world, cfg)
+    return world
+
+def add_units(world: World, cfg: Config):
+    for operator_edge in cfg.get_edges("world", EdgeType.unit_operator):
+        world.add_unit_operator(operator_edge.target)
+        for unit_edge in cfg.get_edges(operator_edge.target, EdgeType.unit):
+            world.add_unit_instance(
+                operator_edge.target,
+                instanciate_unit(cfg, unit_edge.target, operator_edge.target),
+            )
     return world
 
 
@@ -60,14 +69,11 @@ def add_markets(world: World, cfg: Config):
                         first_delivery=relativedelta(
                             minutes=(productData["first_delivery"].int())
                         ),
-                        only_hours=_only_hours(productData["only_hours"].str()),
-                        eligible_lambda_function=_optional_string(
-                            productData["eligible_lambda_function"].str()
-                        ),
+                        only_hours=productData["only_hours"].only_hours(),
+                        eligible_lambda_function=productData["eligible_lambda_function"].optional_str()
                     )
                 )
             data = cfg.get_node(market_edge.target)
-            additional_fields = data.get_comma_array("additional_fields")
             market_config = MarketConfig(
                 market_id=data["name"].str(),
                 market_mechanism=data["market_mechanism"].str(),
@@ -83,11 +89,11 @@ def add_markets(world: World, cfg: Config):
                 maximum_bid_volume=data["maximum_bid_volume"].float(),
                 maximum_bid_price=data["maximum_bid_price"].float(),
                 minimum_bid_price=data["minimum_bid_price"].float(),
-                additional_fields=additional_fields.str(),
+                additional_fields=data["additional_fields"].comma_array(),
                 volume_unit=data["volume_unit"].str(),
-                volume_tick=data["volume_tick"].float(),
+                volume_tick=data["volume_tick"].optional_float(),
                 price_unit=data["price_unit"].str(),
-                price_tick=data["price_tick"].float(),
+                price_tick=data["price_tick"].optional_float(),
                 # supports_get_unmatched=data["supports_get_unmatched"], # TODO
             )
             world.add_market(
@@ -96,108 +102,108 @@ def add_markets(world: World, cfg: Config):
             )
 
 
-def forecaster_for_type(
-    index: ForecastIndex,
-    data: NodeConfig,
-    global_forecasts: dict,
-    market_ids: list[str],
-) -> UnitForecaster:
-    price_forecast = global_forecasts.get("price", None)
+def instanciate_unit(
+    cfg: Config,
+    unit_id: str,
+    unit_operator_id: str,
+) -> BaseUnit:
+    data = cfg.get_node(unit_id)
+    # get bidding strategies for each market
+    strategies = {}
+    for connection in cfg.get_edges(unit_id, EdgeType.market):
+        market_data = cfg.get_node(connection.target)
+        strategies[market_data["name"]] = deprecated_bidding_strategies[connection["strategy"]]()
+    residual_forecast = cfg.forecasts.get("residual_load", None)
+    price_forecast = cfg.forecasts.get("price", None)
     if price_forecast is None:
         # TODO this is a weird default, maybe change it in assume itself
-        price_forecast = {market_id: 50 for market_id in market_ids}
-    residual_forecast = global_forecasts.get("residual_load", None)
-    availability = data["forecast_availability"].optional_file(index)
-    fuel_prices = {
-        "co2": data["forecast_co2_price"].optional_file(index),
-        "others": data["forecast_fuel_price"].optional_file(index),
-    }
-    match data["unitType"]:
-        case "demand":
-            return DemandForecaster(
-                index=index,
-                availability=availability,
-                demand=-abs(data["forecast_demand"].optional_file(index)),
-                market_prices=price_forecast,
-                residual_load=residual_forecast,
-            )
-        case "power_plant":
-            return PowerplantForecaster(
-                index=index,
-                availability=availability,
-                fuel_prices=fuel_prices,
-                market_prices=price_forecast,
-                residual_load=residual_forecast,
-            )
-        case "exchange":
-            return ExchangeForecaster(
-                index=index,
-                availability=availability,
-                volume_export=data["forecast_volume_export"].optional_file(index),
-                volume_import=data["forecast_volume_import"].optional_file(index),
-                market_prices=price_forecast,
-                residual_load=residual_forecast,
-            )
-        case "storage":
-            return UnitForecaster(
-                index=index,
-                availability=availability,
-                market_prices=price_forecast,
-                residual_load=residual_forecast,
-            )
+        price_forecast = {market_id: 50 for market_id in strategies.keys()}
+    try:
+        match data["unitType"].str():
+            case "demand":
+                return Demand(
+                    id=data["name"].str(),
+                    technology=data["technology"].optional_str(""),
+                    unit_operator=unit_operator_id,
+                    bidding_strategies=strategies,
+                    price=data["price"].float(),
+                    max_power=data["max_power"].float(),
+                    min_power=data["min_power"].float(),
+                    forecaster=DemandForecaster(
+                        index=cfg.index,
+                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        demand=-abs(data["forecast_demand"].optional_file(cfg.index)),
+                        market_prices=price_forecast,
+                        residual_load=residual_forecast,
+                    ),
+                )
+            case "power_plant":
+                return PowerPlant(
+                    id=data["name"].str(),
+                    unit_operator=unit_operator_id,
+                    bidding_strategies=strategies,
+                    technology=data["technology"].optional_str(""),
+                    min_power=data["min_power"].float(),
+                    max_power=data["max_power"].float(),
+                    efficiency=data["efficiency"].float(),
+                    ramp_up=data["ramp_up"].float(),
+                    ramp_down=data["ramp_down"].float(),
+                    emission_factor=data["emission_factor"].float(),
+                    min_operating_time=data["min_operating_time"].int(),
+                    min_down_time=data["min_downtime"].int(),
+                    forecaster=PowerplantForecaster(
+                        index=cfg.index,
+                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        fuel_prices={
+                            "co2": data["forecast_co2_price"].optional_file(cfg.index),
+                            "others": data["forecast_fuel_price"].optional_file(cfg.index),
+                        },
+                        market_prices=price_forecast,
+                        residual_load=residual_forecast,
+                    ),
+                )
+            case "exchange":
+                return Exchange(
+                    id=data["name"].str(),
+                    unit_operator=unit_operator_id,
+                    bidding_strategies=strategies,
+                    forecaster=ExchangeForecaster(
+                        index=cfg.index,
+                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        volume_export=data["forecast_volume_export"].optional_file(
+                            cfg.index
+                        ),
+                        volume_import=data["forecast_volume_import"].optional_file(
+                            cfg.index
+                        ),
+                        market_prices=price_forecast,
+                        residual_load=residual_forecast,
+                    ),
+                )
+            case "storage":
+                return Storage(
+                    id=data["name"].str(),
+                    unit_operator=unit_operator_id,
+                    bidding_strategies=strategies,
+                    technology=data["technology"].optional_str(""),
+                    capacity=data["capacity"].float(),
+                    max_power_charge=data["max_power_charge"].float(),
+                    min_power_charge=data["min_power_charge"].float(),
+                    max_power_discharge=data["max_power_discharge"].float(),
+                    min_power_discharge=data["min_power_discharge"].float(),
+                    max_soc=data["max_soc"].float(),
+                    min_soc=data["min_soc"].float(),
+                    forecaster=UnitForecaster(
+                        index=cfg.index,
+                        availability=data["forecast_availability"].optional_file(cfg.index),
+                        market_prices=price_forecast,
+                        residual_load=residual_forecast,
+                    ),
+                )
+    except ValidationError as e:
+        # make sure we reference the correct unit here
+        e.id = unit_id
+        raise e
     raise NotImplementedError(
         f"Forecaster for unit type {data['unitType']} is not implemented."
     )
-
-
-def add_units(world: World, cfg: Config):
-    for operator_edge in cfg.get_edges("world", EdgeType.unit_operator):
-        world.add_unit_operator(operator_edge.target)
-        for unit_edge in cfg.get_edges(operator_edge.target, EdgeType.unit):
-            bidding_strategies = {}
-            for connection in cfg.get_edges(unit_edge.target, EdgeType.market):
-                market_data = cfg.get_node(connection.target)
-                bidding_strategies[market_data["name"]] = connection["strategy"]
-            unitData = cfg.get_node(unit_edge.target)
-            forecaster = forecaster_for_type(
-                cfg.index, unitData, cfg.forecasts, list(bidding_strategies.keys())
-            )
-            world.add_unit(
-                id=unitData["name"],
-                unit_operator_id=operator_edge.target,
-                unit_type=unitData["unitType"],
-                unit_params={
-                    "bidding_strategies": bidding_strategies,
-                    "technology": unitData["technology"].str(),
-                    "min_power": unitData["min_power"].float(),
-                    "max_power": unitData["max_power"].float(),
-                    "capacity": unitData["capacity"].float(),
-                    "price": unitData["price"].float(),
-                    "efficiency": unitData["efficiency"].float(),
-                    "ramp_up": unitData["ramp_up"].float(),
-                    "ramp_down": unitData["ramp_down".float()],
-                    "emission_factor": unitData["emission_factor"].float(),
-                    "min_operating_time": unitData["min_operating_time"].int(),
-                    "min_downtime": unitData["min_downtime"].int(),
-                    "max_power_charge": unitData["max_power_charge"].float(),
-                    "max_power_discharge": unitData["max_power_discharge"].float(),
-                    "min_power_charge": unitData["min_power_charge"].float(),
-                    "min_power_discharge": unitData["min_power_discharge"].float(),
-                    "max_soc": unitData["max_soc"].float(),
-                    "min_soc": unitData["min_soc"].float(),
-                },
-                forecaster=forecaster,
-            )
-    return world
-
-
-def _only_hours(s: str) -> OnlyHours | None:
-    if s is None or s == "" or len(s.split(",")) != 2:
-        return None
-    return OnlyHours(int(s.split(",")[0]), int(s.split(",")[1]))
-
-
-def _optional_string(s: str) -> str | None:
-    if s is None or s == "" or s.lower() == "none":
-        return None
-    return s
