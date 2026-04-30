@@ -212,17 +212,17 @@ export default function editUnit({id, data, updateNodeValue, getErrorMessage}: E
             {(data.unitType === "exchange") && (
                 <>
                     <Input type="number"
-                           label="Volume import"
-                           value={data.volume_import}
-                           tooltip="The maximum line capacity for the import line."
-                           onChange={onChange("volume_import")}
-                           errorMessage={getErrorMessage('volume_import')}/>
+                           label="Price import"
+                           value={data.price_import}
+                           tooltip="The price for import of the unit."
+                           onChange={onChange("price_import")}
+                           errorMessage={getErrorMessage('price_import')}/>
                     <Input type="number"
-                           label="Volume export"
-                           value={data.volume_export}
-                           tooltip="The maximum line capacity for the export line."
-                           onChange={onChange("volume_export")}
-                           errorMessage={getErrorMessage('volume_export')}/>
+                           label="Price export"
+                           value={data.price_export}
+                           tooltip="The price for export of the unit."
+                           onChange={onChange("price_export")}
+                           errorMessage={getErrorMessage('price_export')}/>
                     <Modal name="Forecast settings">
                         <InputOrUpload
                             label="Forecast availability"

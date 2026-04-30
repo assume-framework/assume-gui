@@ -149,8 +149,8 @@ const power_plant_data = {
 const exchange_data = {
     unitType: 'exchange',
     technology: '',
-    volume_import: '',
-    volume_export: '',
+    price_import: '0.0',
+    price_export: '2999.0',
     forecast_availability : '1',
     forecast_volume_import : '0',
     forecast_volume_export : '0',
