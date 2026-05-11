@@ -186,17 +186,16 @@ export default function Home() {
     );
     const onConnect: OnConnect = useCallback(
         (connection) => setEdges((eds) => {
+            const t = connection.source.startsWith('market') && connection.target.startsWith('unit') ? 'unit-market' : 'default'
+            // Build edge like in onConnect
             const newEdge: Edge<EditSidebarData> = {
                 id: `${connection.source}#${connection.sourceHandle}#${connection.target}#${connection.targetHandle}`,
                 source: connection.source,
                 sourceHandle: connection.sourceHandle,
                 target: connection.target,
                 targetHandle: connection.targetHandle,
-                type: 'default',
-                data: {name: 'a connection', errorField: '', errorMessage: ''},
-            };
-            if (connection.source.startsWith('market') && connection.target.startsWith('unit')) {
-                newEdge.type = 'unit-market';
+                type: t,
+                data: initial_data(t),
             }
             return addEdge(newEdge, eds);
         }),
@@ -204,20 +203,20 @@ export default function Home() {
     );
 
     const onConnectEnd = useCallback(
-        (event: MouseEvent | TouchEvent, connectionState: FinalConnectionState) => {
+        (event: MouseEvent | TouchEvent, conn: FinalConnectionState) => {
             // if normal onConnect, fromHandle missing, starting not from 'source' or missing handle id: stop
-            if (connectionState.isValid != null || !connectionState.fromHandle) return;
-            if (connectionState.fromHandle.type !== 'source' || !connectionState.fromHandle.id) return;
+            if (conn.isValid != null || !conn.fromHandle) return;
+            if (conn.fromHandle.type !== 'source' || !conn.fromHandle.id) return;
 
             // Logic to get correct Node type and Handle id
-            const sourceNodeId = connectionState.fromHandle.nodeId;
-            const sourceHandleId = connectionState.fromHandle.id;
+            const sourceID = conn.fromHandle.nodeId;
+            const handleID = conn.fromHandle.id;
 
             // NOTE: this only works if no '_' in handle except at end!
             // New node type from source handle prefix (e.g., "market_handle" → "market")
-            const newNodeType = sourceHandleId.split('_')[0];
+            const newNodeType = handleID.split('_')[0];
             // Target handle = source node type prefix + "_handle"
-            const sourcePrefix = sourceNodeId.split('_')[0];
+            const sourcePrefix = sourceID.split('_')[0];
             const targetHandleId = `${sourcePrefix}_handle`;
 
             // Gets position independent of mouse and touchscreen
@@ -237,21 +236,17 @@ export default function Home() {
                 data: initial_data(newNodeType),
             };
 
+            const t = sourceID.startsWith('market') && newNodeId.startsWith('unit') ? 'unit-market' : 'default'
             // Build edge like in onConnect
             const newEdge: Edge<EditSidebarData> = {
-                id: `${sourceNodeId}#${sourceHandleId}#${newNodeId}#${targetHandleId}`,
-                source: sourceNodeId,
-                sourceHandle: sourceHandleId,
+                id: `${sourceID}#${handleID}#${newNodeId}#${targetHandleId}`,
+                source: sourceID,
+                sourceHandle: handleID,
                 target: newNodeId,
                 targetHandle: targetHandleId,
-                type: sourceNodeId.startsWith('market') && newNodeId.startsWith('unit') ? 'unit-market' : 'default',
-                data: {name: 'a connection', errorField: '', errorMessage: ''},
+                type: t,
+                data: initial_data(t),
             };
-
-            // Special edge treatment if unit to market
-            if (sourceNodeId.startsWith('unit') && newNodeId.startsWith('market')) {
-                newEdge.type = 'unit-market';
-            }
 
             setNodes((nds) => nds.concat(newNode));
             setEdges((eds) => eds.concat(newEdge));

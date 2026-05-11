@@ -177,6 +177,9 @@ export function initial_data(type: string): EditSidebarData {
         case 'exchange':
             data = exchange_data
             break
+        case 'unit-market':
+            data = {'strategy': ''}
+            break
     }
     return {
         name: getName(type),
