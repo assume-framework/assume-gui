@@ -195,7 +195,7 @@ export default function Home() {
                 type: 'default',
                 data: {name: 'a connection', errorField: '', errorMessage: ''},
             };
-            if (connection.source.startsWith('unit') && connection.target.startsWith('market')) {
+            if (connection.source.startsWith('market') && connection.target.startsWith('unit')) {
                 newEdge.type = 'unit-market';
             }
             return addEdge(newEdge, eds);
@@ -244,7 +244,7 @@ export default function Home() {
                 sourceHandle: sourceHandleId,
                 target: newNodeId,
                 targetHandle: targetHandleId,
-                type: 'default',
+                type: sourceNodeId.startsWith('market') && newNodeId.startsWith('unit') ? 'unit-market' : 'default',
                 data: {name: 'a connection', errorField: '', errorMessage: ''},
             };
 

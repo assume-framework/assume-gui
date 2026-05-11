@@ -53,7 +53,7 @@ export function MarketNode({data, isConnectable, selected}: NodeProps<Node<EditS
             />
             <Handle
                 id="unit_handle"
-                type="target"
+                type="source"
                 position={Position.Right}
                 isConnectable={isConnectable}
                 title="Connect units to this market"
@@ -118,7 +118,7 @@ export function UnitNode({data, isConnectable, selected}: NodeProps<Node<EditSid
             )}
             <Handle
                 id="market_handle"
-                type="source"
+                type="target"
                 position={Position.Left}
                 isConnectable={isConnectable}
                 title="Connect to market"
