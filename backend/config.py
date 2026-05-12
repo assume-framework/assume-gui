@@ -137,15 +137,15 @@ class Config:
     def __init__(self, data: dict):
         nodes = {i["id"]: i for i in data["nodes"]}
         edges = {}
-        edge_targets = {}
+        target = {}
         for e in data["edges"]:
             source, _, target, _ = e["id"].split("#")
             e["target"] = target
-            edge_targets.setdefault(target, {}).setdefault(source.split("_")[0], []).append(e)
+            target.setdefault(target, {}).setdefault(source.split("_")[0], []).append(e)
             edges.setdefault(source, {}).setdefault(target.split("_")[0], []).append(e)
         self.nodes = nodes
         self.edges = edges
-        self.edge_targets = edge_targets
+        self.edge_targets = target
         self.forecasts = data.get("forecasts", {})
         self.start, self.end, self.index = self._simulation_time()
 
