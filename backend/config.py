@@ -97,9 +97,9 @@ class FieldConfig:
             data = data[data.columns[0]]
         except Exception as e:
             raise ValidationError(
-                message=f"uploaded file {self.content} for {self.key} did have {e}",
+                message=f"uploaded file {self.content} for {self.field} did have {e}",
                 id=self.id,
-                field=self.key,
+                field=self.field,
             )
         return data
 
@@ -137,12 +137,15 @@ class Config:
     def __init__(self, data: dict):
         nodes = {i["id"]: i for i in data["nodes"]}
         edges = {}
+        edge_targets = {}
         for e in data["edges"]:
             source, _, target, _ = e["id"].split("#")
             e["target"] = target
+            edge_targets.setdefault(target, {}).setdefault(source.split("_")[0], []).append(e)
             edges.setdefault(source, {}).setdefault(target.split("_")[0], []).append(e)
         self.nodes = nodes
         self.edges = edges
+        self.edge_targets = edge_targets
         self.forecasts = data.get("forecasts", {})
         self.start, self.end, self.index = self._simulation_time()
 
@@ -162,6 +165,16 @@ class Config:
     def get_edges(self, unit_id: str, edge_type: EdgeType) -> list[EdgeConfig]:
         try:
             return [EdgeConfig(e) for e in self.edges[unit_id][edge_type.value]]
+        except KeyError:
+            raise ValidationError(
+                f"No edges of type {edge_type.value} found for unit {unit_id}",
+                id=unit_id,
+                field="edges",
+            )
+
+    def get_edge_targets(self, unit_id: str, edge_type: EdgeType) -> list[EdgeConfig]:
+        try:
+            return [EdgeConfig(t) for t in self.edge_targets[unit_id][edge_type.value]]
         except KeyError:
             raise ValidationError(
                 f"No edges of type {edge_type.value} found for unit {unit_id}",
