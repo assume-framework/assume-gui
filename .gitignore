@@ -29,3 +29,5 @@ build
 /backend/tmp/
 
 .env
+/assume-db/
+/gui-tmp
