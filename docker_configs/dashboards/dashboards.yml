@@ -1,0 +1,15 @@
+# SPDX-FileCopyrightText: ASSUME Developers
+#
+# SPDX-License-Identifier: AGPL-3.0-or-later
+
+apiVersion: 1
+
+providers:
+- name: 'ASSUME'
+  orgId: 1
+  folder: ''
+  type: file
+  disableDeletion: false
+  allowUiUpdates: true
+  options:
+    path: /etc/grafana/provisioning/dashboard-definitions
