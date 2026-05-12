@@ -1,0 +1,57 @@
+services:
+  assume-gui:
+    image: ghcr.io/assume-framework/assume-gui:latest
+    build: .
+    container_name: assume-gui
+    ports:
+      - 9090:8000
+    environment:
+      DATABASE_URL: "postgresql://${POSTGRES_USER}@assume_db:5432/assume?password=${POSTGRES_PASSWORD}"
+      GRAFANA_BASE_URL: http://grafana:3000
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+    volumes:
+      - ./gui-tmp:/server/backend/tmp
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: assume_grafana
+    user: "104"
+    depends_on:
+      - assume_db
+    ports:
+      - 3000:3000
+    environment:
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_INSTALL_PLUGINS: "marcusolsson-dynamictext-panel,orchestracities-map-panel"
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
+      GF_USERS_DEFAULT_THEME: light
+      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT}
+      GF_SERVER_SERVE_FROM_SUB_PATH: true
+    volumes:
+      - ./docker_configs/grafana.ini:/etc/grafana/grafana.ini
+      - ./docker_configs/datasources:/etc/grafana/provisioning/datasources
+      - ./docker_configs/dashboards:/etc/grafana/provisioning/dashboards
+      - ./docker_configs/dashboard-definitions:/etc/grafana/provisioning/dashboard-definitions
+    restart: always
+  assume_db:
+    image: timescale/timescaledb-ha:pg18-oss
+    # smaller without postgis support:
+    # image: timescale/timescaledb:latest-pg18
+    container_name: assume_db
+    restart: always
+    # running as 0 removes the need to create the volume bind-mount beforehand
+    user: "0:0"
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=assume
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - TS_TUNE_MAX_CONNS=500
+      # pgdata is /home/postgres/pgdata otherwise
+      # https://github.com/timescale/timescaledb-docker-ha/blob/345ceabef65c808ec6aaaa61a8b6ca568ccad7d3/Dockerfile#L460
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      # needed for normal image
+      - ./assume-db:/var/lib/postgresql/data
