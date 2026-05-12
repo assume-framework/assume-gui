@@ -113,7 +113,7 @@ def instanciate_unit(
     data = cfg.get_node(unit_id)
     # get bidding strategies for each market
     strategies = {}
-    for connection in cfg.get_edges(unit_id, EdgeType.market):
+    for connection in cfg.get_edge_targets(unit_id, EdgeType.market):
         market_data = cfg.get_node(connection.target)
         strat = connection["strategy"]
         strategies[market_data["name"]] = deprecated_bidding_strategies[strat]()
