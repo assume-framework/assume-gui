@@ -31,13 +31,16 @@ class FieldConfig:
         self.id = id
         self.content = cfg
 
+    def _error(self, message: s):
+        raise ValidationError(
+            message=message,
+            id=self.id,
+            field=self.field,
+        )
+
     def _check_value(self):
         if self.content.strip() == "":
-            raise ValidationError(
-                message=f"{self.field} is required",
-                id=self.id,
-                field=self.field,
-            )
+            self._error(f"{self.field} is required")
 
     def int(self) -> i:
         self._check_value()
@@ -55,6 +58,13 @@ class FieldConfig:
     def str(self) -> s:
         self._check_value()
         return self.content
+
+    def offset(self) -> pd.tseries.offsets.BaseOffset:
+        self._check_value()
+        try:
+            return pd.tseries.frequencies.to_offset(self.content)
+        except ValueError:
+            self._error(f"{self.field} must be a valid time delta e.g. '1h'")
 
     def only_hours(self) -> s:
         if (
@@ -74,7 +84,10 @@ class FieldConfig:
 
     def date(self) -> pd.Timestamp:
         self._check_value()
-        return pd.to_datetime(self.content)
+        try:
+            return pd.to_datetime(self.content)
+        except ValueError:
+            self._error(f"{self.field} must be a valid date format")
 
     def comma_array(self, required=False) -> list[s]:
         if required:
@@ -96,11 +109,7 @@ class FieldConfig:
             data = load_index_file(path, index)
             data = data[data.columns[0]]
         except Exception as e:
-            raise ValidationError(
-                message=f"uploaded file {self.content} for {self.field} did have {e}",
-                id=self.id,
-                field=self.field,
-            )
+            self._error(f"uploaded file {self.content} for {self.field} did have {e}")
         return data
 
 
@@ -153,10 +162,11 @@ class Config:
         world_cfg = self.get_node("world")
         start = world_cfg["start"].date()
         end = world_cfg["end"].date()
+        frq = world_cfg["frequency"].offset()
         return (
             start,
             end,
-            pd.date_range(start=start, end=end, freq=world_cfg["frequency"].str()),
+            pd.date_range(start=start, end=end, freq=frq),
         )
 
     def get_node(self, unit_id: str) -> NodeConfig:
