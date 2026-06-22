@@ -8,7 +8,7 @@ from assume.common.exceptions import ValidationError
 from assume.common.market_objects import OnlyHours
 from assume.common.utils import load_index_file
 
-from backend.utils import read_file
+from backend.utils import load_forecasts, read_file
 
 
 class EdgeType(Enum):
@@ -23,6 +23,11 @@ class EdgeType(Enum):
 s: TypeAlias = str
 i: TypeAlias = int
 f: TypeAlias = float
+
+UUID_PATTERN = (
+    r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-"
+    r"[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+)
 
 
 class FieldConfig:
@@ -44,7 +49,7 @@ class FieldConfig:
 
     def int(self) -> i:
         self._check_value()
-        return int(self.content)
+        return int(float(self.content))
 
     def float(self) -> f:
         self._check_value()
@@ -55,9 +60,18 @@ class FieldConfig:
             return default
         return float(self.content)
 
+    def optional_int(self, default: i = None) -> None | i:
+        value = self.optional_float(default)
+        if value is None:
+            return None
+        return int(value)
+
     def str(self) -> s:
         self._check_value()
         return self.content
+
+    def __str__(self) -> s:
+        return self.str()
 
     def offset(self) -> pd.tseries.offsets.BaseOffset:
         self._check_value()
@@ -96,12 +110,12 @@ class FieldConfig:
             return []
         return [value.strip() for value in self.content.split(",")]
 
-    def optional_file(self, index: pd.DatetimeIndex = None) -> f | pd.DataFrame:
-        self._check_value()
-        if not re.match(
-            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-            self.content,
-        ):
+    def optional_file(
+        self, index: pd.DatetimeIndex = None, default: f = None
+    ) -> f | pd.DataFrame:
+        if self.content == "":
+            return default
+        if not re.match(UUID_PATTERN, self.content):
             return self.float()
         # load file
         path = Path(__file__).parent / "tmp" / f"{self.content}.csv"
@@ -128,6 +142,13 @@ class NodeConfig:
         if key in self.data:
             return FieldConfig(key, self.id, self.data[key])
         raise ValidationError(f"{key} is required", id=self.id, field=key)
+
+    def optional(self, key: str) -> FieldConfig:
+        """
+        Get a field that may be absent from the node data, so that the caller can
+        fall back to the default value used by ASSUME itself.
+        """
+        return FieldConfig(key, self.id, self.data.get(key, ""))
 
 
 class EdgeConfig:
@@ -159,7 +180,15 @@ class Config:
         self.nodes = nodes
         self.edges = edges
         self.edge_targets = targets
-        self.forecasts = data.get("forecasts", {})
+        forecast_files = data.get("forecasts", {})
+        for forecast_type, file_id in forecast_files.items():
+            if file_id is not None and not re.match(UUID_PATTERN, str(file_id)):
+                raise ValidationError(
+                    f"invalid uploaded file id for {forecast_type}",
+                    id="world",
+                    field=forecast_type,
+                )
+        self.forecasts = load_forecasts(forecast_files)
         self.start, self.end, self.index = self._simulation_time()
 
     def _simulation_time(self) -> tuple[pd.Timestamp, pd.Timestamp, pd.DatetimeIndex]:

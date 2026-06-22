@@ -10,7 +10,7 @@ from assume.common.forecaster import (
     PowerplantForecaster,
     UnitForecaster,
 )
-from assume.strategies import deprecated_bidding_strategies
+from assume.strategies import bidding_strategies, deprecated_bidding_strategies
 from assume.units import Demand, Exchange, PowerPlant, Storage
 from dateutil.relativedelta import relativedelta
 
@@ -116,7 +116,14 @@ def instanciate_unit(
     for connection in cfg.get_edge_targets(unit_id, EdgeType.market):
         market_data = cfg.get_node(connection.source)
         strat = connection["strategy"]
-        strategies[market_data["name"].str()] = deprecated_bidding_strategies[strat]()
+        strategy_class = bidding_strategies.get(
+            strat, deprecated_bidding_strategies.get(strat)
+        )
+        if strategy_class is None:
+            raise ValidationError(
+                f"unknown bidding strategy {strat!r}", id=unit_id, field="strategy"
+            )
+        strategies[market_data["name"].str()] = strategy_class()
     residual_forecast = cfg.forecasts.get("residual_load", None)
     price_forecast = cfg.forecasts.get("price", None)
     if price_forecast is None:
@@ -125,94 +132,113 @@ def instanciate_unit(
     try:
         match data["unitType"].str():
             case "demand":
+                price = data.optional("price").optional_float()
+                price_kwargs = {} if price is None else {"price": price}
                 return Demand(
                     id=data["name"].str(),
-                    technology=data["technology"].optional_str(""),
+                    technology=data.optional("technology").optional_str(""),
                     unit_operator=unit_operator_id,
                     bidding_strategies=strategies,
-                    price=data["price"].float(),
                     max_power=data["max_power"].float(),
-                    min_power=data["min_power"].float(),
+                    min_power=data.optional("min_power").optional_float(0.0),
                     forecaster=DemandForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(
-                            cfg.index
+                        availability=data.optional(
+                            "forecast_availability"
+                        ).optional_file(cfg.index, 1),
+                        demand=-abs(
+                            data.optional("forecast_demand").optional_file(
+                                cfg.index, -100
+                            )
                         ),
-                        demand=-abs(data["forecast_demand"].optional_file(cfg.index)),
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
                     ),
+                    **price_kwargs,
                 )
             case "power_plant":
                 return PowerPlant(
                     id=data["name"].str(),
-                    technology=data["technology"].optional_str(""),
+                    technology=data.optional("technology").optional_str(""),
                     unit_operator=unit_operator_id,
                     bidding_strategies=strategies,
-                    min_power=data["min_power"].float(),
+                    min_power=data.optional("min_power").optional_float(0.0),
                     max_power=data["max_power"].float(),
-                    efficiency=data["efficiency"].float(),
-                    ramp_up=data["ramp_up"].float(),
-                    ramp_down=data["ramp_down"].float(),
-                    emission_factor=data["emission_factor"].float(),
-                    min_operating_time=data["min_operating_time"].int(),
-                    min_down_time=data["min_downtime"].int(),
+                    efficiency=data.optional("efficiency").optional_float(1.0),
+                    ramp_up=data.optional("ramp_up").optional_float(),
+                    ramp_down=data.optional("ramp_down").optional_float(),
+                    emission_factor=data.optional("emission_factor").optional_float(
+                        0.0
+                    ),
+                    min_operating_time=data.optional("min_operating_time").optional_int(
+                        1
+                    ),
+                    min_down_time=data.optional("min_downtime").optional_int(1),
                     forecaster=PowerplantForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(
-                            cfg.index
-                        ),
+                        availability=data.optional(
+                            "forecast_availability"
+                        ).optional_file(cfg.index, 1),
                         fuel_prices={
-                            "co2": data["forecast_co2_price"].optional_file(cfg.index),
-                            "others": data["forecast_fuel_price"].optional_file(
-                                cfg.index
+                            "co2": data.optional("forecast_co2_price").optional_file(
+                                cfg.index, 0
                             ),
+                            "others": data.optional(
+                                "forecast_fuel_price"
+                            ).optional_file(cfg.index, 0),
                         },
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
                     ),
                 )
             case "exchange":
+                price_kwargs = {}
+                for field in ("price_import", "price_export"):
+                    price = data.optional(field).optional_float()
+                    if price is not None:
+                        price_kwargs[field] = price
                 return Exchange(
                     id=data["name"].str(),
                     unit_operator=unit_operator_id,
                     bidding_strategies=strategies,
-                    technology=data["technology"].optional_str(""),
-                    price_import=data["price_import"].float(),
-                    price_export=data["price_export"].float(),
                     forecaster=ExchangeForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(
-                            cfg.index
-                        ),
-                        volume_export=data["forecast_volume_export"].optional_file(
-                            cfg.index
-                        ),
-                        volume_import=data["forecast_volume_import"].optional_file(
-                            cfg.index
-                        ),
+                        availability=data.optional(
+                            "forecast_availability"
+                        ).optional_file(cfg.index, 1),
+                        volume_export=data.optional(
+                            "forecast_volume_export"
+                        ).optional_file(cfg.index, 0),
+                        volume_import=data.optional(
+                            "forecast_volume_import"
+                        ).optional_file(cfg.index, 0),
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
                     ),
+                    **price_kwargs,
                 )
             case "storage":
                 return Storage(
                     id=data["name"].str(),
                     unit_operator=unit_operator_id,
                     bidding_strategies=strategies,
-                    technology=data["technology"].optional_str(""),
+                    technology=data.optional("technology").optional_str(""),
                     capacity=data["capacity"].float(),
                     max_power_charge=data["max_power_charge"].float(),
-                    min_power_charge=data["min_power_charge"].float(),
+                    min_power_charge=data.optional("min_power_charge").optional_float(
+                        0.0
+                    ),
                     max_power_discharge=data["max_power_discharge"].float(),
-                    min_power_discharge=data["min_power_discharge"].float(),
-                    max_soc=data["max_soc"].float(),
-                    min_soc=data["min_soc"].float(),
+                    min_power_discharge=data.optional(
+                        "min_power_discharge"
+                    ).optional_float(0.0),
+                    max_soc=data.optional("max_soc").optional_float(1.0),
+                    min_soc=data.optional("min_soc").optional_float(0.0),
                     forecaster=UnitForecaster(
                         index=cfg.index,
-                        availability=data["forecast_availability"].optional_file(
-                            cfg.index
-                        ),
+                        availability=data.optional(
+                            "forecast_availability"
+                        ).optional_file(cfg.index, 1),
                         market_prices=price_forecast,
                         residual_load=residual_forecast,
                     ),
