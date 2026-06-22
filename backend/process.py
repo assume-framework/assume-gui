@@ -114,9 +114,9 @@ def instanciate_unit(
     # get bidding strategies for each market
     strategies = {}
     for connection in cfg.get_edge_targets(unit_id, EdgeType.market):
-        market_data = cfg.get_node(connection.target)
+        market_data = cfg.get_node(connection.source)
         strat = connection["strategy"]
-        strategies[market_data["name"]] = deprecated_bidding_strategies[strat]()
+        strategies[market_data["name"].str()] = deprecated_bidding_strategies[strat]()
     residual_forecast = cfg.forecasts.get("residual_load", None)
     price_forecast = cfg.forecasts.get("price", None)
     if price_forecast is None:

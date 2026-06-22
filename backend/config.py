@@ -92,6 +92,8 @@ class FieldConfig:
     def comma_array(self, required=False) -> list[s]:
         if required:
             self._check_value()
+        if self.content == '':
+            return []
         return [value.strip() for value in self.content.split(",")]
 
     def optional_file(self, index: pd.DatetimeIndex = None) -> f | pd.DataFrame:
@@ -134,6 +136,7 @@ class EdgeConfig:
         self.id = cfg["id"]
         self.type = cfg["type"]
         self.target = cfg["target"]
+        self.source = cfg["source"]
 
     def __getitem__(self, key: str, default=None):
         try:
@@ -150,6 +153,7 @@ class Config:
         for e in data["edges"]:
             source, _, t, _ = e["id"].split("#")
             e["target"] = t
+            e["source"] = source
             targets.setdefault(t, {}).setdefault(source.split("_")[0], []).append(e)
             edges.setdefault(source, {}).setdefault(t.split("_")[0], []).append(e)
         self.nodes = nodes

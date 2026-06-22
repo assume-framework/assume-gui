@@ -405,6 +405,7 @@ export default function Home() {
                     </div>
                 )}
                 <div className="grow"
+                     onContextMenu={e => e.preventDefault()}
                      ref={reactFlowWrapper}>
                     <ReactFlow
                         deleteKeyCode={["Delete", "Backspace"]}
