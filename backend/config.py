@@ -92,7 +92,7 @@ class FieldConfig:
     def comma_array(self, required=False) -> list[s]:
         if required:
             self._check_value()
-        if self.content == '':
+        if self.content == "":
             return []
         return [value.strip() for value in self.content.split(",")]
 
