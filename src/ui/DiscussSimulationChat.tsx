@@ -4,8 +4,8 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
 type ChatRole = 'user' | 'assistant' | 'system';
-type ChatMessage = {role: ChatRole; content: string};
-type OpenAIModel = {id: string};
+type ChatMessage = { role: ChatRole; content: string };
+type OpenAIModel = { id: string };
 
 const OPENAI_MODEL_KEY = 'openai_model';
 /** Build-time default; must use the `VITE_` prefix so Vite exposes it to the client. */
@@ -63,7 +63,7 @@ export default function DiscussSimulationChat({
             if (!resp.ok) {
                 throw new Error(`Request failed (${resp.status})`);
             }
-            const body = (await resp.json()) as {data?: OpenAIModel[]};
+            const body = (await resp.json()) as { data?: OpenAIModel[] };
             const loadedModels = body.data ?? [];
             setModels(loadedModels);
 
@@ -103,25 +103,24 @@ export default function DiscussSimulationChat({
         setInput('');
         setMessages((prev) => [...prev, {role: 'assistant', content: ''}]);
 
+        const messagesPayload = [
+            {
+                role: 'system' as const,
+                content: [
+                    'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
+                    'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
+                    'The market design is configurable. If there are multiple markets, help the user structure the order of the markets.',
+                    'Use the following world JSON as authoritative context.',
+                    'Remember that the user does not know about the JSON and sees the graph visualized instead. Do not quote position fields or JSON; they are irrelevant.',
+                    '',
+                    'WORLD_JSON:',
+                    worldJson,
+                ].join('\n'),
+            },
+            ...history,
+            {role: 'user' as const, content: trimmed},
+        ];
         try {
-            const messagesPayload = [
-                {
-                    role: 'system' as const,
-                    content: [
-                        'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
-                        'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
-                        'The market design is configurable. If there are multiple markets, help the user structure the order of the markets.',
-                        'Use the following world JSON as authoritative context.',
-                        'Remember that the user does not know about the JSON and sees the graph visualized instead. Do not quote position fields or JSON; they are irrelevant.',
-                        '',
-                        'WORLD_JSON:',
-                        worldJson,
-                    ].join('\n'),
-                },
-                ...history,
-                {role: 'user' as const, content: trimmed},
-            ];
-
             const resp = await fetch(`/rag/v1/chat/completions`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -141,41 +140,20 @@ export default function DiscussSimulationChat({
                 throw new Error('Missing response body stream.');
             }
 
-            const reader = resp.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let assistantText = '';
+            const body = await resp.text()
+            const response = JSON.parse(body) as {
+                choices: Array<{ message?: { content?: string } }>;
+            };
 
-            while (true) {
-                const {done, value} = await reader.read();
-                if (done) break;
-
-                buffer += decoder.decode(value, {stream: true});
-                const lines = buffer.split('\n');
-                buffer = lines.pop() ?? '';
-
-                for (const line of lines) {
-                    const trimmedLine = line.trim();
-                    if (!trimmedLine || !trimmedLine.startsWith('data:')) continue;
-                    const data = trimmedLine.slice('data:'.length).trim();
-                    if (data === '[DONE]') {
-                        break;
-                    }
-                    const chunk = JSON.parse(data) as {
-                        choices?: Array<{delta?: {content?: string}}>;
-                    };
-                    const content = chunk.choices?.[0]?.delta?.content;
-                    if (!content) {
-                        continue;
-                    }
-                    assistantText += content;
-                    setMessages((prev) => {
-                        const next = [...prev];
-                        next[next.length - 1] = {role: 'assistant', content: assistantText};
-                        return next;
-                    });
-                }
+            const reply = response?.choices[0].message?.content;
+            if (!reply) {
+                throw new Error('Missing response body content.');
             }
+            setMessages((prev) => {
+                const next = [...prev];
+                next[next.length - 1] = {role: 'assistant', content: reply};
+                return next;
+            });
         } catch (e) {
             console.error(e);
             setMessages((prev) => prev.slice(0, -1));
@@ -226,9 +204,13 @@ export default function DiscussSimulationChat({
                         className="w-full border rounded px-2 py-1 text-xs"
                         disabled={isLoadingModels || isSending}
                     >
-                        <option value="" disabled>-- select model --</option>
+                        <option value=""
+                                disabled>
+                            -- select model --
+                        </option>
                         {models.map((m) => (
-                            <option key={m.id} value={m.id}>{m.id}</option>
+                            <option key={m.id}
+                                    value={m.id}>{m.id}</option>
                         ))}
                     </select>
                 )}
@@ -257,7 +239,7 @@ export default function DiscussSimulationChat({
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
-                                code(props: {inline?: boolean; children?: React.ReactNode; className?: string}) {
+                                code(props: { inline?: boolean; children?: React.ReactNode; className?: string }) {
                                     const {inline, children, className} = props;
                                     if (inline) {
                                         return (
@@ -284,7 +266,10 @@ export default function DiscussSimulationChat({
                 ))}
                 {isSending && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <CircularProgress size={16} thickness={5} color="success" />
+                        <CircularProgress
+                            size={16}
+                            thickness={5}
+                            color="success"/>
                         Waiting for OpenAI...
                     </div>
                 )}
@@ -293,7 +278,7 @@ export default function DiscussSimulationChat({
                         {error}
                     </div>
                 )}
-                <div ref={endRef} />
+                <div ref={endRef}/>
             </div>
 
             <div className="p-3 border-t border-gray-200 flex gap-2">

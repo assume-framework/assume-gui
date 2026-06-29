@@ -44,12 +44,6 @@ def _filter_response_headers(headers: httpx.Headers) -> dict[str, str]:
 
 
 def _openai_headers(headers: httpx.Headers) -> dict[str, str]:
-    if not OPENAI_API_KEY:
-        raise HTTPException(
-            status_code=500,
-            detail="OPENAI_API_KEY is not configured on the server.",
-        )
-
     filtered = _filter_request_headers(headers)
     filtered.pop("accept-encoding", None)
     filtered["authorization"] = f"Bearer {OPENAI_API_KEY}"
