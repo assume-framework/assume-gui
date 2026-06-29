@@ -6,9 +6,11 @@ from fastapi.responses import StreamingResponse
 
 router = APIRouter()
 
-OLLAMA_UPSTREAM_BASE_URL = os.getenv(
-    "OLLAMA_BASE_URL", "http://localhost:11434"
-).rstrip("/")
+_openai_base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com").rstrip("/")
+if _openai_base_url.endswith("/v1"):
+    _openai_base_url = _openai_base_url[:-3]
+OPENAI_UPSTREAM_BASE_URL = _openai_base_url
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
 GRAFANA_UPSTREAM_BASE_URL = os.getenv(
     "GRAFANA_BASE_URL", "http://localhost:3000"
 ).rstrip("/")
@@ -41,31 +43,43 @@ def _filter_response_headers(headers: httpx.Headers) -> dict[str, str]:
     }
 
 
+def _openai_headers(headers: httpx.Headers) -> dict[str, str]:
+    if not OPENAI_API_KEY:
+        raise HTTPException(
+            status_code=500,
+            detail="OPENAI_API_KEY is not configured on the server.",
+        )
+
+    filtered = _filter_request_headers(headers)
+    filtered.pop("accept-encoding", None)
+    filtered["authorization"] = f"Bearer {OPENAI_API_KEY}"
+    return filtered
+
+
 async def _proxy_stream(
     request: Request,
     *,
     upstream_base: str,
     upstream_path: str,
+    request_headers: dict[str, str] | None = None,
 ) -> StreamingResponse:
     query = request.url.query
     upstream_url = f"{upstream_base}/{upstream_path.lstrip('/')}"
     if query:
         upstream_url = f"{upstream_url}?{query}"
 
-    headers = _filter_request_headers(request.headers)
-    # Avoid transparent encoding differences when proxying streaming responses.
-    headers.pop("accept-encoding", None)
+    headers = request_headers or _filter_request_headers(request.headers)
+    body = await request.body()
 
     async with httpx.AsyncClient(timeout=None) as client:
         try:
-            resp = await client.request(
+            request_obj = client.build_request(
                 request.method,
                 upstream_url,
-                follow_redirects=True,
-                params=request.query_params,
                 headers=headers,
-                content=await request.body(),
+                content=body,
             )
+            resp = await client.send(request_obj, stream=True, follow_redirects=True)
         except httpx.HTTPError as e:
             raise HTTPException(
                 status_code=502,
@@ -75,6 +89,15 @@ async def _proxy_stream(
         response_headers = _filter_response_headers(resp.headers)
         media_type = resp.headers.get("content-type")
         status_code = resp.status_code
+
+        if status_code >= 400:
+            text = await resp.aread()
+            await resp.aclose()
+            detail = text.decode("utf-8", errors="replace").strip()
+            raise HTTPException(
+                status_code=status_code,
+                detail=detail or f"Request failed ({status_code})",
+            )
 
         async def iter_bytes():
             try:
@@ -91,23 +114,14 @@ async def _proxy_stream(
         )
 
 
-@router.api_route("/ollama/api/tags", methods=["GET", "POST", "OPTIONS"])
-async def ollama_tags_proxy(request: Request) -> StreamingResponse:
-    # Tags responses are small JSON; streaming proxy is still fine and simpler.
+@router.api_route("/rag/{path:path}", methods=["GET", "POST", "OPTIONS"])
+async def openai_proxy(path: str, request: Request) -> StreamingResponse:
+    headers = _openai_headers(request.headers)
     return await _proxy_stream(
         request,
-        upstream_base=OLLAMA_UPSTREAM_BASE_URL,
-        upstream_path="api/tags",
-    )
-
-
-@router.api_route("/ollama/api/generate", methods=["POST", "OPTIONS"])
-async def ollama_generate_proxy(request: Request) -> StreamingResponse:
-    # Streaming must be preserved for `stream: true`.
-    return await _proxy_stream(
-        request,
-        upstream_base=OLLAMA_UPSTREAM_BASE_URL,
-        upstream_path="api/generate",
+        upstream_base=OPENAI_UPSTREAM_BASE_URL,
+        upstream_path=path,
+        request_headers=headers,
     )
 
 

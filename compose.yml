@@ -8,7 +8,8 @@ services:
     environment:
       DATABASE_URL: "postgresql://${POSTGRES_USER}@assume_db:5432/assume?password=${POSTGRES_PASSWORD}"
       GRAFANA_BASE_URL: http://grafana:3000
-      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
+      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
     volumes:
       - ./gui-tmp:/server/backend/tmp
   grafana:

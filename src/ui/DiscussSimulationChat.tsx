@@ -5,12 +5,12 @@ import remarkGfm from 'remark-gfm';
 
 type ChatRole = 'user' | 'assistant' | 'system';
 type ChatMessage = {role: ChatRole; content: string};
-type OllamaModel = {name: string};
+type OpenAIModel = {id: string};
 
-const OLLAMA_MODEL_KEY = 'ollama_model';
+const OPENAI_MODEL_KEY = 'openai_model';
 /** Build-time default; must use the `VITE_` prefix so Vite exposes it to the client. */
-const GLOBAL_OLLAMA_MODEL = import.meta.env.VITE_OLLAMA_MODEL?.trim() ?? '';
-const HAS_GLOBAL_OLLAMA_MODEL = GLOBAL_OLLAMA_MODEL.length > 0;
+const GLOBAL_OPENAI_MODEL = import.meta.env.VITE_OPENAI_MODEL?.trim() ?? '';
+const HAS_GLOBAL_OPENAI_MODEL = GLOBAL_OPENAI_MODEL.length > 0;
 
 export default function DiscussSimulationChat({
     open,
@@ -31,9 +31,9 @@ export default function DiscussSimulationChat({
     const [input, setInput] = useState('');
     const [isSending, setIsSending] = useState(false);
     const [error, setError] = useState<string>('');
-    const [models, setModels] = useState<OllamaModel[]>([]);
+    const [models, setModels] = useState<OpenAIModel[]>([]);
     const [selectedModel, setSelectedModel] = useState<string>(
-        HAS_GLOBAL_OLLAMA_MODEL ? GLOBAL_OLLAMA_MODEL : localStorage.getItem(OLLAMA_MODEL_KEY) ?? '',
+        HAS_GLOBAL_OPENAI_MODEL ? GLOBAL_OPENAI_MODEL : localStorage.getItem(OPENAI_MODEL_KEY) ?? '',
     );
     const [isLoadingModels, setIsLoadingModels] = useState(false);
     const [isAtBottom, setIsAtBottom] = useState(true);
@@ -59,29 +59,29 @@ export default function DiscussSimulationChat({
         setIsLoadingModels(true);
         setError('');
         try {
-            const resp = await fetch(`/ollama/api/tags`);
+            const resp = await fetch(`/rag/v1/models`);
             if (!resp.ok) {
                 throw new Error(`Request failed (${resp.status})`);
             }
-            const body = (await resp.json()) as {models?: OllamaModel[]};
-            const loadedModels = body.models ?? [];
+            const body = (await resp.json()) as {data?: OpenAIModel[]};
+            const loadedModels = body.data ?? [];
             setModels(loadedModels);
 
             if (!selectedModel && loadedModels.length > 0) {
-                const model = loadedModels[0].name;
+                const model = loadedModels[0].id;
                 setSelectedModel(model);
-                localStorage.setItem(OLLAMA_MODEL_KEY, model);
+                localStorage.setItem(OPENAI_MODEL_KEY, model);
             }
         } catch (e) {
             console.error(e);
-            setError('Could not load Ollama models. Check the URL and CORS settings.');
+            setError('Could not load OpenAI models. Check the API proxy and credentials.');
         } finally {
             setIsLoadingModels(false);
         }
     };
 
     useEffect(() => {
-        if (!HAS_GLOBAL_OLLAMA_MODEL) {
+        if (!HAS_GLOBAL_OPENAI_MODEL) {
             fetchModels();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -91,7 +91,7 @@ export default function DiscussSimulationChat({
         const trimmed = input.trim();
         if (!trimmed || isSending) return;
         if (!selectedModel) {
-            setError('Please select an Ollama model first.');
+            setError('Please select an OpenAI model first.');
             return;
         }
 
@@ -104,30 +104,30 @@ export default function DiscussSimulationChat({
         setMessages((prev) => [...prev, {role: 'assistant', content: ''}]);
 
         try {
-            const prompt = [
-                'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
-                'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
-                'The market design is configurable. If there are multiple markets, help the user to structure the order of the markets.',
-                'Use the following world JSON as authoritative context.',
-                'Remember that the user does not know about the json - but sees the graph visualized. Do not quote position fields or json - they are irrelevant.',
-                '',
-                'WORLD_JSON:',
-                worldJson,
-                '',
-                'CHAT HISTORY:',
-                ...history.map((m) => `${m.role.toUpperCase()}: ${m.content}`),
-                '',
-                `USER: ${trimmed}`,
-                'ASSISTANT:',
-            ].join('\n');
+            const messagesPayload = [
+                {
+                    role: 'system' as const,
+                    content: [
+                        'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
+                        'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
+                        'The market design is configurable. If there are multiple markets, help the user structure the order of the markets.',
+                        'Use the following world JSON as authoritative context.',
+                        'Remember that the user does not know about the JSON and sees the graph visualized instead. Do not quote position fields or JSON; they are irrelevant.',
+                        '',
+                        'WORLD_JSON:',
+                        worldJson,
+                    ].join('\n'),
+                },
+                ...history,
+                {role: 'user' as const, content: trimmed},
+            ];
 
-            const resp = await fetch(`/ollama/api/generate`, {
+            const resp = await fetch(`/rag/v1/chat/completions`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
                     model: selectedModel,
-                    prompt,
-                    think: false,
+                    messages: messagesPayload,
                     stream: true,
                 }),
             });
@@ -156,25 +156,30 @@ export default function DiscussSimulationChat({
 
                 for (const line of lines) {
                     const trimmedLine = line.trim();
-                    if (!trimmedLine) continue;
-                    const chunk = JSON.parse(trimmedLine) as {response?: string; done?: boolean};
-                    if (chunk.response) {
-                        assistantText += chunk.response;
-                        setMessages((prev) => {
-                            const next = [...prev];
-                            next[next.length - 1] = {role: 'assistant', content: assistantText};
-                            return next;
-                        });
-                    }
-                    if (chunk.done) {
+                    if (!trimmedLine || !trimmedLine.startsWith('data:')) continue;
+                    const data = trimmedLine.slice('data:'.length).trim();
+                    if (data === '[DONE]') {
                         break;
                     }
+                    const chunk = JSON.parse(data) as {
+                        choices?: Array<{delta?: {content?: string}}>;
+                    };
+                    const content = chunk.choices?.[0]?.delta?.content;
+                    if (!content) {
+                        continue;
+                    }
+                    assistantText += content;
+                    setMessages((prev) => {
+                        const next = [...prev];
+                        next[next.length - 1] = {role: 'assistant', content: assistantText};
+                        return next;
+                    });
                 }
             }
         } catch (e) {
             console.error(e);
             setMessages((prev) => prev.slice(0, -1));
-            setError('Failed to connect to Ollama. Check that it is reachable and allows browser requests.');
+            setError('Failed to connect to OpenAI. Check the proxy and API credentials.');
         } finally {
             setIsSending(false);
         }
@@ -200,7 +205,7 @@ export default function DiscussSimulationChat({
 
             <div className="p-3 border-b border-gray-200 space-y-2">
                 <div className="flex gap-2">
-                    {!HAS_GLOBAL_OLLAMA_MODEL && (
+                    {!HAS_GLOBAL_OPENAI_MODEL && (
                         <button
                             type="button"
                             className="px-2 py-1 rounded border text-xs hover:bg-gray-50"
@@ -211,25 +216,25 @@ export default function DiscussSimulationChat({
                         </button>
                     )}
                 </div>
-                {!HAS_GLOBAL_OLLAMA_MODEL && (
+                {!HAS_GLOBAL_OPENAI_MODEL && (
                     <select
                         value={selectedModel}
                         onChange={(e) => {
                             setSelectedModel(e.target.value);
-                            localStorage.setItem(OLLAMA_MODEL_KEY, e.target.value);
+                            localStorage.setItem(OPENAI_MODEL_KEY, e.target.value);
                         }}
                         className="w-full border rounded px-2 py-1 text-xs"
                         disabled={isLoadingModels || isSending}
                     >
                         <option value="" disabled>-- select model --</option>
                         {models.map((m) => (
-                            <option key={m.name} value={m.name}>{m.name}</option>
+                            <option key={m.id} value={m.id}>{m.id}</option>
                         ))}
                     </select>
                 )}
-                {HAS_GLOBAL_OLLAMA_MODEL && (
+                {HAS_GLOBAL_OPENAI_MODEL && (
                     <div className="text-xs text-gray-600">
-                        Using model: <span className="font-semibold">{GLOBAL_OLLAMA_MODEL}</span>
+                        Using model: <span className="font-semibold">{GLOBAL_OPENAI_MODEL}</span>
                     </div>
                 )}
             </div>
@@ -280,7 +285,7 @@ export default function DiscussSimulationChat({
                 {isSending && (
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                         <CircularProgress size={16} thickness={5} color="success" />
-                        Waiting for Ollama...
+                        Waiting for OpenAI...
                     </div>
                 )}
                 {error && (
