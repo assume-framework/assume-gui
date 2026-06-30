@@ -5,7 +5,7 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 const apiTarget = process.env.VITE_API_TARGET ?? 'http://localhost:8000';
 const grafanaTarget = process.env.GRAFANA_BASE_URL ?? 'http://localhost:3000';
-const ollamaTarget = process.env.OLLAMA_BASE_URL ?? 'http://localhost:11434';
+const openaiTarget = process.env.OPENAI_BASE_URL ?? 'http://localhost:4000';
 
 export default defineConfig({
   plugins: [
@@ -32,10 +32,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/grafana/, ''),
       },
-      '/ollama': {
-        target: ollamaTarget,
+      '/openai': {
+        target: openaiTarget,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/ollama/, ''),
+        rewrite: (path) => path.replace(/^\/openai/, ''),
       },
     },
   },
