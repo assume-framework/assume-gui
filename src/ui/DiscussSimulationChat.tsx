@@ -118,7 +118,7 @@ export default function DiscussSimulationChat({
                 ].join('\n'),
             },
             ...history,
-            {role: 'user' as const, content: trimmed},
+            {role: 'user', content: trimmed},
         ];
         try {
             const resp = await fetch(`/openai/v1/chat/completions`, {
