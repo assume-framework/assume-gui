@@ -59,7 +59,7 @@ export default function DiscussSimulationChat({
         setIsLoadingModels(true);
         setError('');
         try {
-            const resp = await fetch(`/rag/v1/models`);
+            const resp = await fetch(`/openai/v1/models`);
             if (!resp.ok) {
                 throw new Error(`Request failed (${resp.status})`);
             }
@@ -105,7 +105,7 @@ export default function DiscussSimulationChat({
 
         const messagesPayload = [
             {
-                role: 'system' as const,
+                role: 'system',
                 content: [
                     'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
                     'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
@@ -121,7 +121,7 @@ export default function DiscussSimulationChat({
             {role: 'user' as const, content: trimmed},
         ];
         try {
-            const resp = await fetch(`/rag/v1/chat/completions`, {
+            const resp = await fetch(`/openai/v1/chat/completions`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({

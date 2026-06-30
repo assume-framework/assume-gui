@@ -32,10 +32,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/grafana/, ''),
       },
-      '/rag': {
+      '/openai': {
         target: openaiTarget,
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/rag/, ''),
+        rewrite: (path) => path.replace(/^\/openai/, ''),
       },
     },
   },

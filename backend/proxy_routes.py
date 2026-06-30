@@ -108,7 +108,7 @@ async def _proxy_stream(
         )
 
 
-@router.api_route("/rag/{path:path}", methods=["GET", "POST", "OPTIONS"])
+@router.api_route("/openai/{path:path}", methods=["GET", "POST", "OPTIONS"])
 async def openai_proxy(path: str, request: Request) -> StreamingResponse:
     headers = _openai_headers(request.headers)
     return await _proxy_stream(
