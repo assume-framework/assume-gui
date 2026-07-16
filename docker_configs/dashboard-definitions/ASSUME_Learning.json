@@ -211,11 +211,7 @@
       "id": 50,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -256,43 +252,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -331,9 +313,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false,
             "naming": {
               "asLabels": false
@@ -410,11 +390,7 @@
       "id": 51,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -455,43 +431,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -530,9 +492,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false,
             "naming": {
               "asLabels": false
@@ -622,11 +582,7 @@
       "id": 31,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -667,43 +623,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -742,9 +684,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false,
             "naming": {
               "asLabels": false
@@ -821,11 +761,7 @@
       "id": 37,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -866,43 +802,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -941,9 +863,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false,
             "naming": {
               "asLabels": false
@@ -1020,11 +940,7 @@
       "id": 38,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1065,43 +981,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -1140,9 +1042,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false,
             "naming": {
               "asLabels": false
@@ -1219,11 +1119,7 @@
       "id": 39,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1264,43 +1160,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -1339,9 +1221,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false,
             "naming": {
               "asLabels": false
@@ -1443,12 +1323,7 @@
       "id": 41,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "sum"
-          ],
+          "calcs": ["min", "max", "mean", "sum"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1477,43 +1352,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -1552,9 +1413,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false
           }
         }
@@ -1640,12 +1499,7 @@
       "id": 43,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "sum"
-          ],
+          "calcs": ["min", "max", "mean", "sum"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1674,43 +1528,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -1749,9 +1589,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false
           }
         }
@@ -1837,12 +1675,7 @@
       "id": 44,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "sum"
-          ],
+          "calcs": ["min", "max", "mean", "sum"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1871,43 +1704,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -1946,9 +1765,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false
           }
         }
@@ -2034,12 +1851,7 @@
       "id": 45,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean",
-            "sum"
-          ],
+          "calcs": ["min", "max", "mean", "sum"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -2068,43 +1880,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -2143,9 +1941,7 @@
         {
           "id": "partitionByValues",
           "options": {
-            "fields": [
-              "unit"
-            ],
+            "fields": ["unit"],
             "keepFields": false
           }
         }
@@ -2220,11 +2016,7 @@
       "id": 46,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -2253,43 +2045,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -2431,11 +2209,7 @@
       "id": 47,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -2464,43 +2238,29 @@
           "select": [
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "reward"
-                ],
+                "params": ["reward"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg",
-                  "24"
-                ],
+                "params": ["avg", "24"],
                 "type": "moving_window"
               },
               {
-                "params": [
-                  "avg_reward"
-                ],
+                "params": ["avg_reward"],
                 "type": "alias"
               }
             ]
@@ -2642,12 +2402,8 @@
       },
       {
         "current": {
-          "text": [
-            "pp_6"
-          ],
-          "value": [
-            "pp_6"
-          ]
+          "text": ["pp_6"],
+          "value": ["pp_6"]
         },
         "datasource": {
           "type": "postgres",
@@ -2672,15 +2428,7 @@
     "to": "2019-03-31T21:59:59.000Z"
   },
   "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h",
-      "2h"
-    ]
+    "refresh_intervals": ["5s", "1m", "5m", "15m", "30m", "1h", "2h"]
   },
   "timezone": "",
   "title": "ASSUME: Training progress",

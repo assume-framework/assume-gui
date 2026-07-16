@@ -6,22 +6,22 @@ services:
     ports:
       - 9090:8000
     environment:
-      DATABASE_URL: "postgresql://${POSTGRES_USER}@assume_db:5432/assume?password=${POSTGRES_PASSWORD}"
+      DATABASE_URL: 'postgresql://${POSTGRES_USER}@assume_db:5432/assume?password=${POSTGRES_PASSWORD}'
       GRAFANA_BASE_URL: http://grafana:3000
     volumes:
       - ./gui-tmp:/server/backend/tmp
   grafana:
     image: grafana/grafana-oss:latest
     container_name: assume_grafana
-    user: "104"
+    user: '104'
     depends_on:
       - assume_db
     ports:
       - 3000:3000
     environment:
-      GF_SECURITY_ALLOW_EMBEDDING: "true"
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_INSTALL_PLUGINS: "marcusolsson-dynamictext-panel,orchestracities-map-panel"
+      GF_SECURITY_ALLOW_EMBEDDING: 'true'
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_INSTALL_PLUGINS: 'marcusolsson-dynamictext-panel,orchestracities-map-panel'
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
       GF_USERS_DEFAULT_THEME: light
@@ -42,7 +42,7 @@ services:
     container_name: assume_db
     restart: always
     # running as 0 removes the need to create the volume bind-mount beforehand
-    user: "0:0"
+    user: '0:0'
     ports:
       - 5432:5432
     environment:

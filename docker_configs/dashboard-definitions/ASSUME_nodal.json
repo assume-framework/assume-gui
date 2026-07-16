@@ -142,11 +142,7 @@
                 "min": 2
               }
             },
-            "displayProperties": [
-              "bus0",
-              "bus1",
-              "usage"
-            ],
+            "displayProperties": ["bus0", "bus1", "usage"],
             "location": {
               "geohash": "geometry",
               "geojson": "geometry",
@@ -182,9 +178,7 @@
           "select": [
             [
               {
-                "params": [
-                  "r"
-                ],
+                "params": ["r"],
                 "type": "column"
               }
             ]
@@ -286,9 +280,7 @@
       "id": 103,
       "options": {
         "legend": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -309,16 +301,11 @@
           "format": "time_series",
           "group": [
             {
-              "params": [
-                "$__interval",
-                "none"
-              ],
+              "params": ["$__interval", "none"],
               "type": "time"
             },
             {
-              "params": [
-                "unit_id"
-              ],
+              "params": ["unit_id"],
               "type": "column"
             }
           ],
@@ -329,35 +316,25 @@
           "select": [
             [
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "column"
               },
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "alias"
               }
             ]
@@ -391,21 +368,13 @@
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "market_id",
-                "=",
-                "'$market'"
-              ],
+              "params": ["market_id", "=", "'$market'"],
               "type": "expression"
             },
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "simulation",
-                "=",
-                "'$simulation'"
-              ],
+              "params": ["simulation", "=", "'$simulation'"],
               "type": "expression"
             }
           ]
@@ -543,18 +512,12 @@
       "maxPerRow": 4,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "max",
-            "mean"
-          ],
+          "calcs": ["min", "max", "mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "timezone": [
-          ""
-        ],
+        "timezone": [""],
         "tooltip": {
           "maxHeight": 600,
           "mode": "multi",
@@ -578,9 +541,7 @@
           "select": [
             [
               {
-                "params": [
-                  "supply_volume"
-                ],
+                "params": ["supply_volume"],
                 "type": "column"
               }
             ]
@@ -688,9 +649,7 @@
       "id": 19,
       "options": {
         "legend": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -710,16 +669,11 @@
           "format": "time_series",
           "group": [
             {
-              "params": [
-                "$__interval",
-                "none"
-              ],
+              "params": ["$__interval", "none"],
               "type": "time"
             },
             {
-              "params": [
-                "unit_id"
-              ],
+              "params": ["unit_id"],
               "type": "column"
             }
           ],
@@ -730,35 +684,25 @@
           "select": [
             [
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "column"
               },
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "alias"
               }
             ]
@@ -775,21 +719,13 @@
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "market_id",
-                "=",
-                "'$market'"
-              ],
+              "params": ["market_id", "=", "'$market'"],
               "type": "expression"
             },
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "simulation",
-                "=",
-                "'$simulation'"
-              ],
+              "params": ["simulation", "=", "'$simulation'"],
               "type": "expression"
             }
           ]
@@ -869,9 +805,7 @@
       "id": 20,
       "options": {
         "legend": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -891,16 +825,11 @@
           "format": "time_series",
           "group": [
             {
-              "params": [
-                "$__interval",
-                "none"
-              ],
+              "params": ["$__interval", "none"],
               "type": "time"
             },
             {
-              "params": [
-                "unit_id"
-              ],
+              "params": ["unit_id"],
               "type": "column"
             }
           ],
@@ -911,35 +840,25 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "column"
               },
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "alias"
               }
             ]
@@ -956,21 +875,13 @@
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "market_id",
-                "=",
-                "'$market'"
-              ],
+              "params": ["market_id", "=", "'$market'"],
               "type": "expression"
             },
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "simulation",
-                "=",
-                "'$simulation'"
-              ],
+              "params": ["simulation", "=", "'$simulation'"],
               "type": "expression"
             }
           ]
@@ -1032,14 +943,7 @@
     "to": "2019-01-08T23:00:00.000Z"
   },
   "timepicker": {
-    "refresh_intervals": [
-      "5s",
-      "1m",
-      "5m",
-      "15m",
-      "30m",
-      "1h"
-    ]
+    "refresh_intervals": ["5s", "1m", "5m", "15m", "30m", "1h"]
   },
   "timezone": "",
   "title": "ASSUME: Nodal view",
