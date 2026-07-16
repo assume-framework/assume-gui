@@ -178,9 +178,7 @@
           "select": [
             [
               {
-                "params": [
-                  "power"
-                ],
+                "params": ["power"],
                 "type": "column"
               }
             ]
@@ -324,18 +322,12 @@
       "maxPerRow": 4,
       "options": {
         "legend": {
-          "calcs": [
-            "min",
-            "mean",
-            "max"
-          ],
+          "calcs": ["min", "mean", "max"],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
         },
-        "timezone": [
-          ""
-        ],
+        "timezone": [""],
         "tooltip": {
           "maxHeight": 600,
           "mode": "multi",
@@ -358,9 +350,7 @@
           "select": [
             [
               {
-                "params": [
-                  "supply_volume"
-                ],
+                "params": ["supply_volume"],
                 "type": "column"
               }
             ]
@@ -391,9 +381,7 @@
           "select": [
             [
               {
-                "params": [
-                  "supply_volume"
-                ],
+                "params": ["supply_volume"],
                 "type": "column"
               }
             ]
@@ -504,16 +492,11 @@
           "format": "time_series",
           "group": [
             {
-              "params": [
-                "$__interval",
-                "none"
-              ],
+              "params": ["$__interval", "none"],
               "type": "time"
             },
             {
-              "params": [
-                "unit_id"
-              ],
+              "params": ["unit_id"],
               "type": "column"
             }
           ],
@@ -524,35 +507,25 @@
           "select": [
             [
               {
-                "params": [
-                  "original_price"
-                ],
+                "params": ["original_price"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "column"
               },
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "alias"
               }
             ]
@@ -569,21 +542,13 @@
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "market_id",
-                "=",
-                "'$market'"
-              ],
+              "params": ["market_id", "=", "'$market'"],
               "type": "expression"
             },
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "simulation",
-                "=",
-                "'$simulation'"
-              ],
+              "params": ["simulation", "=", "'$simulation'"],
               "type": "expression"
             }
           ]
@@ -662,9 +627,7 @@
       "id": 20,
       "options": {
         "legend": {
-          "calcs": [
-            "mean"
-          ],
+          "calcs": ["mean"],
           "displayMode": "table",
           "placement": "right",
           "showLegend": true
@@ -685,16 +648,11 @@
           "format": "time_series",
           "group": [
             {
-              "params": [
-                "$__interval",
-                "none"
-              ],
+              "params": ["$__interval", "none"],
               "type": "time"
             },
             {
-              "params": [
-                "unit_id"
-              ],
+              "params": ["unit_id"],
               "type": "column"
             }
           ],
@@ -705,35 +663,25 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "column"
               },
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "alias"
               }
             ]
@@ -750,21 +698,13 @@
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "market_id",
-                "=",
-                "'$market'"
-              ],
+              "params": ["market_id", "=", "'$market'"],
               "type": "expression"
             },
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "simulation",
-                "=",
-                "'$simulation'"
-              ],
+              "params": ["simulation", "=", "'$simulation'"],
               "type": "expression"
             }
           ]
@@ -915,9 +855,7 @@
           "select": [
             [
               {
-                "params": [
-                  "power"
-                ],
+                "params": ["power"],
                 "type": "column"
               }
             ]
@@ -1006,9 +944,7 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": [
-            "sum"
-          ],
+          "reducer": ["sum"],
           "show": false
         },
         "showHeader": true,
@@ -1036,9 +972,7 @@
           "select": [
             [
               {
-                "params": [
-                  "power"
-                ],
+                "params": ["power"],
                 "type": "column"
               }
             ]
@@ -1089,10 +1023,7 @@
       },
       "id": 7,
       "options": {
-        "displayLabels": [
-          "value",
-          "name"
-        ],
+        "displayLabels": ["value", "name"],
         "legend": {
           "displayMode": "list",
           "placement": "bottom",
@@ -1100,9 +1031,7 @@
         },
         "pieType": "pie",
         "reduceOptions": {
-          "calcs": [
-            "lastNotNull"
-          ],
+          "calcs": ["lastNotNull"],
           "fields": "/^sum$/",
           "values": true
         },
@@ -1122,9 +1051,7 @@
           "format": "table",
           "group": [
             {
-              "params": [
-                "fuel_type"
-              ],
+              "params": ["fuel_type"],
               "type": "column"
             }
           ],
@@ -1136,21 +1063,15 @@
           "select": [
             [
               {
-                "params": [
-                  "max_power"
-                ],
+                "params": ["max_power"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "max_power"
-                ],
+                "params": ["max_power"],
                 "type": "alias"
               }
             ]
@@ -1305,9 +1226,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -1356,9 +1275,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -1459,9 +1376,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -1585,16 +1500,11 @@
           "format": "time_series",
           "group": [
             {
-              "params": [
-                "$__interval",
-                "none"
-              ],
+              "params": ["$__interval", "none"],
               "type": "time"
             },
             {
-              "params": [
-                "unit_id"
-              ],
+              "params": ["unit_id"],
               "type": "column"
             }
           ],
@@ -1605,35 +1515,25 @@
           "select": [
             [
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "column"
               },
               {
-                "params": [
-                  "avg"
-                ],
+                "params": ["avg"],
                 "type": "aggregate"
               },
               {
-                "params": [
-                  "price"
-                ],
+                "params": ["price"],
                 "type": "alias"
               }
             ],
             [
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "column"
               },
               {
-                "params": [
-                  "unit_id"
-                ],
+                "params": ["unit_id"],
                 "type": "alias"
               }
             ]
@@ -1650,21 +1550,13 @@
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "market_id",
-                "=",
-                "'$market'"
-              ],
+              "params": ["market_id", "=", "'$market'"],
               "type": "expression"
             },
             {
               "datatype": "text",
               "name": "",
-              "params": [
-                "simulation",
-                "=",
-                "'$simulation'"
-              ],
+              "params": ["simulation", "=", "'$simulation'"],
               "type": "expression"
             }
           ]
@@ -1803,9 +1695,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -1837,9 +1727,7 @@
           "select": [
             [
               {
-                "params": [
-                  "power"
-                ],
+                "params": ["power"],
                 "type": "column"
               }
             ]
@@ -1940,9 +1828,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -2092,9 +1978,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -2125,9 +2009,7 @@
           "select": [
             [
               {
-                "params": [
-                  "power"
-                ],
+                "params": ["power"],
                 "type": "column"
               }
             ]
@@ -2211,9 +2093,7 @@
           "select": [
             [
               {
-                "params": [
-                  "volume"
-                ],
+                "params": ["volume"],
                 "type": "column"
               }
             ]
@@ -2314,12 +2194,8 @@
       {
         "current": {
           "selected": true,
-          "text": [
-            "Unit 1"
-          ],
-          "value": [
-            "Unit 1"
-          ]
+          "text": ["Unit 1"],
+          "value": ["Unit 1"]
         },
         "datasource": {
           "type": "postgres",
@@ -2342,12 +2218,8 @@
       {
         "current": {
           "selected": true,
-          "text": [
-            "demand_EOM"
-          ],
-          "value": [
-            "demand_EOM"
-          ]
+          "text": ["demand_EOM"],
+          "value": ["demand_EOM"]
         },
         "datasource": {
           "type": "postgres",
@@ -2370,12 +2242,8 @@
       {
         "current": {
           "selected": true,
-          "text": [
-            "Storage 1"
-          ],
-          "value": [
-            "Storage 1"
-          ]
+          "text": ["Storage 1"],
+          "value": ["Storage 1"]
         },
         "datasource": {
           "type": "postgres",

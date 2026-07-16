@@ -13,17 +13,17 @@ deleteDatasources:
 # list of datasources to insert/update depending
 # what's available in the database
 datasources:
-- name: ASSUME
-  type: postgres
-  url: assume_db:5432
-  user: $POSTGRES_USER
-  database: assume
-  secureJsonData:
-    password: $POSTGRES_PASSWORD
-  jsonData:
+  - name: ASSUME
+    type: postgres
+    url: assume_db:5432
+    user: $POSTGRES_USER
     database: assume
-    sslmode: "disable"
-    postgresVersion: 1600
-    timescaledb: true
-  isDefault: true
-  editable: true
+    secureJsonData:
+      password: $POSTGRES_PASSWORD
+    jsonData:
+      database: assume
+      sslmode: 'disable'
+      postgresVersion: 1600
+      timescaledb: true
+    isDefault: true
+    editable: true
