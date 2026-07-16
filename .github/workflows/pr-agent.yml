@@ -19,5 +19,5 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CONFIG__FALLBACK_MODELS: '["openai-gpt-oss-120b"]'
           OPENAI__API_BASE: "https://chat.kiconnect.nrw/api/v1"
-          CONFIG__MODEL: "gpt-5.2"
+          CONFIG__MODEL: "gpt-5.5"
           github_action_config.pr_actions: '["opened", "reopened", "synchronize", "ready_for_review", "review_requested"]'
