@@ -74,7 +74,12 @@ const readLocalStorage = () => {
     if (!data) {
         return {};
     }
-    return JSON.parse(data);
+    try {
+        return JSON.parse(data);
+    } catch {
+    localStorage.removeItem('flow');
+        return {};
+    }
 }
 
 interface AlertState {
@@ -360,6 +365,7 @@ export default function Home() {
             }
         }
         window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
     }, [stopEditView]);
 
     return (
