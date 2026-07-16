@@ -1,11 +1,11 @@
 name: PR Agent
 on:
-  pull_request:
-      types: [opened, reopened, synchronize, ready_for_review, review_requested]
+  pull_request_target:
+    types: [opened, reopened, synchronize, ready_for_review, review_requested]
   issue_comment:
 jobs:
   pr_agent_job:
-    if: ${{ github.event.sender.type != 'Bot' && (github.event_name == 'pull_request' || github.event.issue.pull_request) }}
+    if: ${{ github.event.sender.type != 'Bot' && (github.event_name == 'pull_request_target' || github.event.issue.pull_request) }}
     runs-on: ubuntu-latest
     permissions:
       issues: write
@@ -13,7 +13,7 @@ jobs:
       contents: write
     steps:
       - name: PR Agent action step
-        uses: the-pr-agent/pr-agent@v0.36.1
+        uses: the-pr-agent/pr-agent@v0.39.0
         env:
           OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
