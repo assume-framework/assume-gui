@@ -87,3 +87,30 @@ export async function uploadFile(file: File): Promise<string> {
     const body = await result.json()
     return body['id']
 }
+
+export async function importScenario(file: File): Promise<string> {
+    const formData = new FormData()
+    formData.append('file', file)
+    const result = await fetch('/api/import', {
+        method: 'POST',
+        body: formData,
+    })
+    if (!result.ok) {
+        throw new Error('Import failed')
+    }
+    return await result.text()
+}
+
+export async function exportScenario(nodes: Node[], edges: Edge[], forecasts: Forecast): Promise<Blob> {
+    const n = nodes.map(n => ({id: n.id, type: n.type, data: n.data}));
+    const e = edges.map(e => ({id: e.id, type: e.type, source: e.source, target: e.target, data: e.data}));
+    const result = await fetch('/api/export', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({nodes: n, edges: e, forecasts: forecasts}),
+    })
+    if (!result.ok) {
+        throw new Error('Export failed')
+    }
+    return await result.blob()
+}

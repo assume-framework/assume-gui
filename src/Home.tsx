@@ -35,7 +35,7 @@ import Cockpit from "./ui/Cockpit.tsx";
 import Sidebar from "./ui/Sidebar.tsx";
 import DiscussSimulationChat from "./ui/DiscussSimulationChat.tsx";
 import type {EditSidebarData, EditSidebarProps} from "./ui/SidebarComponents/NodeEditSidebar.tsx";
-import {sendData, type DataResponse} from "./sendData.ts";
+import {sendData, type DataResponse, importScenario, exportScenario} from "./sendData.ts";
 import {buildGrafanaResultsHref, getId, initial_data, initial_world} from "./utils.ts";
 import {getLayoutedElements} from "./layout.ts";
 import {Alert, type AlertColor, Snackbar} from "@mui/material";
@@ -342,6 +342,38 @@ export default function Home() {
         setAlert({message: 'Flow saved successfully', severity: 'success'})
     }, [nodes, edges, forecast]);
 
+    const importScenarioZip = useCallback(async (file: File) => {
+        try {
+            const json = await importScenario(file);
+            const loaded = JSON.parse(json);
+            const importedNodes = (loaded['nodes'] ?? createInitialNodes()) as Node<EditSidebarData>[];
+            const importedEdges = (loaded['edges'] ?? initialEdges) as Edge<EditSidebarData>[];
+            setNodes(getLayoutedElements(importedNodes, importedEdges));
+            setEdges(importedEdges);
+            setForecast(loaded['forecasts'] ?? initialForecast);
+            window.requestAnimationFrame(() => fitView({padding: 0.1}));
+            setAlert({message: 'Scenario imported successfully', severity: 'success'});
+        } catch {
+            setAlert({message: 'Could not import the .zip scenario', severity: 'error'});
+        }
+    }, [setNodes, setEdges, setForecast, fitView]);
+
+    const exportScenarioZip = useCallback(async () => {
+        try {
+            const blob = await exportScenario(nodes, edges, forecast);
+            const href = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = href;
+            link.download = `scenario-${Date.now().toString()}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(href);
+        } catch {
+            setAlert({message: 'Could not export the scenario', severity: 'error'});
+        }
+    }, [nodes, edges, forecast]);
+
     const autoArrange = useCallback(() => {
         setNodes((nds) => getLayoutedElements(nds, edges));
         window.requestAnimationFrame(() => fitView({padding: 0.1}));
@@ -440,6 +472,8 @@ export default function Home() {
                                 download={download}
                                 setFlowByJson={setFlowByJson}
                                 autoArrange={autoArrange}
+                                importScenario={importScenarioZip}
+                                exportScenario={exportScenarioZip}
                             />
                         </Panel>
                     </ReactFlow>

@@ -1,7 +1,9 @@
 import {
     AccountTreeOutlined,
+    ArchiveOutlined,
     FileDownloadOutlined,
     FileUploadOutlined,
+    FolderZipOutlined,
     ReplayOutlined,
     SaveOutlined,
     SendOutlined
@@ -17,6 +19,8 @@ type Args = {
     save?: () => void,
     download?: () => void,
     autoArrange?: () => void,
+    importScenario?: (file: File) => void,
+    exportScenario?: () => void,
 }
 
 export default function Cockpit({
@@ -27,6 +31,8 @@ export default function Cockpit({
     save,
     download,
     autoArrange,
+    importScenario,
+    exportScenario,
 }: Args) {
     const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
         const inputElement = e.target as HTMLInputElement
@@ -41,6 +47,16 @@ export default function Cockpit({
             const data = event.target?.result
             setFlowByJson(data as string)
         }
+    }
+
+    const handleZipImport = (e: React.InputEvent<HTMLInputElement>) => {
+        const inputElement = e.target as HTMLInputElement
+        if (!inputElement.files || inputElement.files.length == 0) {
+            console.warn("No input provided!")
+            return;
+        }
+        importScenario?.(inputElement.files[0])
+        inputElement.value = ''
     }
 
     return <>
@@ -69,6 +85,19 @@ export default function Cockpit({
             accept=".json"
             className="hidden"
             onInput={handleFileUpload}
+        />
+        <CockpitElement name={"Export ASSUME (.zip)"}
+                        onClick={exportScenario}
+                        Icon={ArchiveOutlined}/>
+        <label htmlFor="zip_import" className={"cursor-pointer"}>
+            <CockpitElement name={"Import ASSUME (.zip)"} Icon={FolderZipOutlined}/>
+        </label>
+        <input
+            id="zip_import"
+            type="file"
+            accept=".zip"
+            className="hidden"
+            onInput={handleZipImport}
         />
     </>
 }
