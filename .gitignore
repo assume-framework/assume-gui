@@ -31,3 +31,4 @@ build
 .env
 /assume-db/
 /gui-tmp
+/examples/
