@@ -16,7 +16,7 @@ app.include_router(proxy_router)
 
 
 @app.post("/api/submit")
-async def send_data(data: dict):
+def send_data(data: dict):
     try:
         world = process_data(data)
         world.run()

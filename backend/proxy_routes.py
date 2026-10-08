@@ -65,47 +65,55 @@ async def _proxy_stream(
     headers = request_headers or _filter_request_headers(request.headers)
     body = await request.body()
 
-    async with httpx.AsyncClient(timeout=None) as client:
-        try:
-            request_obj = client.build_request(
-                request.method,
-                upstream_url,
-                headers=headers,
-                content=body,
-            )
-            resp = await client.send(request_obj, stream=True, follow_redirects=True)
-        except httpx.HTTPError as e:
-            raise HTTPException(
-                status_code=502,
-                detail=f"Upstream not reachable at {upstream_base}: {e}",
-            ) from e
-
-        response_headers = _filter_response_headers(resp.headers)
-        media_type = resp.headers.get("content-type")
-        status_code = resp.status_code
-
-        if status_code >= 400:
-            text = await resp.aread()
-            await resp.aclose()
-            detail = text.decode("utf-8", errors="replace").strip()
-            raise HTTPException(
-                status_code=status_code,
-                detail=detail or f"Request failed ({status_code})",
-            )
-
-        async def iter_bytes():
-            try:
-                async for chunk in resp.aiter_bytes():
-                    yield chunk
-            finally:
-                await resp.aclose()
-
-        return StreamingResponse(
-            iter_bytes(),
-            status_code=status_code,
-            media_type=media_type,
-            headers=response_headers,
+    client = httpx.AsyncClient(timeout=None)
+    try:
+        request_obj = client.build_request(
+            request.method,
+            upstream_url,
+            headers=headers,
+            content=body,
         )
+        resp = await client.send(request_obj, stream=True, follow_redirects=True)
+    except httpx.HTTPError as e:
+        await client.aclose()
+        raise HTTPException(
+            status_code=502,
+            detail=f"Upstream not reachable at {upstream_base}: {e}",
+        ) from e
+    except BaseException:
+        await client.aclose()
+        raise
+
+    response_headers = _filter_response_headers(resp.headers)
+    media_type = resp.headers.get("content-type")
+    status_code = resp.status_code
+
+    if status_code >= 400:
+        try:
+            text = await resp.aread()
+        finally:
+            await resp.aclose()
+            await client.aclose()
+        detail = text.decode("utf-8", errors="replace").strip()
+        raise HTTPException(
+            status_code=status_code,
+            detail=detail or f"Request failed ({status_code})",
+        )
+
+    async def iter_bytes():
+        try:
+            async for chunk in resp.aiter_bytes():
+                yield chunk
+        finally:
+            await resp.aclose()
+            await client.aclose()
+
+    return StreamingResponse(
+        iter_bytes(),
+        status_code=status_code,
+        media_type=media_type,
+        headers=response_headers,
+    )
 
 
 @router.api_route("/openai/{path:path}", methods=["GET", "POST", "OPTIONS"])
