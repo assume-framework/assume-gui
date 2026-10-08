@@ -1,6 +1,4 @@
-import re
 from enum import Enum
-from pathlib import Path
 from typing import TypeAlias
 
 import pandas as pd
@@ -8,7 +6,7 @@ from assume.common.exceptions import ValidationError
 from assume.common.market_objects import OnlyHours
 from assume.common.utils import load_index_file
 
-from backend.utils import read_file
+from backend.utils import is_uuid, load_forecasts, read_series, tmp_path
 
 
 class EdgeType(Enum):
@@ -66,7 +64,7 @@ class FieldConfig:
         except ValueError:
             self._error(f"{self.field} must be a valid time delta e.g. '1h'")
 
-    def only_hours(self) -> s:
+    def only_hours(self) -> OnlyHours:
         if (
             self.content is None
             or self.content == ""
@@ -96,19 +94,15 @@ class FieldConfig:
             return []
         return [value.strip() for value in self.content.split(",")]
 
-    def optional_file(self, index: pd.DatetimeIndex = None) -> f | pd.DataFrame:
+    def optional_file(self, index: pd.DatetimeIndex = None) -> f | pd.Series:
         self._check_value()
-        if not re.match(
-            r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-            self.content,
-        ):
+        if not is_uuid(self.content):
             return self.float()
         # load file
-        path = Path(__file__).parent / "tmp" / f"{self.content}.csv"
         if index is None:
-            return read_file(path)
+            return read_series(self.content)
         try:
-            data = load_index_file(path, index)
+            data = load_index_file(tmp_path(self.content), index)
             data = data[data.columns[0]]
         except Exception as e:
             self._error(f"uploaded file {self.content} for {self.field} did have {e}")
@@ -159,7 +153,7 @@ class Config:
         self.nodes = nodes
         self.edges = edges
         self.edge_targets = targets
-        self.forecasts = data.get("forecasts", {})
+        self.forecasts = load_forecasts(data.get("forecasts", {}))
         self.start, self.end, self.index = self._simulation_time()
 
     def _simulation_time(self) -> tuple[pd.Timestamp, pd.Timestamp, pd.DatetimeIndex]:
