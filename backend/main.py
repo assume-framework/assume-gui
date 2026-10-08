@@ -30,10 +30,10 @@ def send_data(data: dict):
             },
         )
     except ValueError as e:
-        logging.error("Value error: ", e)
+        logging.exception("Value error: %s", e)
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        logging.error("Internal server error: ", e)
+        logging.exception("Internal server error: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
     return {"status": "success"}
 
