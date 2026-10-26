@@ -10,12 +10,12 @@ build-backend = "setuptools.build_meta"
 name = "assume-gui"
 version = "1.1.1"
 description = "ASSUME - GUI"
-authors = [{ name = "ASSUME Developers", email = "contact@assume-project.de"}]
+authors = [{ name = "ASSUME Developers", email = "contact@assume-project.de" }]
 license = "AGPL-3.0-or-later"
 readme = "README.md"
 keywords = ["agent based simulation", "energy market", "fastapi", "user interface", "simulation"]
 
-classifiers=[
+classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
@@ -31,8 +31,9 @@ classifiers=[
 requires-python = ">=3.10"
 dependencies = [
     "fastapi[standard] >=0.119.0",
-    "assume-framework >=0.5.5",
+    "assume-framework >=0.6.0",
     "uvicorn >= 0.37.0",
+    "psycopg[binary] >= 3.3.6", #temporary
     "pandas",
     "httpx",
 ]
@@ -78,7 +79,7 @@ ignore = ["E501", "G004", "E731"]
 ]
 "tests/*" = [
     "S101", # allow assert statements for pytest
-    "ARG",  # allow unused arguments for pytest fixtures
+    "ARG", # allow unused arguments for pytest fixtures
     "F841", # allow unused local variables
 ]
 "examples/notebooks/*" = [
