@@ -1,6 +1,6 @@
 # SPDX-FileCopyrightText: ASSUME Developers
 #
-# SPDX-License-Identifier: AGPL-3.0-or-later
+# SPDX-License-Identifier: MIT
 
 # config file version
 apiVersion: 1
@@ -16,10 +16,10 @@ datasources:
 - name: ASSUME
   type: postgres
   url: assume_db:5432
-  user: $POSTGRES_USER
+  user: assume
   database: assume
   secureJsonData:
-    password: $POSTGRES_PASSWORD
+    password: assume
   jsonData:
     database: assume
     sslmode: "disable"

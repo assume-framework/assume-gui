@@ -11,7 +11,7 @@ services:
     volumes:
       - ./gui-tmp:/server/backend/tmp
   grafana:
-    image: grafana/grafana-oss:latest
+    image: grafana/grafana:latest
     container_name: assume_grafana
     user: "104"
     depends_on:
@@ -25,7 +25,8 @@ services:
       GF_SECURITY_ADMIN_USER: ${GRAFANA_USER}
       GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD}
       GF_USERS_DEFAULT_THEME: light
-      GF_SERVER_ROOT_URL: ${GRAFANA_ROOT}
+      GF_SERVER_ROOT_URL: ${GRAFANA_SCHEMA:-https}://${GRAFANA_DOMAIN}/grafana
+      GF_SECURITY_CSRF_TRUSTED_ORIGINS: ${GRAFANA_DOMAIN}
       GF_SERVER_SERVE_FROM_SUB_PATH: true
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
