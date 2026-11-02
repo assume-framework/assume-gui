@@ -26,7 +26,14 @@ export default function Sidebar({
       {nodeData ? (
         <>
           <div>
-            <CloseOutlined onClick={close} className="float-right m-5 cursor-pointer" />
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={close}
+              className="float-right m-5 cursor-pointer"
+            >
+              <CloseOutlined />
+            </button>
           </div>
           <EditSidebar
             id={nodeData.id}

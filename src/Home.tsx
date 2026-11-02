@@ -1,5 +1,3 @@
-'use client';
-
 import {
   addEdge,
   applyEdgeChanges,
@@ -137,7 +135,7 @@ export default function Home() {
             item.data.errorField &&
             item.data[item.data.errorField] !== data[item.data.errorField]
           ) {
-            // fiel with error has changed, reset error
+            // field with error has changed, reset error
             data.errorField = '';
             data.errorMessage = '';
           }
@@ -260,7 +258,7 @@ export default function Home() {
       const clientX = 'changedTouches' in event ? event.changedTouches[0].clientX : event.clientX;
       const clientY = 'changedTouches' in event ? event.changedTouches[0].clientY : event.clientY;
 
-      // create new Node at canvas coords corresponding to mouse postion
+      // create new Node at canvas coords corresponding to mouse position
       const newNodeId = getId(newNodeType);
       const newNode: Node<EditSidebarData> = {
         id: newNodeId,

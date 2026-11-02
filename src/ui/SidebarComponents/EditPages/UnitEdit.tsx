@@ -13,9 +13,7 @@ export default function UnitEdit({
 }: EditComponentArgs) {
   const onChange = handleChange(id, data, updateNodeValue);
   const reset = (value: string) => {
-    const d = initialData(value);
-    console.log(d);
-    updateNodeValue(id, d, false);
+    updateNodeValue(id, initialData(value), false);
   };
 
   return (
@@ -73,7 +71,7 @@ export default function UnitEdit({
             value={data.price}
             onChange={onChange('price')}
             errorMessage={getErrorMessage('price')}
-            tooltip="TODO" //TODO
+            tooltip="Bidding price of the demand in €/MWh"
           />
           <Modal name="Forecast settings">
             <InputOrUpload

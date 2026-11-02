@@ -15,7 +15,13 @@ import type { SvgIconComponent } from '@mui/icons-material';
 export function WorldNode({ data, isConnectable, selected }: NodeProps<Node<EditSidebarData>>) {
   return (
     <>
-      {renderUnit('World', data.name, data.errorField, PublicOutlinedIcon, selected)}
+      <NodeCard
+        label="World"
+        name={data.name}
+        hasError={!!data.errorField}
+        Icon={PublicOutlinedIcon}
+        selected={selected}
+      />
       <Handle
         id="marketProvider_handle"
         type="source"
@@ -60,7 +66,13 @@ export function MarketNode({ data, isConnectable, selected }: NodeProps<Node<Edi
         isConnectable={isConnectable}
         title="Connect units to this market"
       />
-      {renderUnit('Market', data.name, data.errorField, StorefrontOutlinedIcon, selected)}
+      <NodeCard
+        label="Market"
+        name={data.name}
+        hasError={!!data.errorField}
+        Icon={StorefrontOutlinedIcon}
+        selected={selected}
+      />
       <Handle
         id="marketProduct_handle"
         type="source"
@@ -89,13 +101,13 @@ export function MarketProviderNode({
         title="Connect from world"
       />
 
-      {renderUnit(
-        'Market Provider',
-        data.name,
-        data.errorField,
-        AccountBalanceOutlinedIcon,
-        selected
-      )}
+      <NodeCard
+        label="Market Provider"
+        name={data.name}
+        hasError={!!data.errorField}
+        Icon={AccountBalanceOutlinedIcon}
+        selected={selected}
+      />
       <Handle
         id="market_handle"
         type="source"
@@ -120,13 +132,13 @@ export function UnitNode({ data, isConnectable, selected }: NodeProps<Node<EditS
         isConnectable={isConnectable && connections.length === 0}
         title="Connect from unit operator"
       />
-      {renderUnit(
-        getUnitTypeLabel(data.unitType as string),
-        data.name,
-        data.errorField,
-        getUnitTypeIcon(data.unitType as string),
-        selected
-      )}
+      <NodeCard
+        label={getUnitTypeLabel(data.unitType as string)}
+        name={data.name}
+        hasError={!!data.errorField}
+        Icon={getUnitTypeIcon(data.unitType as string)}
+        selected={selected}
+      />
       <Handle
         id="market_handle"
         type="target"
@@ -154,7 +166,13 @@ export function UnitOperatorNode({
         isConnectable={isConnectable && connections.length === 0}
         title="Connect from world"
       />
-      {renderUnit('Unit Operator', data.name, data.errorField, AccountTreeOutlinedIcon, selected)}
+      <NodeCard
+        label="Unit Operator"
+        name={data.name}
+        hasError={!!data.errorField}
+        Icon={AccountTreeOutlinedIcon}
+        selected={selected}
+      />
       <Handle
         id="unit_handle"
         type="source"
@@ -183,13 +201,19 @@ export function MarketProductNode({
         isConnectable={isConnectable && connections.length === 0}
         title="Connect from market"
       />
-      {renderUnit('Market Product', data.name, data.errorField, Inventory2OutlinedIcon, selected)}
+      <NodeCard
+        label="Market Product"
+        name={data.name}
+        hasError={!!data.errorField}
+        Icon={Inventory2OutlinedIcon}
+        selected={selected}
+      />
     </>
   );
 }
 
-function getUnitTypeLabel(unitTpye: string): string {
-  switch (unitTpye) {
+function getUnitTypeLabel(unitType: string): string {
+  switch (unitType) {
     case 'storage':
       return 'Storage';
     case 'power_plant':
@@ -218,26 +242,30 @@ function getUnitTypeIcon(unitType: string): SvgIconComponent {
   }
 }
 
-function renderUnit(
-  name: string,
-  id: string,
-  errorField: string,
-  Icon: SvgIconComponent,
-  selected = false
-) {
-  const border_color = errorField === '' ? 'border-stone-300' : 'border-red-400';
+interface NodeCardProps {
+  /** Node kind shown in small grey text, e.g. "Market". */
+  label: string;
+  /** User-defined node name, shown in bold. */
+  name: string;
+  hasError: boolean;
+  Icon: SvgIconComponent;
+  selected?: boolean;
+}
+
+function NodeCard({ label, name, hasError, Icon, selected = false }: NodeCardProps) {
+  const borderColor = hasError ? 'border-red-400' : 'border-stone-300';
   return (
     <div
       className={`inline-flex p-0.5 rounded-md transition-shadow ${
         selected ? 'ring-2 ring-emerald-400 ring-offset-2' : ''
       }`}
     >
-      <div className={`px-2 py-0.5 shadow rounded bg-white border text-[11px] ${border_color}`}>
+      <div className={`px-2 py-0.5 shadow rounded bg-white border text-[11px] ${borderColor}`}>
         <div className="flex justify-center text-sky-700 pb-0.5">
           <Icon sx={{ fontSize: 20 }} />
         </div>
-        <div className="font-semibold">{id}</div>
-        <div className="text-[10px] text-gray-500 truncate max-w-[120px]">{name}</div>
+        <div className="font-semibold">{name}</div>
+        <div className="text-[10px] text-gray-500 truncate max-w-[120px]">{label}</div>
       </div>
     </div>
   );
