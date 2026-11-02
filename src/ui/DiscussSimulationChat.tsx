@@ -81,6 +81,8 @@ export default function DiscussSimulationChat({
 
   useEffect(() => {
     if (!HAS_GLOBAL_OPENAI_MODEL) {
+      // One-time load on mount; the loading state is set synchronously on purpose.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       fetchModels();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

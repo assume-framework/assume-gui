@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { DnDContext } from '../../DragDropCtx';
+import { DnDContext } from '../../DragDropContext';
 
 function Node({ type, name }: { type: string; name: string }) {
   const [, setType] = useContext(DnDContext);
