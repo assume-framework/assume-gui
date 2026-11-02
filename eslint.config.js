@@ -1,12 +1,13 @@
-import js from '@eslint/js'
-import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
-import tseslint from 'typescript-eslint'
-import {defineConfig, globalIgnores} from 'eslint/config'
+import js from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import globals from 'globals';
+import reactHooks from 'eslint-plugin-react-hooks';
+import reactRefresh from 'eslint-plugin-react-refresh';
+import tseslint from 'typescript-eslint';
+import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['.venv', 'backend', 'node_modules']),
+  globalIgnores(['.venv', 'backend', 'node_modules', 'dist']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -16,11 +17,15 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     rules: {
-      "@typescript-eslint/no-explicit-any": "warn"
+      '@typescript-eslint/no-explicit-any': 'warn',
+      // `== null` (null or undefined) is allowed, everything else must use ===
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
     },
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: globals.browser,
     },
   },
-])
+  // Must be last: turns off ESLint rules that conflict with Prettier
+  eslintConfigPrettier,
+]);

@@ -1,0 +1,4 @@
+# Prettier is only used for the frontend sources in src/.
+# Ignore everything at the repository root except src.
+/*
+!/src

@@ -1,9 +1,8 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import Home from './Home.tsx'
-import { ReactFlowProvider } from '@xyflow/react'
-import { DnDProvider } from './DragDropCtx.tsx'
-
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import Home from './Home.tsx';
+import { ReactFlowProvider } from '@xyflow/react';
+import { DnDProvider } from './DragDropCtx.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -12,5 +11,5 @@ createRoot(document.getElementById('root')!).render(
         <Home />
       </DnDProvider>
     </ReactFlowProvider>
-  </StrictMode>,
-)
+  </StrictMode>
+);
