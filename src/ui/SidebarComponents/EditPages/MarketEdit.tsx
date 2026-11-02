@@ -3,7 +3,7 @@ import Input from '../../InputComponents/Input';
 import Select from '../../InputComponents/Select';
 import type { EditComponentArgs } from '../NodeEditSidebar';
 
-function editMarket({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {
+function MarketEdit({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {
   const onChange = handleChange(id, data, updateNodeValue);
 
   return (
@@ -112,4 +112,4 @@ function editMarket({ id, data, updateNodeValue, getErrorMessage }: EditComponen
   );
 }
 
-export default editMarket;
+export default MarketEdit;

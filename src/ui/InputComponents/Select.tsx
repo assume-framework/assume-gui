@@ -1,4 +1,4 @@
-import { classNames, type BaseProps } from './types';
+import { inputClassName, type BaseProps } from './types';
 import { useId } from 'react';
 import { HelpOutline } from '@mui/icons-material';
 
@@ -30,7 +30,7 @@ export default function Select({
           disabled={disabled}
           onChange={(e) => onChange(e.target.value)}
           required={required}
-          className={classNames}
+          className={inputClassName}
         >
           <option disabled value="">
             -- select an option --

@@ -44,7 +44,7 @@ import Sidebar from './ui/Sidebar';
 import DiscussSimulationChat from './ui/DiscussSimulationChat';
 import type { EditSidebarData, EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar';
 import { sendData, type DataResponse } from './sendData';
-import { buildGrafanaResultsHref, getId, initial_data, initial_world } from './utils';
+import { buildGrafanaResultsHref, getId, initialData, initialWorld } from './utils';
 import { getLayoutedElements } from './layout';
 import { Alert, type AlertColor, Snackbar } from '@mui/material';
 
@@ -67,7 +67,7 @@ function createInitialNodes(): Node<EditSidebarData>[] {
       id: 'world',
       type: 'world',
       position: { x: 300, y: 0 },
-      data: initial_world(),
+      data: initialWorld(),
       deletable: false,
     },
   ];
@@ -232,7 +232,7 @@ export default function Home() {
           target: connection.target,
           targetHandle: connection.targetHandle,
           type: t,
-          data: initial_data(t),
+          data: initialData(t),
         };
         return addEdge(newEdge, eds);
       }),
@@ -266,7 +266,7 @@ export default function Home() {
         id: newNodeId,
         type: newNodeType,
         position: screenToFlowPosition({ x: clientX, y: clientY }),
-        data: initial_data(newNodeType),
+        data: initialData(newNodeType),
       };
 
       const t =
@@ -279,7 +279,7 @@ export default function Home() {
         target: newNodeId,
         targetHandle: targetHandleId,
         type: t,
-        data: initial_data(t),
+        data: initialData(t),
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -313,7 +313,7 @@ export default function Home() {
           x: event.clientX,
           y: event.clientY,
         }),
-        data: initial_data(type),
+        data: initialData(type),
       };
       setNodes((nds) => nds.concat(newNode));
     },

@@ -18,7 +18,7 @@ export function UnitMarketEdge({
   selected,
 }: EdgeProps<Edge<EditSidebarData>>) {
   const [edgePath, labelX, labelY] = getSimpleBezierPath({ sourceX, sourceY, targetX, targetY });
-  const border_color = data?.errorField ? 'border-red-400' : 'border-stone-300';
+  const borderColor = data?.errorField ? 'border-red-400' : 'border-stone-300';
   const selectedStrategy = typeof data?.strategy === 'string' ? data.strategy : undefined;
   const label = selectedStrategy
     ? (UNIT_MARKET_STRATEGY_LABELS[selectedStrategy] ?? selectedStrategy)
@@ -31,7 +31,7 @@ export function UnitMarketEdge({
           style={{
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
           }}
-          className={`nodrag nopan absolute px-1.5 py-0.5 shadow rounded bg-white border text-[10px] ${border_color} ${
+          className={`nodrag nopan absolute px-1.5 py-0.5 shadow rounded bg-white border text-[10px] ${borderColor} ${
             selected ? 'ring-2 ring-emerald-400 ring-offset-2' : ''
           }`}
         >

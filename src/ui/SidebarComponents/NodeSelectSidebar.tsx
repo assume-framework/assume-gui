@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { DnDContext } from '../../DragDropContext';
 
-function Node({ type, name }: { type: string; name: string }) {
+function DraggableNode({ type, name }: { type: string; name: string }) {
   const [, setType] = useContext(DnDContext);
 
   const onDragStart = (event: React.DragEvent, nodeType: string) => {
@@ -25,12 +25,12 @@ export default function SelectSidebar() {
     <>
       <div className="px-4 pt-4 pb-6 mb-2 text-sm">
         <div className="mb-4">Drag nodes into the canvas.</div>
-        <Node type={'marketProvider'} name={'Market Provider Node'} />
-        <Node type={'market'} name={'Market Node'} />
-        <Node type={'marketProduct'} name={'Market Product Node'} />
+        <DraggableNode type={'marketProvider'} name={'Market Provider Node'} />
+        <DraggableNode type={'market'} name={'Market Node'} />
+        <DraggableNode type={'marketProduct'} name={'Market Product Node'} />
         <div className="h-2" />
-        <Node type={'unitOperator'} name={'Unit Operator Node'} />
-        <Node type={'unit'} name={'Unit Node'} />
+        <DraggableNode type={'unitOperator'} name={'Unit Operator Node'} />
+        <DraggableNode type={'unit'} name={'Unit Node'} />
       </div>
     </>
   );
