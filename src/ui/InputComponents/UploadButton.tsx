@@ -4,7 +4,7 @@ import {
   PublishOutlined,
   UploadFileOutlined,
 } from '@mui/icons-material';
-import { uploadFile } from '../../sendData.ts';
+import { uploadFile } from '../../sendData';
 import React, { useId, useState } from 'react';
 
 interface UploadButtonProps {

@@ -3,7 +3,7 @@ import type { EditComponentArgs } from '../NodeEditSidebar';
 import Select from '../../InputComponents/Select';
 import Input from '../../InputComponents/Input';
 import Modal from '../../InputComponents/Modal';
-import { InputOrUpload } from '../../InputComponents/InputOrUpload.tsx';
+import { InputOrUpload } from '../../InputComponents/InputOrUpload';
 
 export default function editUnit({
   id,

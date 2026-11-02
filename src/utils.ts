@@ -1,4 +1,4 @@
-import type { EditSidebarData } from './ui/SidebarComponents/NodeEditSidebar.tsx';
+import type { EditSidebarData } from './ui/SidebarComponents/NodeEditSidebar';
 
 /** Parse world `datetime-local` strings as local wall time. */
 export function parseWorldDatetimeLocal(value: string): Date | null {

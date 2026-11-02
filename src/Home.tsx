@@ -36,16 +36,16 @@ import {
   UnitOperatorNode,
   WorldNode,
 } from './ui/Nodes';
-import { type Forecast } from './ui/SidebarComponents/UploadSidebar.tsx';
+import { type Forecast } from './ui/SidebarComponents/UploadSidebar';
 import Header from './Header';
 import Footer from './Footer';
-import Cockpit from './ui/Cockpit.tsx';
-import Sidebar from './ui/Sidebar.tsx';
-import DiscussSimulationChat from './ui/DiscussSimulationChat.tsx';
-import type { EditSidebarData, EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar.tsx';
-import { sendData, type DataResponse } from './sendData.ts';
-import { buildGrafanaResultsHref, getId, initial_data, initial_world } from './utils.ts';
-import { getLayoutedElements } from './layout.ts';
+import Cockpit from './ui/Cockpit';
+import Sidebar from './ui/Sidebar';
+import DiscussSimulationChat from './ui/DiscussSimulationChat';
+import type { EditSidebarData, EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar';
+import { sendData, type DataResponse } from './sendData';
+import { buildGrafanaResultsHref, getId, initial_data, initial_world } from './utils';
+import { getLayoutedElements } from './layout';
 import { Alert, type AlertColor, Snackbar } from '@mui/material';
 
 const nodeTypes = {

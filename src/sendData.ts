@@ -1,5 +1,5 @@
 import type { Node, Edge } from '@xyflow/react';
-import type { Forecast } from './ui/SidebarComponents/UploadSidebar.tsx';
+import type { Forecast } from './ui/SidebarComponents/UploadSidebar';
 
 export interface DataResponse {
   success: boolean;

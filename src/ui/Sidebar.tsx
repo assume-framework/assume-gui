@@ -1,9 +1,9 @@
 import EditSidebar, {
   type EditSidebarData,
   type EditSidebarProps,
-} from './SidebarComponents/NodeEditSidebar.tsx';
-import SelectSidebar from './SidebarComponents/NodeSelectSidebar.tsx';
-import UploadSidebar, { type Forecast } from './SidebarComponents/UploadSidebar.tsx';
+} from './SidebarComponents/NodeEditSidebar';
+import SelectSidebar from './SidebarComponents/NodeSelectSidebar';
+import UploadSidebar, { type Forecast } from './SidebarComponents/UploadSidebar';
 import { CloseOutlined } from '@mui/icons-material';
 
 interface SidebarProps {

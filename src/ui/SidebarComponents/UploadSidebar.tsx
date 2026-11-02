@@ -1,4 +1,4 @@
-import UploadButton from '../InputComponents/UploadButton.tsx';
+import UploadButton from '../InputComponents/UploadButton';
 
 export interface Forecast {
   price: string | null;

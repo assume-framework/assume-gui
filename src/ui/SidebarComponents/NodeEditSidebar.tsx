@@ -4,7 +4,7 @@ import MarketProductEdit from './EditPages/MarketProductEdit';
 import UnitEdit from './EditPages/UnitEdit';
 import UnitMarketEdit from './EditPages/UnitMarketEdit';
 import WorldEdit from './EditPages/WorldEdit';
-import { handleChange } from '../../utils.ts';
+import { handleChange } from '../../utils';
 
 export interface EditSidebarData {
   // properties that shall be editable in the sidebar
