@@ -30,7 +30,7 @@ export default function Select ({
                     required={required}
                     className={classNames}
                 >
-                    <option disabled selected value="">-- select an option --</option>
+                    <option disabled value="">-- select an option --</option>
                     {children}
                 </select>
                 {tooltip && (

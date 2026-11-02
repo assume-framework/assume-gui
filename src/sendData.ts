@@ -84,6 +84,12 @@ export async function uploadFile(file: File): Promise<string> {
         method: 'POST',
         body: formData,
     })
+    if (!result.ok) {
+        throw new Error(`Upload failed (${result.status} ${result.statusText})`)
+    }
     const body = await result.json()
-    return body['id']
+    if (typeof body?.id !== 'string') {
+        throw new Error('Upload response did not contain a file id')
+    }
+    return body.id
 }

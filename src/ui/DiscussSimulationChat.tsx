@@ -127,7 +127,7 @@ export default function DiscussSimulationChat({
                 body: JSON.stringify({
                     model: selectedModel,
                     messages: messagesPayload,
-                    stream: true,
+                    stream: false,
                 }),
             });
 
@@ -136,16 +136,11 @@ export default function DiscussSimulationChat({
                 throw new Error(text || `Request failed (${resp.status})`);
             }
 
-            if (!resp.body) {
-                throw new Error('Missing response body stream.');
-            }
-
-            const body = await resp.text()
-            const response = JSON.parse(body) as {
-                choices: Array<{ message?: { content?: string } }>;
+            const response = (await resp.json()) as {
+                choices?: Array<{ message?: { content?: string } }>;
             };
 
-            const reply = response?.choices[0].message?.content;
+            const reply = response.choices?.[0]?.message?.content;
             if (!reply) {
                 throw new Error('Missing response body content.');
             }

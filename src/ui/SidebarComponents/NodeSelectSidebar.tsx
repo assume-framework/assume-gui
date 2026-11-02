@@ -11,7 +11,7 @@ function Node({type, name}: { type: string, name: string }) {
 
     return (
         <div
-            className="py-3 border-2 border-stone-400 rounded-md font-bold my-5 flex justify-center cursor-grab touch-none background-white text-s active:cursor-grabbing"
+            className="py-3 border-2 border-stone-400 rounded-md font-bold my-5 flex justify-center cursor-grab touch-none bg-white active:cursor-grabbing"
             onDragStart={(event) => onDragStart(event, type)}
             draggable
         >

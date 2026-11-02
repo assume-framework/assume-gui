@@ -9,6 +9,7 @@ import {
     Controls,
     type Edge,
     type EdgeChange,
+    type EdgeSelectionChange,
     type FinalConnectionState,
     type Node,
     type NodeChange,
@@ -162,7 +163,7 @@ export default function Home() {
             if (!changes.map(c => c.type).includes('select')) {
                 return
             }
-            const selectedChange = changes.find((c): c is NodeSelectionChange => c.type === 'select' && c.selected);
+            const selectedChange = changes.find((c): c is EdgeSelectionChange => c.type === 'select' && c.selected);
             const edge: Edge<EditSidebarData> | undefined = edges.find(e => e.id === selectedChange?.id);
             if (edge) {
                 setNodeData({id: edge.id, type: edge.type, data: edge.data!, isEdge: true});

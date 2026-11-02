@@ -4,11 +4,11 @@ import { UNIT_MARKET_STRATEGY_LABELS } from "./UnitMarketStrategies";
 
 export function UnitMarketEdge({ id, sourceX, sourceY, targetX, targetY, data, selected }: EdgeProps<Edge<EditSidebarData>>) {
     const [edgePath, labelX, labelY] = getSimpleBezierPath({ sourceX, sourceY, targetX, targetY });
-    const border_color = data?.errorField == '' ? "border-stone-300" : "border-red-400"
+    const border_color = data?.errorField ? "border-red-400" : "border-stone-300"
     const selectedStrategy = typeof data?.strategy === "string" ? data.strategy : undefined;
     const label = selectedStrategy ? (UNIT_MARKET_STRATEGY_LABELS[selectedStrategy] ?? selectedStrategy) : 'Select strategy';
     return <>
-        <BaseEdge path={edgePath} id={id} />;
+        <BaseEdge path={edgePath} id={id} />
         <EdgeLabelRenderer>
             <div
                 style={{
