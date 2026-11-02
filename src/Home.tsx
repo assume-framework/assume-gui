@@ -1,5 +1,3 @@
-'use client';
-
 import {
   addEdge,
   applyEdgeChanges,
@@ -36,16 +34,16 @@ import {
   UnitOperatorNode,
   WorldNode,
 } from './ui/Nodes';
-import { type Forecast } from './ui/SidebarComponents/UploadSidebar.tsx';
+import { type Forecast } from './ui/SidebarComponents/UploadSidebar';
 import Header from './Header';
 import Footer from './Footer';
-import Cockpit from './ui/Cockpit.tsx';
-import Sidebar from './ui/Sidebar.tsx';
-import DiscussSimulationChat from './ui/DiscussSimulationChat.tsx';
-import type { EditSidebarData, EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar.tsx';
-import { sendData, type DataResponse } from './sendData.ts';
-import { buildGrafanaResultsHref, getId, initial_data, initial_world } from './utils.ts';
-import { getLayoutedElements } from './layout.ts';
+import Cockpit from './ui/Cockpit';
+import Sidebar from './ui/Sidebar';
+import DiscussSimulationChat from './ui/DiscussSimulationChat';
+import type { EditSidebarData, EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar';
+import { sendData, type DataResponse } from './sendData';
+import { buildGrafanaResultsHref, getId, initialData, initialWorld } from './utils';
+import { getLayoutedElements } from './layout';
 import { Alert, type AlertColor, Snackbar } from '@mui/material';
 
 const nodeTypes = {
@@ -67,7 +65,7 @@ function createInitialNodes(): Node<EditSidebarData>[] {
       id: 'world',
       type: 'world',
       position: { x: 300, y: 0 },
-      data: initial_world(),
+      data: initialWorld(),
       deletable: false,
     },
   ];
@@ -137,7 +135,7 @@ export default function Home() {
             item.data.errorField &&
             item.data[item.data.errorField] !== data[item.data.errorField]
           ) {
-            // fiel with error has changed, reset error
+            // field with error has changed, reset error
             data.errorField = '';
             data.errorMessage = '';
           }
@@ -232,7 +230,7 @@ export default function Home() {
           target: connection.target,
           targetHandle: connection.targetHandle,
           type: t,
-          data: initial_data(t),
+          data: initialData(t),
         };
         return addEdge(newEdge, eds);
       }),
@@ -260,13 +258,13 @@ export default function Home() {
       const clientX = 'changedTouches' in event ? event.changedTouches[0].clientX : event.clientX;
       const clientY = 'changedTouches' in event ? event.changedTouches[0].clientY : event.clientY;
 
-      // create new Node at canvas coords corresponding to mouse postion
+      // create new Node at canvas coords corresponding to mouse position
       const newNodeId = getId(newNodeType);
       const newNode: Node<EditSidebarData> = {
         id: newNodeId,
         type: newNodeType,
         position: screenToFlowPosition({ x: clientX, y: clientY }),
-        data: initial_data(newNodeType),
+        data: initialData(newNodeType),
       };
 
       const t =
@@ -279,7 +277,7 @@ export default function Home() {
         target: newNodeId,
         targetHandle: targetHandleId,
         type: t,
-        data: initial_data(t),
+        data: initialData(t),
       };
 
       setNodes((nds) => nds.concat(newNode));
@@ -313,7 +311,7 @@ export default function Home() {
           x: event.clientX,
           y: event.clientY,
         }),
-        data: initial_data(type),
+        data: initialData(type),
       };
       setNodes((nds) => nds.concat(newNode));
     },

@@ -1,7 +1,7 @@
 import { useId, useState } from 'react';
-import UploadButton from './UploadButton.tsx';
+import UploadButton from './UploadButton';
 import { HelpOutline, ToggleOffOutlined, ToggleOnOutlined } from '@mui/icons-material';
-import type { BaseProps } from './types.ts';
+import type { BaseProps } from './types';
 
 export function InputOrUpload({ onChange, errorMessage, value, label, tooltip }: BaseProps) {
   const hasFile = /^[\da-f]{8}-[\da-f]{4}-[0-9a-f]{4}-[\da-f]{4}-[\da-f]{12}$/.test(value); // UUID regex
@@ -12,7 +12,9 @@ export function InputOrUpload({ onChange, errorMessage, value, label, tooltip }:
 
   return (
     <div className="my-4">
-      <label className={`block text-sm font-bold mt-2 ${color}`}>{label}</label>
+      <label htmlFor={id} className={`block text-sm font-bold mt-2 ${color}`}>
+        {label}
+      </label>
       <div className="flex flex-grow">
         {upload ? (
           <div className="w-50">

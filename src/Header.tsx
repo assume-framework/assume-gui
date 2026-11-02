@@ -8,7 +8,7 @@ export default function Header({
   // World time range for Grafana, e.g. `/grafana/?from=...&to=...`
   grafanaResultsHref?: string;
 } = {}) {
-  const header_classes = 'p-2 m-1 text-xl rounded-md hover:bg-gray-300 cursor-pointer';
+  const headerClasses = 'p-2 m-1 text-xl rounded-md hover:bg-gray-300 cursor-pointer';
 
   return (
     <header className="p-2 flex justify-between items-center border-b-1 border-gray-300">
@@ -19,7 +19,7 @@ export default function Header({
         <ul className="flex items-center">
           <li>
             <a
-              className={header_classes}
+              className={headerClasses}
               href={grafanaResultsHref}
               target="_blank"
               rel="noopener noreferrer"
@@ -28,12 +28,12 @@ export default function Header({
             </a>
           </li>
           <li>
-            <button type="button" className={header_classes} onClick={onReinforcementLearning}>
+            <button type="button" className={headerClasses} onClick={onReinforcementLearning}>
               Reinforcement Learning
             </button>
           </li>
           <li>
-            <button type="button" className={header_classes} onClick={onDiscussSimulation}>
+            <button type="button" className={headerClasses} onClick={onDiscussSimulation}>
               Discuss Simulation
             </button>
           </li>

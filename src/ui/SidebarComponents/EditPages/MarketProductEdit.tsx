@@ -1,9 +1,9 @@
 import { handleChange } from '../../../utils';
 import type { EditComponentArgs } from '../NodeEditSidebar';
 import Input from '../../InputComponents/Input';
-import Select from '../../InputComponents/Select.tsx';
+import Select from '../../InputComponents/Select';
 
-function editMarketProduct({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {
+function MarketProductEdit({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {
   const onChange = handleChange(id, data, updateNodeValue);
 
   return (
@@ -57,4 +57,4 @@ function editMarketProduct({ id, data, updateNodeValue, getErrorMessage }: EditC
   );
 }
 
-export default editMarketProduct;
+export default MarketProductEdit;

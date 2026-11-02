@@ -1,11 +1,11 @@
-import { handleChange, initial_data } from '../../../utils';
+import { handleChange, initialData } from '../../../utils';
 import type { EditComponentArgs } from '../NodeEditSidebar';
 import Select from '../../InputComponents/Select';
 import Input from '../../InputComponents/Input';
 import Modal from '../../InputComponents/Modal';
-import { InputOrUpload } from '../../InputComponents/InputOrUpload.tsx';
+import { InputOrUpload } from '../../InputComponents/InputOrUpload';
 
-export default function editUnit({
+export default function UnitEdit({
   id,
   data,
   updateNodeValue,
@@ -13,9 +13,7 @@ export default function editUnit({
 }: EditComponentArgs) {
   const onChange = handleChange(id, data, updateNodeValue);
   const reset = (value: string) => {
-    const d = initial_data(value);
-    console.log(d);
-    updateNodeValue(id, d, false);
+    updateNodeValue(id, initialData(value), false);
   };
 
   return (
@@ -73,7 +71,7 @@ export default function editUnit({
             value={data.price}
             onChange={onChange('price')}
             errorMessage={getErrorMessage('price')}
-            tooltip="TODO" //TODO
+            tooltip="Bidding price of the demand in €/MWh"
           />
           <Modal name="Forecast settings">
             <InputOrUpload

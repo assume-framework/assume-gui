@@ -4,8 +4,12 @@ import {
   PublishOutlined,
   UploadFileOutlined,
 } from '@mui/icons-material';
-import { uploadFile } from '../../sendData.ts';
-import React, { useId, useState } from 'react';
+import { Alert, Snackbar } from '@mui/material';
+import { uploadFile } from '../../sendData';
+import { type ChangeEvent, useId, useState } from 'react';
+
+// Browsers (notably on Windows) do not always report `text/csv` for .csv files.
+const isCsv = (file: File) => file.type === 'text/csv' || file.name.toLowerCase().endsWith('.csv');
 
 interface UploadButtonProps {
   name: string;
@@ -22,24 +26,27 @@ export default function UploadButton({
 }: UploadButtonProps) {
   const id = useId();
   const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState('');
 
-  const set = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!e.target.files || e.target.files.length === 0) return;
-    if (e.target.files[0].type === 'text/csv') {
-      setFile(e.target.files[0]);
+  const set = (e: ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0];
+    if (!selected) return;
+    if (isCsv(selected)) {
+      setError('');
+      setFile(selected);
       return;
     }
-    alert('not a csv file');
+    setError('Not a CSV file');
     setFile(null);
   };
 
   const upload = async () => {
     if (!file) return;
     try {
-      const id = await uploadFile(file);
-      setDocumentID(id);
+      const documentId = await uploadFile(file);
+      setDocumentID(documentId);
     } catch (e) {
-      alert('Error uploading file');
+      setError('Error uploading file');
       console.error(e);
     }
   };
@@ -63,12 +70,11 @@ export default function UploadButton({
       <input
         title={tooltip}
         className="hidden"
-        accept="text/csv"
+        accept=".csv,text/csv"
         id={id}
-        type={'file'}
+        type="file"
         onChange={set}
       />
-      {uploaded && <></>}
       {!!file && !uploaded && (
         <button type="button" className="ml-auto pr-3 cursor-pointer" onClick={upload}>
           <PublishOutlined />
@@ -81,6 +87,16 @@ export default function UploadButton({
           </button>
         </div>
       )}
+      <Snackbar
+        open={!!error}
+        autoHideDuration={3000}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        onClose={() => setError('')}
+      >
+        <Alert severity="error" variant="outlined">
+          {error}
+        </Alert>
+      </Snackbar>
     </div>
   );
 }

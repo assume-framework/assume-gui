@@ -1,9 +1,9 @@
 import EditSidebar, {
   type EditSidebarData,
   type EditSidebarProps,
-} from './SidebarComponents/NodeEditSidebar.tsx';
-import SelectSidebar from './SidebarComponents/NodeSelectSidebar.tsx';
-import UploadSidebar, { type Forecast } from './SidebarComponents/UploadSidebar.tsx';
+} from './SidebarComponents/NodeEditSidebar';
+import SelectSidebar from './SidebarComponents/NodeSelectSidebar';
+import UploadSidebar, { type Forecast } from './SidebarComponents/UploadSidebar';
 import { CloseOutlined } from '@mui/icons-material';
 
 interface SidebarProps {
@@ -26,7 +26,14 @@ export default function Sidebar({
       {nodeData ? (
         <>
           <div>
-            <CloseOutlined onClick={close} className="float-right m-5 cursor-pointer" />
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={close}
+              className="float-right m-5 cursor-pointer"
+            >
+              <CloseOutlined />
+            </button>
           </div>
           <EditSidebar
             id={nodeData.id}

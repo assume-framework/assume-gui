@@ -1,4 +1,4 @@
-import type { EditSidebarData } from './ui/SidebarComponents/NodeEditSidebar.tsx';
+import type { EditSidebarData } from './ui/SidebarComponents/NodeEditSidebar';
 
 /** Parse world `datetime-local` strings as local wall time. */
 export function parseWorldDatetimeLocal(value: string): Date | null {
@@ -71,7 +71,7 @@ function formatDatetimeLocalMidnight(d: Date): string {
   return `${y}-${m}-${day}T00:00`;
 }
 
-export function initial_world(): EditSidebarData {
+export function initialWorld(): EditSidebarData {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const end = new Date(start);
@@ -88,7 +88,7 @@ export function initial_world(): EditSidebarData {
   };
 }
 
-const market_data = {
+const marketData = {
   product_type: 'energy',
   maximum_bid_volume: '2000.0',
   maximum_bid_price: '3000.0',
@@ -103,7 +103,7 @@ const market_data = {
   market_mechanism: '',
 };
 
-const market_product_data = {
+const marketProductData = {
   duration: '',
   count: '',
   first_delivery: '',
@@ -111,7 +111,7 @@ const market_product_data = {
   eligible_lambda_function: '',
 };
 
-const demand_data = {
+const demandData = {
   unitType: 'demand',
   technology: '',
   max_power: '0',
@@ -121,7 +121,7 @@ const demand_data = {
   forecast_demand: '-100',
 };
 
-const storage_data = {
+const storageData = {
   unitType: 'storage',
   technology: '',
   capacity: '',
@@ -135,7 +135,7 @@ const storage_data = {
   forecast_availability: '1',
 };
 
-const power_plant_data = {
+const powerPlantData = {
   unitType: 'power_plant',
   technology: '',
   max_power: '',
@@ -151,7 +151,7 @@ const power_plant_data = {
   forecast_co2_price: '10',
 };
 
-const exchange_data = {
+const exchangeData = {
   unitType: 'exchange',
   technology: '',
   price_import: '0.0',
@@ -161,26 +161,26 @@ const exchange_data = {
   forecast_volume_export: '0',
 };
 
-export function initial_data(type: string): EditSidebarData {
+export function initialData(type: string): EditSidebarData {
   let data = {};
   switch (type) {
     case 'market':
-      data = market_data;
+      data = marketData;
       break;
     case 'marketProduct':
-      data = market_product_data;
+      data = marketProductData;
       break;
     case 'demand':
-      data = demand_data;
+      data = demandData;
       break;
     case 'storage':
-      data = storage_data;
+      data = storageData;
       break;
     case 'power_plant':
-      data = power_plant_data;
+      data = powerPlantData;
       break;
     case 'exchange':
-      data = exchange_data;
+      data = exchangeData;
       break;
     case 'unit-market':
       data = { strategy: '' };

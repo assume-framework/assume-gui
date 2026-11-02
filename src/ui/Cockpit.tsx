@@ -7,7 +7,7 @@ import {
   SendOutlined,
 } from '@mui/icons-material';
 import { CircularProgress } from '@mui/material';
-import { type ComponentType, type MouseEventHandler } from 'react';
+import { type ChangeEvent, type ComponentType, type MouseEventHandler } from 'react';
 
 type Args = {
   reset: () => void;
@@ -28,19 +28,20 @@ export default function Cockpit({
   download,
   autoArrange,
 }: Args) {
-  const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
-    const inputElement = e.target as HTMLInputElement;
-    if (!inputElement.files || inputElement.files.length === 0) {
+  const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const file = input.files?.[0];
+    if (!file) {
       console.warn('No input provided!');
       return;
     }
 
-    const reader: FileReader = new FileReader();
-    reader.readAsText(inputElement.files[0], `UTF-8`);
-    reader.onload = (event) => {
-      const data = event.target?.result;
-      setFlowByJson(data as string);
-    };
+    try {
+      setFlowByJson(await file.text());
+    } finally {
+      // Reset so that selecting the same file again triggers onChange.
+      input.value = '';
+    }
   };
 
   return (
@@ -55,41 +56,51 @@ export default function Cockpit({
       <CockpitElement name={'Reset'} Icon={ReplayOutlined} onClick={reset} />
       <CockpitElement name={'Auto Arrange'} onClick={autoArrange} Icon={AccountTreeOutlined} />
       <CockpitElement name={'Download'} onClick={download} Icon={FileDownloadOutlined} />
-      <label htmlFor="file_upload" className={'cursor-pointer'}>
-        <CockpitElement name={'Upload'} Icon={FileUploadOutlined} />
-      </label>
+      {/* Visually hidden (not display:none) so the input stays keyboard-focusable. */}
       <input
         id="file_upload"
         type="file"
         accept=".json"
-        className="hidden"
-        onInput={handleFileUpload}
+        className="peer sr-only"
+        onChange={handleFileUpload}
       />
+      <label
+        htmlFor="file_upload"
+        className={`${cockpitItemClasses(false)} peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400`}
+      >
+        <FileUploadOutlined />
+        <span className="px-3">Upload</span>
+      </label>
     </>
   );
 }
 
+const cockpitItemClasses = (disabled: boolean) =>
+  `bg-white border rounded w-full my-2 py-1 px-3 flex items-center ${
+    disabled
+      ? 'cursor-not-allowed opacity-60'
+      : 'cursor-pointer hover:bg-neutral-100 active:bg-neutral-300'
+  }`;
+
 interface ElementArgs {
   name: string;
-  onClick?: MouseEventHandler<HTMLDivElement>;
-  disabled?: boolean;
+  onClick?: MouseEventHandler<HTMLButtonElement>;
   Icon: ComponentType;
   processing?: boolean;
 }
 
 function CockpitElement({ onClick, name, Icon, processing = false }: ElementArgs) {
   return (
-    <div
-      className={`bg-white border rounded w-full my-2 py-1 px-3 flex items-center ${
-        processing
-          ? 'cursor-not-allowed opacity-60'
-          : 'cursor-pointer hover:bg-neutral-100 active:bg-neutral-300'
-      }`}
-      onClick={processing ? undefined : onClick}
+    <button
+      type="button"
+      className={cockpitItemClasses(processing)}
+      onClick={onClick}
+      disabled={processing}
+      aria-busy={processing}
     >
       <Icon />
-      <div className="px-3">{name}</div>
+      <span className="px-3">{name}</span>
       {processing && <CircularProgress size={16} thickness={5} color="success" />}
-    </div>
+    </button>
   );
 }

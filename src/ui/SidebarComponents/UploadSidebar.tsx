@@ -1,4 +1,4 @@
-import UploadButton from '../InputComponents/UploadButton.tsx';
+import UploadButton from '../InputComponents/UploadButton';
 
 export interface Forecast {
   price: string | null;
@@ -27,7 +27,7 @@ export default function UploadSidebar({ updateForecast, forecast }: UploadSideba
       </div>
       <div className="my-4">
         <UploadButton
-          name={'Resiudal load'}
+          name={'Residual load'}
           uploaded={!!forecast.residual_load}
           setDocumentID={setDocumentID('residual_load')}
         />
