@@ -18,6 +18,16 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
       - id: check-illegal-windows-names
+  - repo: local
+    hooks:
+      # Frontend formatting. Uses the prettier version pinned in package.json
+      # (requires `npm ci`); --no-install avoids fetching a different version.
+      - id: prettier
+        name: prettier
+        entry: npx --no-install prettier --write
+        language: system
+        files: ^src/
+        types_or: [ts, tsx, css]
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.2
     hooks:

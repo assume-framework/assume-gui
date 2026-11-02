@@ -25,7 +25,7 @@ export default function UploadButton({
 
   const set = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
-    if (e.target.files[0].type == 'text/csv') {
+    if (e.target.files[0].type === 'text/csv') {
       setFile(e.target.files[0]);
       return;
     }

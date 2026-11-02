@@ -50,7 +50,7 @@ export function MarketNode({ data, isConnectable, selected }: NodeProps<Node<Edi
         type="target"
         className="!bg-teal-400"
         position={Position.Top}
-        isConnectable={isConnectable && connections.length == 0}
+        isConnectable={isConnectable && connections.length === 0}
         title="Connect from world (market providers)"
       />
       <Handle
@@ -85,7 +85,7 @@ export function MarketProviderNode({
         type="target"
         className="!bg-sky-400"
         position={Position.Top}
-        isConnectable={isConnectable && connections.length == 0}
+        isConnectable={isConnectable && connections.length === 0}
         title="Connect from world"
       />
 
@@ -117,7 +117,7 @@ export function UnitNode({ data, isConnectable, selected }: NodeProps<Node<EditS
         type="target"
         className="!bg-violet-400"
         position={Position.Top}
-        isConnectable={isConnectable && connections.length == 0}
+        isConnectable={isConnectable && connections.length === 0}
         title="Connect from unit operator"
       />
       {renderUnit(
@@ -151,7 +151,7 @@ export function UnitOperatorNode({
         className="!bg-fuchsia-400"
         type="target"
         position={Position.Top}
-        isConnectable={isConnectable && connections.length == 0}
+        isConnectable={isConnectable && connections.length === 0}
         title="Connect from world"
       />
       {renderUnit('Unit Operator', data.name, data.errorField, AccountTreeOutlinedIcon, selected)}
@@ -180,7 +180,7 @@ export function MarketProductNode({
         type="target"
         position={Position.Top}
         className="!bg-lime-400"
-        isConnectable={isConnectable && connections.length == 0}
+        isConnectable={isConnectable && connections.length === 0}
         title="Connect from market"
       />
       {renderUnit('Market Product', data.name, data.errorField, Inventory2OutlinedIcon, selected)}
@@ -225,7 +225,7 @@ function renderUnit(
   Icon: SvgIconComponent,
   selected = false
 ) {
-  const border_color = errorField == '' ? 'border-stone-300' : 'border-red-400';
+  const border_color = errorField === '' ? 'border-stone-300' : 'border-red-400';
   return (
     <div
       className={`inline-flex p-0.5 rounded-md transition-shadow ${

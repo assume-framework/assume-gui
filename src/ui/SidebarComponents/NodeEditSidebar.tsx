@@ -42,7 +42,7 @@ export default function EditSidebar({
   const onChange = handleChange(id, data, updateNodeValue);
 
   const getErrorMessage = (field: string): string | undefined => {
-    if (data.errorField && data.errorField == field) {
+    if (data.errorField && data.errorField === field) {
       return data.errorMessage;
     }
     return undefined;

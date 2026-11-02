@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build --outDir ./backend/static",
-    "lint": "eslint .",
+    "typecheck": "tsc -b",
+    "lint": "eslint --max-warnings 0 .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write src",
     "format:check": "prettier --check src",
@@ -32,19 +33,15 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.4",
-    "eslint": "^10.1.0",
+    "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-plugin-react-hooks": "^7.0.1",
-    "eslint-plugin-react-refresh": "^0.5.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^16.4.0",
-    "prettier": "^3.8.1",
+    "prettier": "3.9.10",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1"
-  },
-  "overrides": {
-    "esbuild": "^0.28.1",
-    "eslint": "^10.1.0"
   },
   "browserslist": [
     "defaults"

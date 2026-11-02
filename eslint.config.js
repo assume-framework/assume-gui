@@ -7,7 +7,7 @@ import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
 
 export default defineConfig([
-  globalIgnores(['.venv', 'backend', 'node_modules', 'backend/static']),
+  globalIgnores(['.venv', 'backend', 'node_modules', 'dist']),
   {
     files: ['**/*.{ts,tsx}'],
     extends: [
@@ -18,9 +18,11 @@ export default defineConfig([
     ],
     rules: {
       '@typescript-eslint/no-explicit-any': 'warn',
+      // `== null` (null or undefined) is allowed, everything else must use ===
+      eqeqeq: ['error', 'always', { null: 'ignore' }],
     },
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: 2022,
       globals: globals.browser,
     },
   },

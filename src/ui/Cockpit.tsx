@@ -30,7 +30,7 @@ export default function Cockpit({
 }: Args) {
   const handleFileUpload = (e: React.InputEvent<HTMLInputElement>) => {
     const inputElement = e.target as HTMLInputElement;
-    if (!inputElement.files || inputElement.files.length == 0) {
+    if (!inputElement.files || inputElement.files.length === 0) {
       console.warn('No input provided!');
       return;
     }
