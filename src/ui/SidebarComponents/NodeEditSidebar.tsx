@@ -5,32 +5,25 @@ import UnitEdit from './EditPages/UnitEdit';
 import UnitMarketEdit from './EditPages/UnitMarketEdit';
 import WorldEdit from './EditPages/WorldEdit';
 import { handleChange } from '../../utils';
-
-export interface EditSidebarData {
-  // properties that shall be editable in the sidebar
-  name: string;
-  errorField: string;
-  errorMessage: string;
-
-  [key: string]: string;
-}
+import type { ConfigData, ConfigIssue } from '../../scenario/types';
 
 export type EditComponentArgs = {
   id: string;
-  data: EditSidebarData;
-  updateNodeValue: (id: string, data: EditSidebarData, isEdge: boolean) => void;
+  data: ConfigData;
+  updateNodeValue: (id: string, data: ConfigData, isEdge: boolean) => void;
   getErrorMessage: (field: string) => string | undefined;
 };
 
 export type EditSidebarProps = {
   id: string;
-  data: EditSidebarData;
+  data: ConfigData;
   type?: string;
   isEdge?: boolean;
 };
 
 type updateFunction = {
-  updateNodeValue: (id: string, data: EditSidebarData, isEdge: boolean) => void;
+  updateNodeValue: (id: string, data: ConfigData, isEdge: boolean) => void;
+  issues: ConfigIssue[];
 };
 
 export default function EditSidebar({
@@ -38,15 +31,12 @@ export default function EditSidebar({
   type,
   data,
   updateNodeValue,
+  issues,
 }: EditSidebarProps & updateFunction) {
   const onChange = handleChange(id, data, updateNodeValue);
 
-  const getErrorMessage = (field: string): string | undefined => {
-    if (data.errorField && data.errorField === field) {
-      return data.errorMessage;
-    }
-    return undefined;
-  };
+  const getErrorMessage = (field: string): string | undefined =>
+    issues.find((issue) => issue.field === field)?.message;
   return (
     <form className="px-8 pt-6 pb-8 mb-4" id="NodeEditForm" onSubmit={(e) => e.preventDefault()}>
       <Input

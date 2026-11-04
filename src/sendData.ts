@@ -1,5 +1,5 @@
-import type { Node, Edge } from '@xyflow/react';
-import type { Forecast } from './ui/SidebarComponents/UploadSidebar';
+import { toRequestPayload } from './scenario/model';
+import type { ScenarioConfig } from './scenario/types';
 
 export interface DataResponse {
   success: boolean;
@@ -49,13 +49,7 @@ function parseErrorResponse(resp: Response, body: unknown): DataResponse {
   };
 }
 
-export async function sendData(
-  nodes: Node[],
-  edges: Edge[],
-  forecasts: Forecast
-): Promise<DataResponse> {
-  const n = nodes.map((n) => ({ id: n.id, type: n.type, data: n.data }));
-  const e = edges.map((e) => ({ id: e.id, type: e.type, data: e.data }));
+export async function sendData(config: ScenarioConfig): Promise<DataResponse> {
   let resp: Response;
   try {
     resp = await fetch('/api/submit', {
@@ -63,7 +57,7 @@ export async function sendData(
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ nodes: n, edges: e, forecasts: forecasts }),
+      body: JSON.stringify(toRequestPayload(config)),
     });
   } catch {
     return {

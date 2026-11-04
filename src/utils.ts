@@ -1,4 +1,4 @@
-import type { EditSidebarData } from './ui/SidebarComponents/NodeEditSidebar';
+import type { ConfigData } from './scenario/types';
 
 /** Parse world `datetime-local` strings as local wall time. */
 export function parseWorldDatetimeLocal(value: string): Date | null {
@@ -49,8 +49,8 @@ export function buildGrafanaResultsHref(start: string, end: string, simulation_i
 
 export function handleChange(
   id: string,
-  data: EditSidebarData,
-  updateNodeValue: (id: string, data: EditSidebarData, isEdge: boolean) => void,
+  data: ConfigData,
+  updateNodeValue: (id: string, data: ConfigData, isEdge: boolean) => void,
   isEdge: boolean = false
 ) {
   return (key: string) => (value: string) => {
@@ -71,15 +71,13 @@ function formatDatetimeLocalMidnight(d: Date): string {
   return `${y}-${m}-${day}T00:00`;
 }
 
-export function initialWorld(): EditSidebarData {
+export function initialWorld(): ConfigData {
   const start = new Date();
   start.setHours(0, 0, 0, 0);
   const end = new Date(start);
   end.setMonth(end.getMonth() + 1);
   return {
     name: 'World Node',
-    errorField: '',
-    errorMessage: '',
     start: formatDatetimeLocalMidnight(start),
     end: formatDatetimeLocalMidnight(end),
     save_frequency: '',
@@ -161,7 +159,7 @@ const exchangeData = {
   forecast_volume_export: '0',
 };
 
-export function initialData(type: string): EditSidebarData {
+export function initialData(type: string): ConfigData {
   let data = {};
   switch (type) {
     case 'market':
@@ -188,8 +186,6 @@ export function initialData(type: string): EditSidebarData {
   }
   return {
     name: getName(type),
-    errorField: '',
-    errorMessage: '',
     ...data,
   };
 }

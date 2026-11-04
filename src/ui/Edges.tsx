@@ -1,25 +1,12 @@
-import {
-  BaseEdge,
-  EdgeLabelRenderer,
-  getSimpleBezierPath,
-  type Edge,
-  type EdgeProps,
-} from '@xyflow/react';
-import type { EditSidebarData } from './SidebarComponents/NodeEditSidebar';
+import { BaseEdge, EdgeLabelRenderer, getSimpleBezierPath, type EdgeProps } from '@xyflow/react';
+import { useItemView } from '../scenario/context';
 import { UNIT_MARKET_STRATEGY_LABELS } from './UnitMarketStrategies';
 
-export function UnitMarketEdge({
-  id,
-  sourceX,
-  sourceY,
-  targetX,
-  targetY,
-  data,
-  selected,
-}: EdgeProps<Edge<EditSidebarData>>) {
+export function UnitMarketEdge({ id, sourceX, sourceY, targetX, targetY, selected }: EdgeProps) {
+  const { data, hasError } = useItemView(id, true);
   const [edgePath, labelX, labelY] = getSimpleBezierPath({ sourceX, sourceY, targetX, targetY });
-  const borderColor = data?.errorField ? 'border-red-400' : 'border-stone-300';
-  const selectedStrategy = typeof data?.strategy === 'string' ? data.strategy : undefined;
+  const borderColor = hasError ? 'border-red-400' : 'border-stone-300';
+  const selectedStrategy = data.strategy || undefined;
   const label = selectedStrategy
     ? (UNIT_MARKET_STRATEGY_LABELS[selectedStrategy] ?? selectedStrategy)
     : 'Select strategy';

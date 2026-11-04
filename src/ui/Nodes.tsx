@@ -1,5 +1,5 @@
-import { Handle, type Node, type NodeProps, Position, useNodeConnections } from '@xyflow/react';
-import type { EditSidebarData } from './SidebarComponents/NodeEditSidebar';
+import { Handle, type NodeProps, Position, useNodeConnections } from '@xyflow/react';
+import { useItemView } from '../scenario/context';
 import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
@@ -12,13 +12,14 @@ import TrendingDownOutlinedIcon from '@mui/icons-material/TrendingDownOutlined';
 import SwapHorizOutlinedIcon from '@mui/icons-material/SwapHorizOutlined';
 import type { SvgIconComponent } from '@mui/icons-material';
 
-export function WorldNode({ data, isConnectable, selected }: NodeProps<Node<EditSidebarData>>) {
+export function WorldNode({ id, isConnectable, selected }: NodeProps) {
+  const { data, hasError } = useItemView(id, false);
   return (
     <>
       <NodeCard
         label="World"
         name={data.name}
-        hasError={!!data.errorField}
+        hasError={hasError}
         Icon={PublicOutlinedIcon}
         selected={selected}
       />
@@ -44,7 +45,8 @@ export function WorldNode({ data, isConnectable, selected }: NodeProps<Node<Edit
   );
 }
 
-export function MarketNode({ data, isConnectable, selected }: NodeProps<Node<EditSidebarData>>) {
+export function MarketNode({ id, isConnectable, selected }: NodeProps) {
+  const { data, hasError } = useItemView(id, false);
   const connections = useNodeConnections({
     handleType: 'target',
     handleId: 'marketProvider_handle',
@@ -69,7 +71,7 @@ export function MarketNode({ data, isConnectable, selected }: NodeProps<Node<Edi
       <NodeCard
         label="Market"
         name={data.name}
-        hasError={!!data.errorField}
+        hasError={hasError}
         Icon={StorefrontOutlinedIcon}
         selected={selected}
       />
@@ -84,11 +86,8 @@ export function MarketNode({ data, isConnectable, selected }: NodeProps<Node<Edi
   );
 }
 
-export function MarketProviderNode({
-  data,
-  isConnectable,
-  selected,
-}: NodeProps<Node<EditSidebarData>>) {
+export function MarketProviderNode({ id, isConnectable, selected }: NodeProps) {
+  const { data, hasError } = useItemView(id, false);
   const connections = useNodeConnections({ handleType: 'target', handleId: 'world_handle' });
   return (
     <>
@@ -104,7 +103,7 @@ export function MarketProviderNode({
       <NodeCard
         label="Market Provider"
         name={data.name}
-        hasError={!!data.errorField}
+        hasError={hasError}
         Icon={AccountBalanceOutlinedIcon}
         selected={selected}
       />
@@ -120,7 +119,8 @@ export function MarketProviderNode({
   );
 }
 
-export function UnitNode({ data, isConnectable, selected }: NodeProps<Node<EditSidebarData>>) {
+export function UnitNode({ id, isConnectable, selected }: NodeProps) {
+  const { data, hasError } = useItemView(id, false);
   const connections = useNodeConnections({ handleType: 'target', handleId: 'unitOperator_handle' });
   return (
     <>
@@ -135,7 +135,7 @@ export function UnitNode({ data, isConnectable, selected }: NodeProps<Node<EditS
       <NodeCard
         label={getUnitTypeLabel(data.unitType as string)}
         name={data.name}
-        hasError={!!data.errorField}
+        hasError={hasError}
         Icon={getUnitTypeIcon(data.unitType as string)}
         selected={selected}
       />
@@ -150,11 +150,8 @@ export function UnitNode({ data, isConnectable, selected }: NodeProps<Node<EditS
   );
 }
 
-export function UnitOperatorNode({
-  data,
-  isConnectable,
-  selected,
-}: NodeProps<Node<EditSidebarData>>) {
+export function UnitOperatorNode({ id, isConnectable, selected }: NodeProps) {
+  const { data, hasError } = useItemView(id, false);
   const connections = useNodeConnections({ handleType: 'target', handleId: 'world_handle' });
   return (
     <>
@@ -169,7 +166,7 @@ export function UnitOperatorNode({
       <NodeCard
         label="Unit Operator"
         name={data.name}
-        hasError={!!data.errorField}
+        hasError={hasError}
         Icon={AccountTreeOutlinedIcon}
         selected={selected}
       />
@@ -185,11 +182,8 @@ export function UnitOperatorNode({
   );
 }
 
-export function MarketProductNode({
-  data,
-  isConnectable,
-  selected,
-}: NodeProps<Node<EditSidebarData>>) {
+export function MarketProductNode({ id, isConnectable, selected }: NodeProps) {
+  const { data, hasError } = useItemView(id, false);
   const connections = useNodeConnections({ handleType: 'target', handleId: 'market_handle' });
   return (
     <>
@@ -204,7 +198,7 @@ export function MarketProductNode({
       <NodeCard
         label="Market Product"
         name={data.name}
-        hasError={!!data.errorField}
+        hasError={hasError}
         Icon={Inventory2OutlinedIcon}
         selected={selected}
       />

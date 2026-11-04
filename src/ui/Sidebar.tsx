@@ -1,21 +1,22 @@
-import EditSidebar, {
-  type EditSidebarData,
-  type EditSidebarProps,
-} from './SidebarComponents/NodeEditSidebar';
+import EditSidebar, { type EditSidebarProps } from './SidebarComponents/NodeEditSidebar';
 import SelectSidebar from './SidebarComponents/NodeSelectSidebar';
 import UploadSidebar, { type Forecast } from './SidebarComponents/UploadSidebar';
 import { CloseOutlined } from '@mui/icons-material';
+import type { ConfigData, ConfigIssue } from '../scenario/types';
 
 interface SidebarProps {
   nodeData: EditSidebarProps | null;
+  /** Validation issues of the item shown in the editor. */
+  issues: ConfigIssue[];
   updateForecast: (type: keyof Forecast, value: string | null) => void;
-  updateValue: (id: string, data: EditSidebarData, isEdge: boolean) => void;
+  updateValue: (id: string, data: ConfigData, isEdge: boolean) => void;
   forecast: Forecast;
   close: () => void;
 }
 
 export default function Sidebar({
   nodeData,
+  issues,
   updateForecast,
   updateValue,
   forecast,
@@ -40,6 +41,7 @@ export default function Sidebar({
             type={nodeData.type}
             data={nodeData.data}
             updateNodeValue={updateValue}
+            issues={issues}
           />
         </>
       ) : (

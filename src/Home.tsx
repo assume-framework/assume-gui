@@ -35,14 +35,29 @@ import {
   WorldNode,
 } from './ui/Nodes';
 import { type Forecast } from './ui/SidebarComponents/UploadSidebar';
+import { ScenarioContext } from './scenario/context';
+import {
+  WORLD_ID,
+  addConfigEdge,
+  addConfigNode,
+  buildGraph,
+  clearChangedIssues,
+  createInitialScenario,
+  edgeId,
+  extractLayout,
+  removeFromConfig,
+  updateConfigData,
+} from './scenario/model';
+import { parseScenarioFile, serializeScenario } from './scenario/serialization';
+import type { ConfigData, Issues, Scenario, ScenarioConfig } from './scenario/types';
 import Header from './Header';
 import Footer from './Footer';
 import Cockpit from './ui/Cockpit';
 import Sidebar from './ui/Sidebar';
 import DiscussSimulationChat from './ui/DiscussSimulationChat';
-import type { EditSidebarData, EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar';
+import type { EditSidebarProps } from './ui/SidebarComponents/NodeEditSidebar';
 import { sendData, type DataResponse } from './sendData';
-import { buildGrafanaResultsHref, getId, initialData, initialWorld } from './utils';
+import { buildGrafanaResultsHref, getId, initialData } from './utils';
 import { getLayoutedElements } from './layout';
 import { Alert, type AlertColor, Snackbar } from '@mui/material';
 
@@ -59,33 +74,27 @@ const edgeTypes = {
   'unit-market': UnitMarketEdge,
 };
 
-function createInitialNodes(): Node<EditSidebarData>[] {
-  return [
-    {
-      id: 'world',
-      type: 'world',
-      position: { x: 300, y: 0 },
-      data: initialWorld(),
-      deletable: false,
-    },
-  ];
-}
+const STORAGE_KEY = 'flow';
 
-const initialForecast: Forecast = { price: null, residual_load: null };
-const initialEdges: Edge<EditSidebarData>[] = [];
-
-const readLocalStorage = () => {
-  const data = localStorage.getItem('flow');
-  if (!data) {
-    return {};
+/** The saved scenario, or a fresh one if nothing (valid) was saved. */
+const loadScenario = (): Scenario => {
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if (!saved) {
+    return createInitialScenario();
   }
   try {
-    return JSON.parse(data);
-  } catch {
-    localStorage.removeItem('flow');
-    return {};
+    return parseScenarioFile(saved);
+  } catch (e) {
+    console.warn('Discarding unreadable saved flow', e);
+    localStorage.removeItem(STORAGE_KEY);
+    return createInitialScenario();
   }
 };
+
+interface Selection {
+  id: string;
+  isEdge: boolean;
+}
 
 interface AlertState {
   message: string;
@@ -93,14 +102,15 @@ interface AlertState {
 }
 
 export default function Home() {
-  const loaded = readLocalStorage();
+  const [initial] = useState(loadScenario);
   const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes] = useState<Node<EditSidebarData>[]>(
-    () => loaded['nodes'] ?? createInitialNodes()
-  );
-  const [edges, setEdges] = useState<Edge<EditSidebarData>[]>(loaded['edges'] ?? initialEdges);
-  const [forecast, setForecast] = useState<Forecast>(loaded['forecasts'] ?? initialForecast);
-  const [nodeData, setNodeData] = useState<EditSidebarProps | null>(null);
+  // The simulation parameters. This is all the backend gets to see.
+  const [config, setConfig] = useState<ScenarioConfig>(initial.config);
+  // The drawing: React Flow owns positions, selection and measured sizes of the same entities.
+  const [nodes, setNodes] = useState<Node[]>(() => buildGraph(initial).nodes);
+  const [edges, setEdges] = useState<Edge[]>(() => buildGraph(initial).edges);
+  const [issues, setIssues] = useState<Issues>({});
+  const [selection, setSelection] = useState<Selection | null>(null);
   const [type] = useContext(DnDContext);
   const { screenToFlowPosition, fitView } = useReactFlow();
   const [alert, setAlert] = useState<AlertState>({ message: '', severity: 'info' });
@@ -109,93 +119,100 @@ export default function Home() {
   const [discussChatMounted, setDiscussChatMounted] = useState(false);
   const [showRlComingSoon, setShowRlComingSoon] = useState(false);
 
-  const worldJson = useMemo(() => JSON.stringify({ nodes: nodes, edges: edges }), [nodes, edges]);
+  const scenarioContext = useMemo(() => ({ config, issues }), [config, issues]);
+
+  const worldJson = useMemo(
+    () =>
+      JSON.stringify({ nodes: Object.values(config.nodes), edges: Object.values(config.edges) }),
+    [config]
+  );
 
   const grafanaResultsHref = useMemo(() => {
-    const world = nodes.find((n) => n.type === 'world');
-    if (!world?.data) return '/grafana';
-    return buildGrafanaResultsHref(
-      world.data.start as string,
-      world.data.end as string,
-      world.data.simulation_id as string
-    );
-  }, [nodes]);
+    const world = config.nodes[WORLD_ID];
+    if (!world) return '/grafana';
+    return buildGrafanaResultsHref(world.data.start, world.data.end, world.data.simulation_id);
+  }, [config]);
+
+  const nodeData = useMemo((): EditSidebarProps | null => {
+    if (!selection) return null;
+    const item = selection.isEdge ? config.edges[selection.id] : config.nodes[selection.id];
+    return item
+      ? { id: item.id, type: item.type, data: item.data, isEdge: selection.isEdge }
+      : null;
+  }, [selection, config]);
 
   const updateValue = useCallback(
-    (id: string, data: EditSidebarData, isEdge: boolean) => {
-      type T = Node<EditSidebarData> | Edge<EditSidebarData>;
-      const setter: CallableFunction = isEdge ? setEdges : setNodes;
-
-      const entryList: T[] = structuredClone(isEdge ? edges : nodes);
-      let foundItem: T | null = null;
-      entryList.forEach((item: T) => {
-        if (item.id === id) {
-          if (
-            item.data &&
-            item.data.errorField &&
-            item.data[item.data.errorField] !== data[item.data.errorField]
-          ) {
-            // field with error has changed, reset error
-            data.errorField = '';
-            data.errorMessage = '';
-          }
-
-          item.data = data;
-          foundItem = item;
-        }
-      });
-      setter(entryList);
-      let nd = structuredClone(nodeData);
-      if (!nd) {
-        nd = { id: foundItem!.id, data: data, type: foundItem!.type, isEdge: isEdge };
-      }
-      nd.data = data;
-      setNodeData(nd);
+    (id: string, data: ConfigData, isEdge: boolean) => {
+      const before = (isEdge ? config.edges[id] : config.nodes[id])?.data;
+      setConfig((c) => updateConfigData(c, id, isEdge, data));
+      setIssues((current) => clearChangedIssues(current, id, before, data));
     },
-    [nodes, edges, nodeData, setNodes, setEdges, setNodeData]
+    [config]
   );
+
+  /** Removing something from the graph removes it from the configuration. */
+  const removeEntities = useCallback((nodeIds: string[], edgeIds: string[]) => {
+    if (nodeIds.length === 0 && edgeIds.length === 0) return;
+    setConfig((c) => removeFromConfig(c, new Set(nodeIds), new Set(edgeIds)));
+  }, []);
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      setNodes((nds) => applyNodeChanges(changes, nds) as Node<EditSidebarData>[]);
-      if (!changes.map((c) => c.type).includes('select')) {
-        return;
-      }
-      const selectedChange = changes.find(
+      setNodes((nds) => applyNodeChanges(changes, nds));
+      removeEntities(
+        changes.filter((c) => c.type === 'remove').map((c) => c.id),
+        []
+      );
+      const selected = changes.find(
         (c): c is NodeSelectionChange => c.type === 'select' && c.selected
       );
-      const node: Node<EditSidebarData> | undefined = nodes.find(
-        (n) => n.id === selectedChange?.id
-      );
-      if (node) {
-        setNodeData({ id: node.id, type: node.type, data: node.data });
-        return;
+      if (selected) {
+        setSelection({ id: selected.id, isEdge: false });
       }
     },
-    [nodes, setNodes, setNodeData]
+    [removeEntities]
   );
 
-  const onEdgesChange: OnEdgesChange<Edge<EditSidebarData>> = useCallback(
+  const onEdgesChange: OnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
-      setEdges(
-        (eds: Edge<EditSidebarData>[]) => applyEdgeChanges(changes, eds) as Edge<EditSidebarData>[]
+      setEdges((eds) => applyEdgeChanges(changes, eds));
+      removeEntities(
+        [],
+        changes.filter((c) => c.type === 'remove').map((c) => c.id)
       );
-      if (!changes.map((c) => c.type).includes('select')) {
-        return;
-      }
-      const selectedChange = changes.find(
+      const selected = changes.find(
         (c): c is EdgeSelectionChange => c.type === 'select' && c.selected
       );
-      const edge: Edge<EditSidebarData> | undefined = edges.find(
-        (e) => e.id === selectedChange?.id
-      );
-      if (edge) {
-        setNodeData({ id: edge.id, type: edge.type, data: edge.data!, isEdge: true });
-        return;
+      if (selected) {
+        setSelection({ id: selected.id, isEdge: true });
       }
     },
-    [edges, setEdges, setNodeData]
+    [removeEntities]
   );
+
+  /** Adds a connection to the graph and, unless it exists already, to the configuration. */
+  const connect = useCallback(
+    (source: string, sourceHandle: string, target: string, targetHandle: string) => {
+      const type =
+        source.startsWith('market') && target.startsWith('unit') ? 'unit-market' : 'default';
+      const id = edgeId(source, sourceHandle, target, targetHandle);
+      const data = initialData(type);
+      setEdges((eds) =>
+        addEdge({ id, source, sourceHandle, target, targetHandle, type, data: {} }, eds)
+      );
+      setConfig((c) => (c.edges[id] ? c : addConfigEdge(c, { id, type, source, target, data })));
+    },
+    []
+  );
+
+  /** Adds a node to the graph and to the configuration. */
+  const createNode = useCallback((nodeType: string, position: { x: number; y: number }) => {
+    const id = getId(nodeType);
+    setNodes((nds) => nds.concat({ id, type: nodeType, position, data: {} }));
+    const data = initialData(nodeType); // not inside the updater, it numbers the default name
+    setConfig((c) => addConfigNode(c, { id, type: nodeType, data }));
+    return id;
+  }, []);
 
   const isValidConnection = useCallback(
     (connection: Connection | Edge) => {
@@ -217,24 +234,13 @@ export default function Home() {
   );
   const onConnect: OnConnect = useCallback(
     (connection) =>
-      setEdges((eds) => {
-        const t =
-          connection.source.startsWith('market') && connection.target.startsWith('unit')
-            ? 'unit-market'
-            : 'default';
-        // Build edge like in onConnect
-        const newEdge: Edge<EditSidebarData> = {
-          id: `${connection.source}#${connection.sourceHandle}#${connection.target}#${connection.targetHandle}`,
-          source: connection.source,
-          sourceHandle: connection.sourceHandle,
-          target: connection.target,
-          targetHandle: connection.targetHandle,
-          type: t,
-          data: initialData(t),
-        };
-        return addEdge(newEdge, eds);
-      }),
-    [setEdges]
+      connect(
+        connection.source,
+        connection.sourceHandle ?? '',
+        connection.target,
+        connection.targetHandle ?? ''
+      ),
+    [connect]
   );
 
   const onConnectEnd = useCallback(
@@ -259,41 +265,15 @@ export default function Home() {
       const clientY = 'changedTouches' in event ? event.changedTouches[0].clientY : event.clientY;
 
       // create new Node at canvas coords corresponding to mouse position
-      const newNodeId = getId(newNodeType);
-      const newNode: Node<EditSidebarData> = {
-        id: newNodeId,
-        type: newNodeType,
-        position: screenToFlowPosition({ x: clientX, y: clientY }),
-        data: initialData(newNodeType),
-      };
-
-      const t =
-        sourceID.startsWith('market') && newNodeId.startsWith('unit') ? 'unit-market' : 'default';
-      // Build edge like in onConnect
-      const newEdge: Edge<EditSidebarData> = {
-        id: `${sourceID}#${handleID}#${newNodeId}#${targetHandleId}`,
-        source: sourceID,
-        sourceHandle: handleID,
-        target: newNodeId,
-        targetHandle: targetHandleId,
-        type: t,
-        data: initialData(t),
-      };
-
-      setNodes((nds) => nds.concat(newNode));
-      setEdges((eds) => eds.concat(newEdge));
+      const newNodeId = createNode(newNodeType, screenToFlowPosition({ x: clientX, y: clientY }));
+      connect(sourceID, handleID, newNodeId, targetHandleId);
     },
-    [screenToFlowPosition, setNodes, setEdges]
+    [screenToFlowPosition, createNode, connect]
   );
 
-  const updateForecast = useCallback(
-    (type: keyof Forecast, value: string | null) => {
-      const tmp = structuredClone(forecast);
-      tmp[type] = value;
-      setForecast(tmp);
-    },
-    [forecast, setForecast]
-  );
+  const updateForecast = useCallback((type: keyof Forecast, value: string | null) => {
+    setConfig((c) => ({ ...c, forecasts: { ...c.forecasts, [type]: value } }));
+  }, []);
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault();
@@ -304,56 +284,59 @@ export default function Home() {
     (event: React.DragEvent) => {
       event.preventDefault();
       if (!type) return;
-      const newNode: Node<EditSidebarData> = {
-        id: getId(type),
-        type,
-        position: screenToFlowPosition({
-          x: event.clientX,
-          y: event.clientY,
-        }),
-        data: initialData(type),
-      };
-      setNodes((nds) => nds.concat(newNode));
+      createNode(type, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
     },
-    [screenToFlowPosition, setNodes, type]
+    [screenToFlowPosition, createNode, type]
   );
 
-  const stopEditView = useCallback(() => setNodeData(null), [setNodeData]);
+  const stopEditView = useCallback(() => setSelection(null), []);
+
+  const applyScenario = useCallback((scenario: Scenario) => {
+    const graph = buildGraph(scenario);
+    setConfig(scenario.config);
+    setNodes(graph.nodes);
+    setEdges(graph.edges);
+    setIssues({});
+    setSelection(null);
+  }, []);
+
+  /** The scenario as it is saved and downloaded: config and layout side by side. */
+  const currentScenario = useCallback(
+    (): Scenario => ({ config, layout: extractLayout(nodes, edges) }),
+    [config, nodes, edges]
+  );
 
   const reset = useCallback(() => {
     if (!confirm('Are you sure you want to reset the flow? This action cannot be undone.')) {
       return;
     }
-    setNodes(createInitialNodes());
-    setEdges(initialEdges);
-    setForecast(initialForecast);
-    localStorage.removeItem('flow');
-    setNodeData(null);
+    applyScenario(createInitialScenario());
+    localStorage.removeItem(STORAGE_KEY);
     setAlert({ message: 'Flow reset successfully', severity: 'success' });
-  }, [setNodes, setEdges, setNodeData]);
+  }, [applyScenario]);
 
   const submit = useCallback(async () => {
     if (isSubmitting) {
       return;
     }
     setIsSubmitting(true);
+    setIssues({});
     try {
-      const response: DataResponse = await sendData(nodes, edges, forecast);
+      const response: DataResponse = await sendData(config);
       if (response.success) {
         setAlert({ message: 'Flow submitted successfully', severity: 'success' });
         return;
       }
       // handle validation error
-      if (response.id && response.field && response.message) {
-        const foundNode = nodes.find((n) => n.id === response.id);
-        const found = foundNode ?? edges.find((e) => e.id === response.id);
-        if (found && found.data) {
-          found.data.errorField = response.field;
-          found.data.errorMessage = response.message;
-          updateValue(found.id, found.data, !foundNode);
-          setAlert({ message: 'Invalid configuration: ' + response.message, severity: 'warning' });
-          return;
-        }
+      if (
+        response.id &&
+        response.field &&
+        response.message &&
+        (response.id in config.nodes || response.id in config.edges)
+      ) {
+        setIssues({ [response.id]: [{ field: response.field, message: response.message }] });
+        setAlert({ message: 'Invalid configuration: ' + response.message, severity: 'warning' });
+        return;
       }
       console.error('Unknown error: ', response);
       setAlert({
@@ -363,33 +346,34 @@ export default function Home() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [nodes, edges, forecast, updateValue, setAlert, isSubmitting]);
+  }, [config, setAlert, isSubmitting]);
 
   const setFlowByJson = useCallback(
     (data: string) => {
-      const loaded = JSON.parse(data);
-      setNodes(loaded['nodes'] ?? createInitialNodes());
-      setEdges(loaded['edges'] ?? initialEdges);
-      setForecast(loaded['forecasts'] ?? initialForecast);
+      try {
+        applyScenario(parseScenarioFile(data));
+      } catch (e) {
+        setAlert({
+          message: e instanceof Error ? e.message : 'Could not read the file',
+          severity: 'error',
+        });
+      }
     },
-    [setNodes, setEdges, setForecast]
+    [applyScenario]
   );
 
   const save = useCallback(() => {
-    localStorage.setItem(
-      'flow',
-      JSON.stringify({ nodes: nodes, edges: edges, forecasts: forecast })
-    );
+    localStorage.setItem(STORAGE_KEY, serializeScenario(currentScenario()));
     setAlert({ message: 'Flow saved successfully', severity: 'success' });
-  }, [nodes, edges, forecast]);
+  }, [currentScenario]);
 
   const autoArrange = useCallback(() => {
     setNodes((nds) => getLayoutedElements(nds, edges));
     window.requestAnimationFrame(() => fitView({ padding: 0.1 }));
-  }, [edges, fitView, setNodes]);
+  }, [edges, fitView]);
 
   const download = useCallback(() => {
-    const blob = JSON.stringify({ nodes: nodes, edges: edges });
+    const blob = serializeScenario(currentScenario());
     const href = URL.createObjectURL(new Blob([blob], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = href;
@@ -397,7 +381,7 @@ export default function Home() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, [nodes, edges]);
+  }, [currentScenario]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -410,90 +394,93 @@ export default function Home() {
   }, [stopEditView]);
 
   return (
-    <div className="flex h-full">
-      <Snackbar
-        open={!!alert.message}
-        autoHideDuration={3000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        onClose={() => setAlert({ ...alert, message: '' })}
-        onClick={() => setAlert({ ...alert, message: '' })}
-      >
-        <Alert severity={alert.severity} variant="outlined">
-          {alert.message}
-        </Alert>
-      </Snackbar>
-      <Sidebar
-        nodeData={nodeData}
-        updateValue={updateValue}
-        forecast={forecast}
-        updateForecast={updateForecast}
-        close={stopEditView}
-      />
-      <div className="flex grow flex-col select-none">
-        <Header
-          grafanaResultsHref={grafanaResultsHref}
-          onDiscussSimulation={() => {
-            setDiscussChatMounted(true);
-            setShowDiscuss(true);
-          }}
-          onReinforcementLearning={() => setShowRlComingSoon(true)}
+    <ScenarioContext.Provider value={scenarioContext}>
+      <div className="flex h-full">
+        <Snackbar
+          open={!!alert.message}
+          autoHideDuration={3000}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          onClose={() => setAlert({ ...alert, message: '' })}
+          onClick={() => setAlert({ ...alert, message: '' })}
+        >
+          <Alert severity={alert.severity} variant="outlined">
+            {alert.message}
+          </Alert>
+        </Snackbar>
+        <Sidebar
+          nodeData={nodeData}
+          issues={nodeData ? (issues[nodeData.id] ?? []) : []}
+          updateValue={updateValue}
+          forecast={config.forecasts}
+          updateForecast={updateForecast}
+          close={stopEditView}
         />
-        {showRlComingSoon && (
-          <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
-            <div>
-              <div className="font-bold text-sm">Reinforcement Learning</div>
-              <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
+        <div className="flex grow flex-col select-none">
+          <Header
+            grafanaResultsHref={grafanaResultsHref}
+            onDiscussSimulation={() => {
+              setDiscussChatMounted(true);
+              setShowDiscuss(true);
+            }}
+            onReinforcementLearning={() => setShowRlComingSoon(true)}
+          />
+          {showRlComingSoon && (
+            <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
+              <div>
+                <div className="font-bold text-sm">Reinforcement Learning</div>
+                <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
+              </div>
+              <button
+                type="button"
+                className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
+                onClick={() => setShowRlComingSoon(false)}
+              >
+                Dismiss
+              </button>
             </div>
-            <button
-              type="button"
-              className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
-              onClick={() => setShowRlComingSoon(false)}
+          )}
+          <div className="grow" onContextMenu={(e) => e.preventDefault()} ref={reactFlowWrapper}>
+            <ReactFlow
+              deleteKeyCode={['Delete', 'Backspace']}
+              nodes={nodes}
+              edges={edges}
+              nodeTypes={nodeTypes}
+              onPaneClick={stopEditView}
+              onNodesChange={onNodesChange}
+              onEdgesChange={onEdgesChange}
+              onConnect={onConnect}
+              onConnectEnd={onConnectEnd}
+              onDragOver={onDragOver}
+              isValidConnection={isValidConnection}
+              onDrop={onDrop}
+              edgeTypes={edgeTypes}
+              fitView
             >
-              Dismiss
-            </button>
+              <Controls />
+              <Background />
+              <Panel position="bottom-right">
+                <Cockpit
+                  submit={submit}
+                  processing={isSubmitting}
+                  reset={reset}
+                  save={save}
+                  download={download}
+                  setFlowByJson={setFlowByJson}
+                  autoArrange={autoArrange}
+                />
+              </Panel>
+            </ReactFlow>
           </div>
-        )}
-        <div className="grow" onContextMenu={(e) => e.preventDefault()} ref={reactFlowWrapper}>
-          <ReactFlow
-            deleteKeyCode={['Delete', 'Backspace']}
-            nodes={nodes}
-            edges={edges}
-            nodeTypes={nodeTypes}
-            onPaneClick={stopEditView}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onConnectEnd={onConnectEnd}
-            onDragOver={onDragOver}
-            isValidConnection={isValidConnection}
-            onDrop={onDrop}
-            edgeTypes={edgeTypes}
-            fitView
-          >
-            <Controls />
-            <Background />
-            <Panel position="bottom-right">
-              <Cockpit
-                submit={submit}
-                processing={isSubmitting}
-                reset={reset}
-                save={save}
-                download={download}
-                setFlowByJson={setFlowByJson}
-                autoArrange={autoArrange}
-              />
-            </Panel>
-          </ReactFlow>
+          <Footer />
         </div>
-        <Footer />
+        {discussChatMounted && (
+          <DiscussSimulationChat
+            open={showDiscuss}
+            worldJson={worldJson}
+            onClose={() => setShowDiscuss(false)}
+          />
+        )}
       </div>
-      {discussChatMounted && (
-        <DiscussSimulationChat
-          open={showDiscuss}
-          worldJson={worldJson}
-          onClose={() => setShowDiscuss(false)}
-        />
-      )}
-    </div>
+    </ScenarioContext.Provider>
   );
 }
