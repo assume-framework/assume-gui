@@ -1,10 +1,8 @@
 export default function Header({
   onDiscussSimulation,
-  onReinforcementLearning,
   grafanaResultsHref = '/grafana',
 }: {
   onDiscussSimulation?: () => void;
-  onReinforcementLearning?: () => void;
   // World time range for Grafana, e.g. `/grafana/?from=...&to=...`
   grafanaResultsHref?: string;
 } = {}) {
@@ -26,11 +24,6 @@ export default function Header({
             >
               Results
             </a>
-          </li>
-          <li>
-            <button type="button" className={headerClasses} onClick={onReinforcementLearning}>
-              Reinforcement Learning
-            </button>
           </li>
           <li>
             <button type="button" className={headerClasses} onClick={onDiscussSimulation}>

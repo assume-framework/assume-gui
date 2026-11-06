@@ -115,7 +115,6 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDiscuss, setShowDiscuss] = useState(false);
   const [discussChatMounted, setDiscussChatMounted] = useState(false);
-  const [showRlComingSoon, setShowRlComingSoon] = useState(false);
 
   const scenarioContext = useMemo(() => ({ config, issues }), [config, issues]);
 
@@ -397,23 +396,7 @@ export default function Home() {
             setDiscussChatMounted(true);
             setShowDiscuss(true);
           }}
-          onReinforcementLearning={() => setShowRlComingSoon(true)}
         />
-        {showRlComingSoon && (
-          <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
-            <div>
-              <div className="font-bold text-sm">Reinforcement Learning</div>
-              <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
-            </div>
-            <button
-              type="button"
-              className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
-              onClick={() => setShowRlComingSoon(false)}
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
         <div className="flex min-h-0 grow">
           <Sidebar
             nodeData={nodeData}
