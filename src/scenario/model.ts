@@ -1,6 +1,6 @@
 /** Pure functions on the scenario model. No React, no browser APIs except `crypto.randomUUID`. */
 import type { Edge, Node } from '@xyflow/react';
-import { initialWorld } from '../utils';
+import { initialWorld } from './defaults';
 import {
   type ConfigData,
   type ConfigEdge,

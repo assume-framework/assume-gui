@@ -5,11 +5,11 @@ import {
   type ConfigData,
   type ConfigEdge,
   type ConfigNode,
+  type Forecast,
   type GraphLayout,
   type Scenario,
   type ScenarioFile,
 } from './types';
-import type { Forecast } from '../ui/SidebarComponents/UploadSidebar';
 
 /**
  * A scenario file as far as it can be trusted before validation: any member may be missing, and

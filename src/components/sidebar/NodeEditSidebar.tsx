@@ -1,10 +1,10 @@
-import Input from '../InputComponents/Input';
-import MarketEdit from './EditPages/MarketEdit';
-import MarketProductEdit from './EditPages/MarketProductEdit';
-import UnitEdit from './EditPages/UnitEdit';
-import UnitMarketEdit from './EditPages/UnitMarketEdit';
-import WorldEdit from './EditPages/WorldEdit';
-import { handleChange } from '../../utils';
+import Input from '../inputs/Input';
+import MarketEdit from './edit/MarketEdit';
+import MarketProductEdit from './edit/MarketProductEdit';
+import UnitEdit from './edit/UnitEdit';
+import UnitMarketEdit from './edit/UnitMarketEdit';
+import WorldEdit from './edit/WorldEdit';
+import { handleChange } from '../inputs/handleChange';
 import type { ConfigData, ConfigIssue } from '../../scenario/types';
 
 export type EditComponentArgs = {

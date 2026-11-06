@@ -14,11 +14,11 @@ const HAS_GLOBAL_OPENAI_MODEL = GLOBAL_OPENAI_MODEL.length > 0;
 
 export default function DiscussSimulationChat({
   open,
-  worldJson,
+  scenarioJson,
   onClose,
 }: {
   open: boolean;
-  worldJson: string;
+  scenarioJson: string;
   onClose: () => void;
 }) {
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -111,11 +111,11 @@ export default function DiscussSimulationChat({
           'You are a helpful assistant that helps the user with simulating energy markets using the ASSUME-GUI.',
           'The simulation has a market operator, which can have multiple markets. And Unit operators - which manage multiple units.',
           'The market design is configurable. If there are multiple markets, help the user structure the order of the markets.',
-          'Use the following world JSON as authoritative context.',
+          'Use the following scenario JSON (config and layout) as authoritative context.',
           'Remember that the user does not know about the JSON and sees the graph visualized instead. Do not quote position fields or JSON; they are irrelevant.',
           '',
-          'WORLD_JSON:',
-          worldJson,
+          'SCENARIO_JSON:',
+          scenarioJson,
         ].join('\n'),
       },
       ...history,

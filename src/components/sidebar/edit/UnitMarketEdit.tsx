@@ -1,7 +1,7 @@
-import { handleChange } from '../../../utils';
-import Select from '../../InputComponents/Select';
+import { handleChange } from '../../inputs/handleChange';
+import Select from '../../inputs/Select';
 import type { EditComponentArgs } from '../NodeEditSidebar';
-import { UNIT_MARKET_STRATEGIES } from '../../UnitMarketStrategies';
+import { UNIT_MARKET_STRATEGIES } from '../../../scenario/strategies';
 
 function UnitMarketEdit({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {
   const onChange = handleChange(id, data, updateNodeValue, true);

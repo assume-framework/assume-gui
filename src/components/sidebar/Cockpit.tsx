@@ -9,7 +9,7 @@ import {
 import { CircularProgress } from '@mui/material';
 import { type ChangeEvent, type ComponentType, type MouseEventHandler } from 'react';
 
-type Args = {
+export type CockpitProps = {
   reset: () => void;
   setFlowByJson: (data: string) => void;
   submit?: () => void;
@@ -27,7 +27,7 @@ export default function Cockpit({
   save,
   download,
   autoArrange,
-}: Args) {
+}: CockpitProps) {
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
     const file = input.files?.[0];
@@ -69,17 +69,17 @@ export default function Cockpit({
         className={`${cockpitItemClasses(false)} peer-focus-visible:ring-2 peer-focus-visible:ring-emerald-400`}
       >
         <FileUploadOutlined />
-        <span className="px-3">Upload</span>
+        <span className="pl-3">Upload</span>
       </label>
     </>
   );
 }
 
 const cockpitItemClasses = (disabled: boolean) =>
-  `bg-white border rounded w-full my-2 py-1 px-3 flex items-center ${
+  `bg-gray-50 border rounded-xl w-full my-2 py-2 px-2 flex items-center ${
     disabled
       ? 'cursor-not-allowed opacity-60'
-      : 'cursor-pointer hover:bg-neutral-100 active:bg-neutral-300'
+      : 'cursor-pointer hover:bg-gray-100 active:bg-gray-200'
   }`;
 
 interface ElementArgs {
@@ -99,7 +99,7 @@ function CockpitElement({ onClick, name, Icon, processing = false }: ElementArgs
       aria-busy={processing}
     >
       <Icon />
-      <span className="px-3">{name}</span>
+      <span className="pl-3">{name}</span>
       {processing && <CircularProgress size={16} thickness={5} color="success" />}
     </button>
   );

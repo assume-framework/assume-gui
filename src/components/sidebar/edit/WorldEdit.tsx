@@ -1,5 +1,5 @@
-import { handleChange } from '../../../utils';
-import Input from '../../InputComponents/Input';
+import { handleChange } from '../../inputs/handleChange';
+import Input from '../../inputs/Input';
 import type { EditComponentArgs } from '../NodeEditSidebar';
 
 export default function WorldEdit({

@@ -1,6 +1,6 @@
-import { handleChange } from '../../../utils';
-import Input from '../../InputComponents/Input';
-import Select from '../../InputComponents/Select';
+import { handleChange } from '../../inputs/handleChange';
+import Input from '../../inputs/Input';
+import Select from '../../inputs/Select';
 import type { EditComponentArgs } from '../NodeEditSidebar';
 
 function MarketEdit({ id, data, updateNodeValue, getErrorMessage }: EditComponentArgs) {

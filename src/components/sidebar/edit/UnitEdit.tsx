@@ -1,9 +1,10 @@
-import { handleChange, initialData } from '../../../utils';
+import { handleChange } from '../../inputs/handleChange';
+import { initialData } from '../../../scenario/defaults';
 import type { EditComponentArgs } from '../NodeEditSidebar';
-import Select from '../../InputComponents/Select';
-import Input from '../../InputComponents/Input';
-import Modal from '../../InputComponents/Modal';
-import { InputOrUpload } from '../../InputComponents/InputOrUpload';
+import Select from '../../inputs/Select';
+import Input from '../../inputs/Input';
+import Modal from '../../inputs/Modal';
+import { InputOrUpload } from '../../inputs/InputOrUpload';
 
 export default function UnitEdit({
   id,

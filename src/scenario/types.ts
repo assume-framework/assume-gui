@@ -10,7 +10,11 @@
  *
  * Transient UI state (selection, validation issues, measured node sizes) lives in neither.
  */
-import type { Forecast } from '../ui/SidebarComponents/UploadSidebar';
+/** Ids of the uploaded forecast documents, if any. */
+export interface Forecast {
+  price: string | null;
+  residual_load: string | null;
+}
 
 /** Editable parameters of one entity. Values are strings, exactly as the user typed them. */
 export interface ConfigData {

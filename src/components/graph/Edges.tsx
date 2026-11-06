@@ -1,6 +1,6 @@
 import { BaseEdge, EdgeLabelRenderer, getSimpleBezierPath, type EdgeProps } from '@xyflow/react';
-import { useItemView } from '../scenario/context';
-import { UNIT_MARKET_STRATEGY_LABELS } from './UnitMarketStrategies';
+import { useItemView } from '../../scenario/context';
+import { UNIT_MARKET_STRATEGY_LABELS } from '../../scenario/strategies';
 
 export function UnitMarketEdge({ id, sourceX, sourceY, targetX, targetY, selected }: EdgeProps) {
   const { data, hasError } = useItemView(id, true);

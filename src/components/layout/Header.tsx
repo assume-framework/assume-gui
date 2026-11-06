@@ -6,12 +6,12 @@ export default function Header({
   // World time range for Grafana, e.g. `/grafana/?from=...&to=...`
   grafanaResultsHref?: string;
 } = {}) {
-  const headerClasses = 'p-2 m-1 text-xl rounded-md hover:bg-gray-300 cursor-pointer';
+  const headerClasses = 'px-2 py-0.5 mx-1 text-xl rounded hover:bg-gray-300 cursor-pointer';
 
   return (
-    <header className="p-2 flex justify-between items-center border-b-1 border-gray-300">
+    <header className="py-0.5 px-2 flex justify-between items-center border-b-1 border-gray-300">
       <a href="/">
-        <img src="/assume_logo.png" alt="ASSUME Logo" className="w-20" />
+        <img src="/assume_logo.png" alt="ASSUME Logo" className="w-14" />
       </a>
       <nav>
         <ul className="flex items-center">

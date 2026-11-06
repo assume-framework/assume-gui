@@ -5,7 +5,7 @@ import {
   UploadFileOutlined,
 } from '@mui/icons-material';
 import { Alert, Snackbar } from '@mui/material';
-import { uploadFile } from '../../sendData';
+import { uploadFile } from '../../api/sendData';
 import { type ChangeEvent, useId, useState } from 'react';
 
 // Browsers (notably on Windows) do not always report `text/csv` for .csv files.

@@ -1,5 +1,5 @@
-import { toRequestPayload } from './scenario/model';
-import type { ScenarioConfig } from './scenario/types';
+import { toRequestPayload } from '../scenario/model';
+import type { ScenarioConfig } from '../scenario/types';
 
 export interface DataResponse {
   success: boolean;

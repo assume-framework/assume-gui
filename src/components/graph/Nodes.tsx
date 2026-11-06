@@ -1,5 +1,5 @@
 import { Handle, type NodeProps, Position, useNodeConnections } from '@xyflow/react';
-import { useItemView } from '../scenario/context';
+import { useItemView } from '../../scenario/context';
 import PublicOutlinedIcon from '@mui/icons-material/PublicOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import AccountBalanceOutlinedIcon from '@mui/icons-material/AccountBalanceOutlined';
