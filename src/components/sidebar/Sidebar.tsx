@@ -4,14 +4,13 @@ import { useScenario } from '../../scenario/context';
 import { CloseOutlined } from '@mui/icons-material';
 import type { ConfigIssue } from '../../scenario/types';
 
-interface SidebarProps extends Omit<GlobalSidebarProps, 'clearSelection'> {
+interface SidebarProps extends GlobalSidebarProps {
   nodeData: EditSidebarProps | null;
   /** Validation issues of the item shown in the editor. */
   issues: ConfigIssue[];
-  close: () => void;
 }
 
-export default function Sidebar({ nodeData, issues, close, ...global }: SidebarProps) {
+export default function Sidebar({ nodeData, issues, clearSelection, ...global }: SidebarProps) {
   const { updateValue } = useScenario().actions;
   return (
     <aside className="w-full h-full max-w-xs border-r border-gray-300 flex flex-col select-none">
@@ -37,7 +36,7 @@ export default function Sidebar({ nodeData, issues, close, ...global }: SidebarP
             />
           </>
         ) : (
-          <GlobalSidebar {...global} clearSelection={close} />
+          <GlobalSidebar {...global} clearSelection={clearSelection} />
         )}
       </div>
     </aside>

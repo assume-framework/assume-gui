@@ -83,7 +83,7 @@ export default function App() {
             nodeData={nodeData}
             issues={nodeData ? (issues[nodeData.id] ?? []) : []}
             setAlert={setAlert}
-            close={stopEditView}
+            clearSelection={stopEditView}
           />
           <Graph
             initial={initial}

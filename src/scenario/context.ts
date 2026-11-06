@@ -59,7 +59,6 @@ export function useScenario(): ScenarioContextValue {
   return ctx;
 }
 
-
 /**
  * Owns the scenario configuration and its validation issues. Provide the result as context.
  *
