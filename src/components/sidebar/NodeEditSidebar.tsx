@@ -37,6 +37,14 @@ export default function EditSidebar({
 
   const getErrorMessage = (field: string): string | undefined =>
     issues.find((issue) => issue.field === field)?.message;
+
+  const props: EditComponentArgs = {
+    id: id,
+    data: data,
+    getErrorMessage: getErrorMessage,
+    updateNodeValue: updateNodeValue,
+  };
+
   return (
     <form className="px-8 pt-6 pb-8 mb-4" id="NodeEditForm" onSubmit={(e) => e.preventDefault()}>
       <Input
@@ -47,46 +55,11 @@ export default function EditSidebar({
         errorMessage={getErrorMessage('name')}
         tooltip="Identifier of the component - can be any string"
       />
-      {type === 'unit' && (
-        <UnitEdit
-          id={id}
-          data={data}
-          getErrorMessage={getErrorMessage}
-          updateNodeValue={updateNodeValue}
-        />
-      )}
-      {type === 'market' && (
-        <MarketEdit
-          id={id}
-          data={data}
-          getErrorMessage={getErrorMessage}
-          updateNodeValue={updateNodeValue}
-        />
-      )}
-      {type === 'marketProduct' && (
-        <MarketProductEdit
-          id={id}
-          data={data}
-          getErrorMessage={getErrorMessage}
-          updateNodeValue={updateNodeValue}
-        />
-      )}
-      {type === 'world' && (
-        <WorldEdit
-          id={id}
-          data={data}
-          getErrorMessage={getErrorMessage}
-          updateNodeValue={updateNodeValue}
-        />
-      )}
-      {type === 'unit-market' && (
-        <UnitMarketEdit
-          id={id}
-          data={data}
-          getErrorMessage={getErrorMessage}
-          updateNodeValue={updateNodeValue}
-        />
-      )}
+      {type === 'unit' && <UnitEdit {...props} />}
+      {type === 'market' && <MarketEdit {...props} />}
+      {type === 'marketProduct' && <MarketProductEdit {...props} />}
+      {type === 'world' && <WorldEdit {...props} />}
+      {type === 'unit-market' && <UnitMarketEdit {...props} />}
     </form>
   );
 }
