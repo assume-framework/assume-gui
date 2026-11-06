@@ -1,55 +1,17 @@
-import { handleChange } from '../../../inputs/handleChange';
 import type { EditComponentArgs } from '../../NodeEditSidebar';
-import Input from '../../../inputs/Input';
-import Modal from '../../../inputs/Modal';
-import { InputOrUpload } from '../../../inputs/InputOrUpload';
+import FieldList, { type FieldSpec } from './FieldList';
 
-export default function ExchangeEdit({
-  id,
-  data,
-  updateNodeValue,
-  getErrorMessage,
-}: EditComponentArgs) {
-  const onChange = handleChange(id, data, updateNodeValue);
+const fields: FieldSpec[] = [
+  { key: 'price_import', label: 'Price import', tooltip: 'The price for import of the unit.' },
+  { key: 'price_export', label: 'Price export', tooltip: 'The price for export of the unit.' },
+];
 
-  return (
-    <>
-      <Input
-        type="number"
-        label="Price import"
-        value={data.price_import}
-        tooltip="The price for import of the unit."
-        onChange={onChange('price_import')}
-        errorMessage={getErrorMessage('price_import')}
-      />
-      <Input
-        type="number"
-        label="Price export"
-        value={data.price_export}
-        tooltip="The price for export of the unit."
-        onChange={onChange('price_export')}
-        errorMessage={getErrorMessage('price_export')}
-      />
-      <Modal name="Forecast settings">
-        <InputOrUpload
-          label="Forecast availability"
-          value={data.forecast_availability}
-          onChange={onChange('forecast_availability')}
-          errorMessage={getErrorMessage('forecast_availability')}
-        />
-        <InputOrUpload
-          label="Forecast import volume"
-          value={data.forecast_volume_import}
-          onChange={onChange('forecast_volume_import')}
-          errorMessage={getErrorMessage('forecast_volume_import')}
-        />
-        <InputOrUpload
-          label="Forecast export volume"
-          value={data.forecast_volume_export}
-          onChange={onChange('forecast_volume_export')}
-          errorMessage={getErrorMessage('forecast_volume_export')}
-        />
-      </Modal>
-    </>
-  );
+const forecasts: FieldSpec[] = [
+  { key: 'forecast_availability', label: 'Forecast availability' },
+  { key: 'forecast_volume_import', label: 'Forecast import volume' },
+  { key: 'forecast_volume_export', label: 'Forecast export volume' },
+];
+
+export default function ExchangeEdit(props: EditComponentArgs) {
+  return <FieldList {...props} fields={fields} forecasts={forecasts} />;
 }

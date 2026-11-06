@@ -1,64 +1,38 @@
-import { useCallback, useState, type Dispatch, type SetStateAction } from 'react';
-import { useReactFlow, type Edge, type Node } from '@xyflow/react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import UploadButton from '../inputs/UploadButton';
 import Cockpit from './Cockpit';
-import { createInitialScenario, buildGraph, extractLayout } from '../../scenario/model';
+import { useGraphActions } from '../graph/useGraphActions';
+import { useScenario } from '../../scenario/context';
+import { createInitialScenario } from '../../scenario/model';
 import { parseScenarioFile, serializeScenario } from '../../scenario/serialization';
 import { STORAGE_KEY } from '../../scenario/storage';
 import type { AlertState } from '../types';
-import type { Forecast, Issues, Scenario, ScenarioConfig } from '../../scenario/types';
+import type { Forecast, Scenario } from '../../scenario/types';
 import { sendData, type DataResponse } from '../../api/sendData';
-import { getLayoutedElements } from '../graph/autoLayout';
 
 export type GlobalSidebarProps = {
-  config: ScenarioConfig;
-  nodes: Node[];
-  edges: Edge[];
-  setConfig: Dispatch<SetStateAction<ScenarioConfig>>;
-  setNodes: Dispatch<SetStateAction<Node[]>>;
-  setEdges: Dispatch<SetStateAction<Edge[]>>;
-  setIssues: Dispatch<SetStateAction<Issues>>;
   setAlert: Dispatch<SetStateAction<AlertState>>;
   clearSelection: () => void;
 };
 
-export default function GlobalSidebar({
-  config,
-  nodes,
-  edges,
-  setConfig,
-  setNodes,
-  setEdges,
-  setIssues,
-  setAlert,
-  clearSelection,
-}: GlobalSidebarProps) {
-  const { fitView } = useReactFlow();
+export default function GlobalSidebar({ setAlert, clearSelection }: GlobalSidebarProps) {
+  const { config, actions } = useScenario();
+  const graph = useGraphActions();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const forecast = config.forecasts;
 
-  const updateForecast = (type: keyof Forecast, value: string | null) => {
-    setConfig((c) => ({ ...c, forecasts: { ...c.forecasts, [type]: value } }));
-  };
-
   const setDocumentID = (type: keyof Forecast) => (value: string | null) => {
-    updateForecast(type, value);
+    actions.updateForecast(type, value);
   };
 
-  const applyScenario = useCallback(
-    (scenario: Scenario) => {
-      const graph = buildGraph(scenario);
-      setConfig(scenario.config);
-      setNodes(graph.nodes);
-      setEdges(graph.edges);
-      setIssues({});
-      clearSelection();
-    },
-    [setConfig, setNodes, setEdges, setIssues, clearSelection]
-  );
+  const applyScenario = (scenario: Scenario) => {
+    actions.replaceConfig(scenario.config);
+    graph.replaceGraph(scenario);
+    clearSelection();
+  };
 
   /** The scenario as it is saved and downloaded: config and layout side by side. */
-  const currentScenario = (): Scenario => ({ config, layout: extractLayout(nodes, edges) });
+  const currentScenario = (): Scenario => ({ config, layout: graph.getLayout() });
 
   const reset = () => {
     if (!confirm('Are you sure you want to reset the flow? This action cannot be undone.')) {
@@ -74,7 +48,7 @@ export default function GlobalSidebar({
       return;
     }
     setIsSubmitting(true);
-    setIssues({});
+    actions.setIssues({});
     try {
       const response: DataResponse = await sendData(config);
       if (response.success) {
@@ -88,7 +62,9 @@ export default function GlobalSidebar({
         response.message &&
         (response.id in config.nodes || response.id in config.edges)
       ) {
-        setIssues({ [response.id]: [{ field: response.field, message: response.message }] });
+        actions.setIssues({
+          [response.id]: [{ field: response.field, message: response.message }],
+        });
         setAlert({ message: 'Invalid configuration: ' + response.message, severity: 'warning' });
         return;
       }
@@ -116,11 +92,6 @@ export default function GlobalSidebar({
   const save = () => {
     localStorage.setItem(STORAGE_KEY, serializeScenario(currentScenario()));
     setAlert({ message: 'Flow saved successfully', severity: 'success' });
-  };
-
-  const autoArrange = () => {
-    setNodes((nds) => getLayoutedElements(nds, edges));
-    window.requestAnimationFrame(() => fitView({ padding: 0.1 }));
   };
 
   const download = () => {
@@ -161,7 +132,7 @@ export default function GlobalSidebar({
           save={save}
           download={download}
           setFlowByJson={setFlowByJson}
-          autoArrange={autoArrange}
+          autoArrange={graph.autoArrange}
         />
       </div>
     </div>

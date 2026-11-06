@@ -12,7 +12,8 @@ export default function UnitEdit(props: EditComponentArgs) {
   const { id, data, updateNodeValue, getErrorMessage } = props;
   const onChange = handleChange(id, data, updateNodeValue);
   const reset = (value: string) => {
-    updateNodeValue(id, initialData(value), false);
+    // Start from the defaults of the new type, but keep the name the user gave the node.
+    updateNodeValue(id, { ...initialData(value), name: data.name }, false);
   };
 
   return (

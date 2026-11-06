@@ -1,17 +1,18 @@
 import EditSidebar, { type EditSidebarProps } from './NodeEditSidebar';
 import GlobalSidebar, { type GlobalSidebarProps } from './GlobalSidebar';
+import { useScenario } from '../../scenario/context';
 import { CloseOutlined } from '@mui/icons-material';
-import type { ConfigData, ConfigIssue } from '../../scenario/types';
+import type { ConfigIssue } from '../../scenario/types';
 
 interface SidebarProps extends Omit<GlobalSidebarProps, 'clearSelection'> {
   nodeData: EditSidebarProps | null;
   /** Validation issues of the item shown in the editor. */
   issues: ConfigIssue[];
-  updateValue: (id: string, data: ConfigData, isEdge: boolean) => void;
   close: () => void;
 }
 
-export default function Sidebar({ nodeData, issues, updateValue, close, ...global }: SidebarProps) {
+export default function Sidebar({ nodeData, issues, close, ...global }: SidebarProps) {
+  const { updateValue } = useScenario().actions;
   return (
     <aside className="w-full h-full max-w-xs border-r border-gray-300 flex flex-col select-none">
       <div className="grow min-h-0 overflow-y-auto">

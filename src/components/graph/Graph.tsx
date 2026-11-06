@@ -1,7 +1,5 @@
 import {
   addEdge,
-  applyEdgeChanges,
-  applyNodeChanges,
   Background,
   type Connection,
   Controls,
@@ -9,7 +7,6 @@ import {
   type EdgeChange,
   type EdgeSelectionChange,
   type FinalConnectionState,
-  type Node,
   type NodeChange,
   type NodeSelectionChange,
   type OnConnect,
@@ -18,7 +15,8 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react';
-import { useCallback, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useState, type Dispatch, type SetStateAction } from 'react';
+import { useScenario } from '../../scenario/context';
 
 import '@xyflow/react/dist/style.css';
 import './graph.css';
@@ -33,8 +31,8 @@ import {
   WorldNode,
 } from './Nodes';
 import type { AlertState } from '../types';
-import { addConfigEdge, addConfigNode, edgeId, removeFromConfig } from '../../scenario/model';
-import type { ScenarioConfig } from '../../scenario/types';
+import { buildGraph, edgeId } from '../../scenario/model';
+import type { Scenario } from '../../scenario/types';
 import { getId, initialData } from '../../scenario/defaults';
 
 const nodeTypes = {
@@ -56,40 +54,21 @@ export interface Selection {
 }
 
 interface GraphProps {
-  nodes: Node[];
-  edges: Edge[];
-  setNodes: Dispatch<SetStateAction<Node[]>>;
-  setEdges: Dispatch<SetStateAction<Edge[]>>;
-  setConfig: Dispatch<SetStateAction<ScenarioConfig>>;
+  /** Drawn on first render only; afterwards React Flow owns nodes and edges. */
+  initial: Scenario;
   setSelection: (selection: Selection) => void;
   setAlert: Dispatch<SetStateAction<AlertState>>;
   onPaneClick: () => void;
 }
 
-export default function Graph({
-  nodes,
-  edges,
-  setNodes,
-  setEdges,
-  setConfig,
-  setSelection,
-  setAlert,
-  onPaneClick,
-}: GraphProps) {
-  const { screenToFlowPosition } = useReactFlow();
-
-  /** Removing something from the graph removes it from the configuration. */
-  const removeEntities = useCallback(
-    (nodeIds: string[], edgeIds: string[]) => {
-      if (nodeIds.length === 0 && edgeIds.length === 0) return;
-      setConfig((c) => removeFromConfig(c, new Set(nodeIds), new Set(edgeIds)));
-    },
-    [setConfig]
-  );
+export default function Graph({ initial, setSelection, setAlert, onPaneClick }: GraphProps) {
+  const { screenToFlowPosition, setNodes, setEdges } = useReactFlow();
+  const [initialGraph] = useState(() => buildGraph(initial));
+  const { actions } = useScenario();
+  const { addNode, addEdge: addConfigEdge, removeEntities } = actions;
 
   const onNodesChange: OnNodesChange = useCallback(
     (changes: NodeChange[]) => {
-      setNodes((nds) => applyNodeChanges(changes, nds));
       removeEntities(
         changes.filter((c) => c.type === 'remove').map((c) => c.id),
         []
@@ -101,12 +80,11 @@ export default function Graph({
         setSelection({ id: selected.id, isEdge: false });
       }
     },
-    [removeEntities, setNodes, setSelection]
+    [removeEntities, setSelection]
   );
 
   const onEdgesChange: OnEdgesChange = useCallback(
     (changes: EdgeChange[]) => {
-      setEdges((eds) => applyEdgeChanges(changes, eds));
       removeEntities(
         [],
         changes.filter((c) => c.type === 'remove').map((c) => c.id)
@@ -118,7 +96,7 @@ export default function Graph({
         setSelection({ id: selected.id, isEdge: true });
       }
     },
-    [removeEntities, setEdges, setSelection]
+    [removeEntities, setSelection]
   );
 
   /** Adds a connection to the graph and, unless it exists already, to the configuration. */
@@ -131,9 +109,9 @@ export default function Graph({
       setEdges((eds) =>
         addEdge({ id, source, sourceHandle, target, targetHandle, type, data: {} }, eds)
       );
-      setConfig((c) => (c.edges[id] ? c : addConfigEdge(c, { id, type, source, target, data })));
+      addConfigEdge({ id, type, source, target, data });
     },
-    [setEdges, setConfig]
+    [setEdges, addConfigEdge]
   );
 
   /** Adds a node to the graph and to the configuration. */
@@ -142,10 +120,10 @@ export default function Graph({
       const id = getId(nodeType);
       setNodes((nds) => nds.concat({ id, type: nodeType, position, data: {} }));
       const data = initialData(nodeType); // not inside the updater, it numbers the default name
-      setConfig((c) => addConfigNode(c, { id, type: nodeType, data }));
+      addNode({ id, type: nodeType, data });
       return id;
     },
-    [setNodes, setConfig]
+    [setNodes, addNode]
   );
 
   const isValidConnection = useCallback(
@@ -209,8 +187,8 @@ export default function Graph({
     <div className="flex grow flex-col select-none" onContextMenu={(e) => e.preventDefault()}>
       <ReactFlow
         deleteKeyCode={['Delete', 'Backspace']}
-        nodes={nodes}
-        edges={edges}
+        defaultNodes={initialGraph.nodes}
+        defaultEdges={initialGraph.edges}
         nodeTypes={nodeTypes}
         onPaneClick={onPaneClick}
         onNodesChange={onNodesChange}
