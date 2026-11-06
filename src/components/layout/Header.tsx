@@ -1,0 +1,37 @@
+export default function Header({
+  onDiscussSimulation,
+  grafanaResultsHref = '/grafana',
+}: {
+  onDiscussSimulation?: () => void;
+  // World time range for Grafana, e.g. `/grafana/?from=...&to=...`
+  grafanaResultsHref?: string;
+} = {}) {
+  const headerClasses = 'px-2 py-0.5 mx-1 text-xl rounded hover:bg-gray-300 cursor-pointer';
+
+  return (
+    <header className="py-0.5 px-2 flex justify-between items-center border-b-1 border-gray-300">
+      <a href="/">
+        <img src="/assume_logo.png" alt="ASSUME Logo" className="w-14" />
+      </a>
+      <nav>
+        <ul className="flex items-center">
+          <li>
+            <a
+              className={headerClasses}
+              href={grafanaResultsHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Results
+            </a>
+          </li>
+          <li>
+            <button type="button" className={headerClasses} onClick={onDiscussSimulation}>
+              Discuss Simulation
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </header>
+  );
+}
