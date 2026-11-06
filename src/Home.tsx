@@ -19,12 +19,11 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react';
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import '@xyflow/react/dist/style.css';
 import './Home.css';
 
-import { DnDContext } from './DragDropContext';
 import { UnitMarketEdge } from './ui/Edges';
 import {
   MarketNode,
@@ -111,7 +110,6 @@ export default function Home() {
   const [edges, setEdges] = useState<Edge[]>(() => buildGraph(initial).edges);
   const [issues, setIssues] = useState<Issues>({});
   const [selection, setSelection] = useState<Selection | null>(null);
-  const [type] = useContext(DnDContext);
   const { screenToFlowPosition, fitView } = useReactFlow();
   const [alert, setAlert] = useState<AlertState>({ message: '', severity: 'info' });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -275,20 +273,6 @@ export default function Home() {
     setConfig((c) => ({ ...c, forecasts: { ...c.forecasts, [type]: value } }));
   }, []);
 
-  const onDragOver = useCallback((event: React.DragEvent) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const onDrop = useCallback(
-    (event: React.DragEvent) => {
-      event.preventDefault();
-      if (!type) return;
-      createNode(type, screenToFlowPosition({ x: event.clientX, y: event.clientY }));
-    },
-    [screenToFlowPosition, createNode, type]
-  );
-
   const stopEditView = useCallback(() => setSelection(null), []);
 
   const applyScenario = useCallback((scenario: Scenario) => {
@@ -395,7 +379,7 @@ export default function Home() {
 
   return (
     <ScenarioContext.Provider value={scenarioContext}>
-      <div className="flex h-full">
+      <div className="flex h-full flex-col">
         <Snackbar
           open={!!alert.message}
           autoHideDuration={3000}
@@ -407,71 +391,71 @@ export default function Home() {
             {alert.message}
           </Alert>
         </Snackbar>
-        <Sidebar
-          nodeData={nodeData}
-          issues={nodeData ? (issues[nodeData.id] ?? []) : []}
-          updateValue={updateValue}
-          forecast={config.forecasts}
-          updateForecast={updateForecast}
-          close={stopEditView}
+        <Header
+          grafanaResultsHref={grafanaResultsHref}
+          onDiscussSimulation={() => {
+            setDiscussChatMounted(true);
+            setShowDiscuss(true);
+          }}
+          onReinforcementLearning={() => setShowRlComingSoon(true)}
         />
-        <div className="flex grow flex-col select-none">
-          <Header
-            grafanaResultsHref={grafanaResultsHref}
-            onDiscussSimulation={() => {
-              setDiscussChatMounted(true);
-              setShowDiscuss(true);
-            }}
-            onReinforcementLearning={() => setShowRlComingSoon(true)}
-          />
-          {showRlComingSoon && (
-            <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
-              <div>
-                <div className="font-bold text-sm">Reinforcement Learning</div>
-                <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
-              </div>
-              <button
-                type="button"
-                className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
-                onClick={() => setShowRlComingSoon(false)}
-              >
-                Dismiss
-              </button>
+        {showRlComingSoon && (
+          <div className="mx-2 mb-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-amber-900 flex items-start justify-between gap-3">
+            <div>
+              <div className="font-bold text-sm">Reinforcement Learning</div>
+              <div className="text-sm text-amber-800">Coming soon. Check back later.</div>
             </div>
-          )}
-          <div className="grow" onContextMenu={(e) => e.preventDefault()} ref={reactFlowWrapper}>
-            <ReactFlow
-              deleteKeyCode={['Delete', 'Backspace']}
-              nodes={nodes}
-              edges={edges}
-              nodeTypes={nodeTypes}
-              onPaneClick={stopEditView}
-              onNodesChange={onNodesChange}
-              onEdgesChange={onEdgesChange}
-              onConnect={onConnect}
-              onConnectEnd={onConnectEnd}
-              onDragOver={onDragOver}
-              isValidConnection={isValidConnection}
-              onDrop={onDrop}
-              edgeTypes={edgeTypes}
-              fitView
+            <button
+              type="button"
+              className="shrink-0 rounded px-2 py-1 text-sm hover:bg-amber-100"
+              onClick={() => setShowRlComingSoon(false)}
             >
-              <Controls />
-              <Background />
-              <Panel position="bottom-right">
-                <Cockpit
-                  submit={submit}
-                  processing={isSubmitting}
-                  reset={reset}
-                  save={save}
-                  download={download}
-                  setFlowByJson={setFlowByJson}
-                  autoArrange={autoArrange}
-                />
-              </Panel>
-            </ReactFlow>
+              Dismiss
+            </button>
           </div>
-          <Footer />
+        )}
+        <div className="flex min-h-0 grow">
+          <Sidebar
+            nodeData={nodeData}
+            issues={nodeData ? (issues[nodeData.id] ?? []) : []}
+            updateValue={updateValue}
+            forecast={config.forecasts}
+            updateForecast={updateForecast}
+            close={stopEditView}
+          />
+          <div className="flex grow flex-col select-none">
+            <div className="grow" onContextMenu={(e) => e.preventDefault()} ref={reactFlowWrapper}>
+              <ReactFlow
+                deleteKeyCode={['Delete', 'Backspace']}
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                onPaneClick={stopEditView}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
+                onConnect={onConnect}
+                onConnectEnd={onConnectEnd}
+                isValidConnection={isValidConnection}
+                edgeTypes={edgeTypes}
+                fitView
+              >
+                <Controls />
+                <Background />
+                <Panel position="bottom-right">
+                  <Cockpit
+                    submit={submit}
+                    processing={isSubmitting}
+                    reset={reset}
+                    save={save}
+                    download={download}
+                    setFlowByJson={setFlowByJson}
+                    autoArrange={autoArrange}
+                  />
+                </Panel>
+              </ReactFlow>
+            </div>
+            <Footer />
+          </div>
         </div>
         {discussChatMounted && (
           <DiscussSimulationChat

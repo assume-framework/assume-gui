@@ -1,5 +1,4 @@
 import EditSidebar, { type EditSidebarProps } from './SidebarComponents/NodeEditSidebar';
-import SelectSidebar from './SidebarComponents/NodeSelectSidebar';
 import UploadSidebar, { type Forecast } from './SidebarComponents/UploadSidebar';
 import { CloseOutlined } from '@mui/icons-material';
 import type { ConfigData, ConfigIssue } from '../scenario/types';
@@ -45,10 +44,7 @@ export default function Sidebar({
           />
         </>
       ) : (
-        <>
-          <SelectSidebar />
-          <UploadSidebar updateForecast={updateForecast} forecast={forecast} />
-        </>
+        <UploadSidebar updateForecast={updateForecast} forecast={forecast} />
       )}
     </aside>
   );
