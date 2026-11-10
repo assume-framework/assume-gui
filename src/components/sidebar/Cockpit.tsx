@@ -1,5 +1,4 @@
 import {
-  AccountTreeOutlined,
   FileDownloadOutlined,
   FileUploadOutlined,
   ReplayOutlined,
@@ -16,7 +15,6 @@ export type CockpitProps = {
   processing?: boolean;
   save?: () => void;
   download?: () => void;
-  autoArrange?: () => void;
 };
 
 export default function Cockpit({
@@ -26,7 +24,6 @@ export default function Cockpit({
   processing = false,
   save,
   download,
-  autoArrange,
 }: CockpitProps) {
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
@@ -54,7 +51,6 @@ export default function Cockpit({
       />
       <CockpitElement name={'Save'} Icon={SaveOutlined} onClick={save} />
       <CockpitElement name={'Reset'} Icon={ReplayOutlined} onClick={reset} />
-      <CockpitElement name={'Auto Arrange'} onClick={autoArrange} Icon={AccountTreeOutlined} />
       <CockpitElement name={'Download'} onClick={download} Icon={FileDownloadOutlined} />
       {/* Visually hidden (not display:none) so the input stays keyboard-focusable. */}
       <input

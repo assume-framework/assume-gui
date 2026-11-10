@@ -132,7 +132,6 @@ export default function GlobalSidebar({ setAlert, clearSelection }: GlobalSideba
           save={save}
           download={download}
           setFlowByJson={setFlowByJson}
-          autoArrange={graph.autoArrange}
         />
       </div>
     </div>

@@ -15,13 +15,20 @@ import {
   ReactFlow,
   useReactFlow,
 } from '@xyflow/react';
-import { useCallback, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  useCallback,
+  useState,
+  type Dispatch,
+  type MouseEvent as ReactMouseEvent,
+  type SetStateAction,
+} from 'react';
 import { useScenario } from '../../scenario/context';
 
 import '@xyflow/react/dist/style.css';
 import './graph.css';
 
 import { UnitMarketEdge } from './Edges';
+import GraphContextMenu, { type ContextMenuState } from './contextMenu/GraphContextMenu.tsx';
 import {
   MarketNode,
   MarketProductNode,
@@ -63,6 +70,7 @@ interface GraphProps {
 
 export default function Graph({ initial, setSelection, setAlert, onPaneClick }: GraphProps) {
   const { screenToFlowPosition, setNodes, setEdges } = useReactFlow();
+  const [menu, setMenu] = useState<ContextMenuState | null>(null);
   const [initialGraph] = useState(() => buildGraph(initial));
   const { actions } = useScenario();
   const { addNode, addEdge: addConfigEdge, removeEntities } = actions;
@@ -183,14 +191,38 @@ export default function Graph({ initial, setSelection, setAlert, onPaneClick }: 
     [screenToFlowPosition, createNode, connect]
   );
 
+  const openMenu = useCallback(
+    (event: MouseEvent | ReactMouseEvent, target: ContextMenuState['target']) => {
+      event.preventDefault();
+      setMenu({ x: event.clientX, y: event.clientY, target });
+    },
+    []
+  );
+  const closeMenu = () => setMenu(null);
+
   return (
-    <div className="flex grow flex-col select-none" onContextMenu={(e) => e.preventDefault()}>
+    <div
+      className="flex grow flex-col select-none"
+      onContextMenu={(e) => e.preventDefault()}
+      onPointerDownCapture={(e) => {
+        // Any left click on the graph closes the menu. Clicks inside the menu (a portal) are
+        // React-bubbled to here, so only count events whose target is really in this element.
+        if (e.button === 0 && e.currentTarget.contains(e.target as Node)) closeMenu();
+      }}
+    >
       <ReactFlow
         deleteKeyCode={['Delete', 'Backspace']}
         defaultNodes={initialGraph.nodes}
         defaultEdges={initialGraph.edges}
         nodeTypes={nodeTypes}
         onPaneClick={onPaneClick}
+        onPaneContextMenu={(e) => openMenu(e, null)}
+        onNodeContextMenu={(e, node) =>
+          openMenu(e, { id: node.id, isEdge: false, deletable: node.deletable !== false })
+        }
+        onEdgeContextMenu={(e, edge) =>
+          openMenu(e, { id: edge.id, isEdge: true, deletable: edge.deletable !== false })
+        }
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
@@ -202,6 +234,7 @@ export default function Graph({ initial, setSelection, setAlert, onPaneClick }: 
         <Controls />
         <Background />
       </ReactFlow>
+      <GraphContextMenu menu={menu} onClose={closeMenu} onAddNode={createNode} />
     </div>
   );
 }
