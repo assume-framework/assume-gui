@@ -27,8 +27,13 @@ export default function GraphContextMenu({ menu, onClose, onAddNode }: GraphCont
   const { autoArrange } = useGraphActions();
   // Keep rendering the last menu while it fades out, otherwise its items change during the close.
   const [shown, setShown] = useState(menu);
-  if (menu && menu !== shown) setShown(menu);
-  const [addAnchor, setAddAnchor] = useState<HTMLElement | null>(null);
+  const [openAnchor, setAddAnchor] = useState<HTMLElement | null>(null);
+  if (menu && menu !== shown) {
+    setShown(menu);
+    setAddAnchor(null); // a menu opened at a new position starts without submenu
+  }
+  // The graph closes the menu directly, so the submenu must follow `menu` itself.
+  const addAnchor = menu ? openAnchor : null;
 
   const close = () => {
     setAddAnchor(null);
