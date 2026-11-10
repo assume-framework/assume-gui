@@ -5,3 +5,5 @@ export interface AlertState {
   message: string;
   severity: AlertColor;
 }
+
+export type View = 'Build' | 'Run' | 'Inspect';
