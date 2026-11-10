@@ -4,14 +4,12 @@ import type { AlertState, View } from './components/types';
 import { loadScenario } from './scenario/storage';
 import { ScenarioContext, useScenarioState } from './scenario/context';
 import { useGraphActions } from './components/graph/useGraphActions';
-import { WORLD_ID } from './scenario/model';
 import { serializeScenario } from './scenario/serialization';
 import Header from './components/layout/Header';
 import BuildView from './components/views/BuildView';
 import RunView from './components/views/RunView';
 import InspectView from './components/views/InspectView';
 import DiscussSimulationChat from './components/chat/DiscussSimulationChat';
-import { buildGrafanaResultsHref } from './api/grafana';
 import AlertSnackbar from './components/layout/AlertSnackbar';
 
 export default function App() {
@@ -31,12 +29,6 @@ export default function App() {
     [showDiscuss, config, graphActions]
   );
 
-  const grafanaResultsHref = useMemo(() => {
-    const world = config.nodes[WORLD_ID];
-    if (!world) return '/grafana';
-    return buildGrafanaResultsHref(world.data.start, world.data.end, world.data.simulation_id);
-  }, [config]);
-
   return (
     <ScenarioContext.Provider value={scenario}>
       <div className="flex min-h-0 grow flex-col">
@@ -44,14 +36,13 @@ export default function App() {
         <Header
           view={view}
           onViewChange={setView}
-          grafanaResultsHref={grafanaResultsHref}
           onDiscussSimulation={() => {
             setDiscussChatMounted(true);
             setShowDiscuss(true);
           }}
         />
         <BuildView initial={initial} setAlert={setAlert} active={view === 'Build'} />
-        {view === 'Run' && <RunView />}
+        {view === 'Run' && <RunView setAlert={setAlert} />}
         {view === 'Inspect' && <InspectView />}
         {discussChatMounted && (
           <DiscussSimulationChat

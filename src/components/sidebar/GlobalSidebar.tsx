@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import UploadButton from '../inputs/UploadButton';
 import Cockpit from './Cockpit';
 import { useGraphActions } from '../graph/useGraphActions';
@@ -8,7 +8,6 @@ import { parseScenarioFile, serializeScenario } from '../../scenario/serializati
 import { STORAGE_KEY } from '../../scenario/storage';
 import type { AlertState } from '../types';
 import type { Forecast, Scenario } from '../../scenario/types';
-import { sendData, type DataResponse } from '../../api/sendData';
 
 export type GlobalSidebarProps = {
   setAlert: Dispatch<SetStateAction<AlertState>>;
@@ -18,7 +17,6 @@ export type GlobalSidebarProps = {
 export default function GlobalSidebar({ setAlert, clearSelection }: GlobalSidebarProps) {
   const { config, actions } = useScenario();
   const graph = useGraphActions();
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const forecast = config.forecasts;
 
   const setDocumentID = (type: keyof Forecast) => (value: string | null) => {
@@ -41,41 +39,6 @@ export default function GlobalSidebar({ setAlert, clearSelection }: GlobalSideba
     applyScenario(createInitialScenario());
     localStorage.removeItem(STORAGE_KEY);
     setAlert({ message: 'Flow reset successfully', severity: 'success' });
-  };
-
-  const submit = async () => {
-    if (isSubmitting) {
-      return;
-    }
-    setIsSubmitting(true);
-    actions.setIssues({});
-    try {
-      const response: DataResponse = await sendData(config);
-      if (response.success) {
-        setAlert({ message: 'Flow submitted successfully', severity: 'success' });
-        return;
-      }
-      // handle validation error
-      if (
-        response.id &&
-        response.field &&
-        response.message &&
-        (response.id in config.nodes || response.id in config.edges)
-      ) {
-        actions.setIssues({
-          [response.id]: [{ field: response.field, message: response.message }],
-        });
-        setAlert({ message: 'Invalid configuration: ' + response.message, severity: 'warning' });
-        return;
-      }
-      console.error('Unknown error: ', response);
-      setAlert({
-        message: response.message ?? 'Submission failed. Please try again.',
-        severity: 'error',
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   const setFlowByJson = (data: string) => {
@@ -125,14 +88,7 @@ export default function GlobalSidebar({ setAlert, clearSelection }: GlobalSideba
         </div>
       </div>
       <div className="mt-auto border-t border-gray-300 px-8 py-4">
-        <Cockpit
-          submit={submit}
-          processing={isSubmitting}
-          reset={reset}
-          save={save}
-          download={download}
-          setFlowByJson={setFlowByJson}
-        />
+        <Cockpit reset={reset} save={save} download={download} setFlowByJson={setFlowByJson} />
       </div>
     </div>
   );

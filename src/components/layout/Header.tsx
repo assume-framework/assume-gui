@@ -6,13 +6,10 @@ export default function Header({
   view,
   onViewChange,
   onDiscussSimulation,
-  grafanaResultsHref = '/grafana',
 }: {
   view: View;
   onViewChange: (view: View) => void;
   onDiscussSimulation?: () => void;
-  // World time range for Grafana, e.g. `/grafana/?from=...&to=...`
-  grafanaResultsHref?: string;
 }) {
   const headerClasses = 'px-2 py-0.5 mx-1 text-xl rounded hover:bg-gray-300 cursor-pointer';
 
@@ -47,16 +44,6 @@ export default function Header({
       </div>
       <nav>
         <ul className="flex items-center">
-          <li>
-            <a
-              className={headerClasses}
-              href={grafanaResultsHref}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Results
-            </a>
-          </li>
           <li>
             <button type="button" className={headerClasses} onClick={onDiscussSimulation}>
               Discuss Simulation

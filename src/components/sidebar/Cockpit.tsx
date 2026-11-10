@@ -3,28 +3,17 @@ import {
   FileUploadOutlined,
   ReplayOutlined,
   SaveOutlined,
-  SendOutlined,
 } from '@mui/icons-material';
-import { CircularProgress } from '@mui/material';
 import { type ChangeEvent, type ComponentType, type MouseEventHandler } from 'react';
 
 export type CockpitProps = {
   reset: () => void;
   setFlowByJson: (data: string) => void;
-  submit?: () => void;
-  processing?: boolean;
   save?: () => void;
   download?: () => void;
 };
 
-export default function Cockpit({
-  reset,
-  setFlowByJson,
-  submit,
-  processing = false,
-  save,
-  download,
-}: CockpitProps) {
+export default function Cockpit({ reset, setFlowByJson, save, download }: CockpitProps) {
   const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
     const input = e.currentTarget;
     const file = input.files?.[0];
@@ -43,12 +32,6 @@ export default function Cockpit({
 
   return (
     <>
-      <CockpitElement
-        name={'Submit'}
-        Icon={SendOutlined}
-        processing={processing}
-        onClick={submit}
-      />
       <CockpitElement name={'Save'} Icon={SaveOutlined} onClick={save} />
       <CockpitElement name={'Reset'} Icon={ReplayOutlined} onClick={reset} />
       <CockpitElement name={'Download'} onClick={download} Icon={FileDownloadOutlined} />
@@ -82,21 +65,13 @@ interface ElementArgs {
   name: string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
   Icon: ComponentType;
-  processing?: boolean;
 }
 
-function CockpitElement({ onClick, name, Icon, processing = false }: ElementArgs) {
+function CockpitElement({ onClick, name, Icon }: ElementArgs) {
   return (
-    <button
-      type="button"
-      className={cockpitItemClasses(processing)}
-      onClick={onClick}
-      disabled={processing}
-      aria-busy={processing}
-    >
+    <button type="button" className={cockpitItemClasses(false)} onClick={onClick}>
       <Icon />
       <span className="pl-3">{name}</span>
-      {processing && <CircularProgress size={16} thickness={5} color="success" />}
     </button>
   );
 }
