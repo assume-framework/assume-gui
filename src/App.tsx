@@ -12,7 +12,7 @@ import Sidebar from './components/sidebar/Sidebar';
 import DiscussSimulationChat from './components/chat/DiscussSimulationChat';
 import type { EditSidebarProps } from './components/sidebar/NodeEditSidebar';
 import { buildGrafanaResultsHref } from './api/grafana';
-import { Alert, Snackbar } from '@mui/material';
+import AlertSnackbar from './components/layout/AlertSnackbar';
 
 export default function App() {
   const [initial] = useState(loadScenario);
@@ -60,17 +60,7 @@ export default function App() {
   return (
     <ScenarioContext.Provider value={scenario}>
       <div className="flex min-h-0 grow flex-col">
-        <Snackbar
-          open={!!alert.message}
-          autoHideDuration={3000}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          onClose={() => setAlert({ ...alert, message: '' })}
-          onClick={() => setAlert({ ...alert, message: '' })}
-        >
-          <Alert severity={alert.severity} variant="outlined">
-            {alert.message}
-          </Alert>
-        </Snackbar>
+        <AlertSnackbar alert={alert} onClose={() => setAlert({ ...alert, message: '' })} />
         <Header
           grafanaResultsHref={grafanaResultsHref}
           onDiscussSimulation={() => {

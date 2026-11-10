@@ -4,7 +4,7 @@ import {
   PublishOutlined,
   UploadFileOutlined,
 } from '@mui/icons-material';
-import { Alert, Snackbar } from '@mui/material';
+import AlertSnackbar from '../layout/AlertSnackbar';
 import { uploadFile } from '../../api/sendData';
 import { type ChangeEvent, useId, useState } from 'react';
 
@@ -87,16 +87,7 @@ export default function UploadButton({
           </button>
         </div>
       )}
-      <Snackbar
-        open={!!error}
-        autoHideDuration={3000}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        onClose={() => setError('')}
-      >
-        <Alert severity="error" variant="outlined">
-          {error}
-        </Alert>
-      </Snackbar>
+      <AlertSnackbar alert={{ message: error, severity: 'error' }} onClose={() => setError('')} />
     </div>
   );
 }
