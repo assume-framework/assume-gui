@@ -20,37 +20,25 @@ export default function App() {
   const graphActions = useGraphActions();
   const [alert, setAlert] = useState<AlertState>({ message: '', severity: 'info' });
   const [view, setView] = useState<View>('Build');
-  const [showDiscuss, setShowDiscuss] = useState(false);
-  const [discussChatMounted, setDiscussChatMounted] = useState(false);
 
-  // Only serialized while the chat is open: nodes change on every drag.
   const scenarioJson = useMemo(
-    () => (showDiscuss ? serializeScenario({ config, layout: graphActions.getLayout() }) : ''),
-    [showDiscuss, config, graphActions]
+    () => serializeScenario({ config, layout: graphActions.getLayout() }),
+    [config, graphActions]
   );
 
   return (
     <ScenarioContext.Provider value={scenario}>
       <div className="flex min-h-0 grow flex-col">
         <AlertSnackbar alert={alert} onClose={() => setAlert({ ...alert, message: '' })} />
-        <Header
-          view={view}
-          onViewChange={setView}
-          onDiscussSimulation={() => {
-            setDiscussChatMounted(true);
-            setShowDiscuss(true);
-          }}
-        />
-        <BuildView initial={initial} setAlert={setAlert} active={view === 'Build'} />
-        {view === 'Run' && <RunView setAlert={setAlert} />}
-        {view === 'Inspect' && <InspectView />}
-        {discussChatMounted && (
-          <DiscussSimulationChat
-            open={showDiscuss}
-            scenarioJson={scenarioJson}
-            onClose={() => setShowDiscuss(false)}
-          />
-        )}
+        <Header view={view} onViewChange={setView} />
+        <div className="flex min-h-0 grow">
+          <div className="flex min-h-0 min-w-0 grow flex-col">
+            <BuildView initial={initial} setAlert={setAlert} active={view === 'Build'} />
+            {view === 'Run' && <RunView setAlert={setAlert} />}
+            {view === 'Inspect' && <InspectView />}
+          </div>
+          <DiscussSimulationChat scenarioJson={scenarioJson} />
+        </div>
       </div>
     </ScenarioContext.Provider>
   );
